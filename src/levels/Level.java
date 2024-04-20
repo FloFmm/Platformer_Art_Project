@@ -58,15 +58,55 @@ public class Level {
 				int red = c.getRed();
 				int green = c.getGreen();
 				int blue = c.getBlue();
-
+				
+				if (red >= 251 && red <= 254)
+					red = calculateTriangleLengthOrientationPosition(red,x,y,img);
 				loadLevelData(red, x, y);
 				loadEntities(green, x, y);
 				loadObjects(blue, x, y);
 			}
 	}
 
+	private int calculateTriangleLengthOrientationPosition(int red, int x, int y, BufferedImage img) {
+		int imgHeight = img.getHeight();
+		int imgWidth = img.getWidth();
+		
+		// look up
+		int yTest = y;
+		while (yTest < imgHeight && (new Color(img.getRGB(x, yTest)).getRed() == red))
+			yTest += 1;
+		int upperBound = yTest - 1;
+
+		// look down
+		yTest = y;
+		while (yTest >= 0 && (new Color(img.getRGB(x, yTest)).getRed() == red))
+			yTest -= 1;
+		int lowerBound = yTest + 1;
+		
+		// look right
+		int xTest = x;
+		while (xTest < imgWidth && (new Color(img.getRGB(xTest, y)).getRed() == red))
+			xTest += 1;
+		int rightBound = xTest - 1;
+		
+		// look left
+		xTest = x;
+		while (xTest >= 0 && (new Color(img.getRGB(xTest, y)).getRed() == red))
+			xTest -= 1;
+		int leftBound = xTest + 1;
+		
+		int xLength = rightBound - leftBound + 1;
+		int yLength = upperBound - lowerBound + 1;
+		if (xLength == 1) // vertical
+			return yLength*100 + (red-250+4)*10 + (y-lowerBound+1);
+		if (yLength == 1) //horizontal
+			return xLength*100 + (red-250)*10 + (x-leftBound+1);
+		
+		return -1;
+	}
+
 	private void loadLevelData(int redValue, int x, int y) {
-		if (redValue >= 50)
+		if (redValue >= 50 && !(redValue >= 111 && redValue <= 989))
 			lvlData[y][x] = 0;
 		else
 			lvlData[y][x] = redValue;

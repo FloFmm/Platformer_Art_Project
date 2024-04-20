@@ -1,11 +1,16 @@
 package levels;
 
+import static utilz.Constants.ObjectConstants.BLUE_POTION;
+import static utilz.Constants.ObjectConstants.RED_POTION;
+import static utilz.HelpMethods.*;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import main.Game;
 import utilz.LoadSave;
+
 
 public class LevelManager {
 
@@ -56,12 +61,23 @@ public class LevelManager {
 	}
 
 	public void draw(Graphics g, int lvlOffset) {
+		int[][] lvlData = levels.get(lvlIndex).getLevelData();
 		for (int j = 0; j < Game.TILES_IN_HEIGHT; j++)
-			for (int i = 0; i < levels.get(lvlIndex).getLevelData()[0].length; i++) {
+			for (int i = 0; i < lvlData[0].length; i++) {
 				int index = levels.get(lvlIndex).getSpriteIndex(i, j);
 				int x = Game.TILES_SIZE * i - lvlOffset;
 				int y = Game.TILES_SIZE * j;
-				if (index == 48)
+			
+				if (111 <= index && index <= 989) { // triangle
+					if  (index%10 == 1) {
+						int[][] c = TriangleCoordinatesBaseLongShort(i, j, lvlData);
+						g.drawPolygon(new int[] {c[0][0]- lvlOffset, c[1][0]- lvlOffset, c[2][0]- lvlOffset}, 
+								new int[] {c[0][1], c[1][1], c[2][1]}, 3);
+						g.fillPolygon(new int[] {c[0][0]- lvlOffset, c[1][0]- lvlOffset, c[2][0]- lvlOffset}, 
+								new int[] {c[0][1], c[1][1], c[2][1]}, 3);
+					}
+				}
+				else if (index == 48)
 					g.drawImage(waterSprite[aniIndex], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
 				else if (index == 49)
 					g.drawImage(waterSprite[4], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);

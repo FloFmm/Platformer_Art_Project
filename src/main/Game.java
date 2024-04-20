@@ -24,7 +24,7 @@ public class Game implements Runnable {
 	private AudioOptions audioOptions;
 	private AudioPlayer audioPlayer;
 
-	public final static int TILES_DEFAULT_SIZE = 32;
+	public final static int TILES_DEFAULT_SIZE = 32d;
 	public final static float SCALE = 2f;
 	public final static int TILES_IN_WIDTH = 26;
 	public final static int TILES_IN_HEIGHT = 14;
@@ -119,7 +119,7 @@ public class Game implements Runnable {
 				if (System.currentTimeMillis() - lastCheck >= 1000) {
 
 					lastCheck = System.currentTimeMillis();
-					System.out.println("FPS: " + frames + " | UPS: " + updates);
+					// System.out.println("FPS: " + frames + " | UPS: " + updates);
 					frames = 0;
 					updates = 0;
 

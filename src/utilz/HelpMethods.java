@@ -1,6 +1,8 @@
 package utilz;
 
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
+import java.util.Collections;
 
 import main.Game;
 import objects.Projectile;
@@ -8,12 +10,13 @@ import objects.Projectile;
 public class HelpMethods {
 
 	public static boolean CanMoveHere(float x, float y, float width, float height, int[][] lvlData) {
-		if (!IsSolid(x, y, lvlData))
-			if (!IsSolid(x + width, y + height, lvlData))
-				if (!IsSolid(x + width, y, lvlData))
-					if (!IsSolid(x, y + height, lvlData))
-						return true;
-		return false;
+//		if (!IsSolid(x, y, lvlData))
+//			if (!IsSolid(x + width, y + height, lvlData))
+//				if (!IsSolid(x + width, y, lvlData))
+//					if (!IsSolid(x, y + height, lvlData))
+//						return true;
+//		return false;
+		return !IsSolid(x, y, width, height, lvlData);
 	}
 
 	private static boolean IsSolid(float x, float y, int[][] lvlData) {
@@ -24,8 +27,68 @@ public class HelpMethods {
 			return true;
 		float xIndex = x / Game.TILES_SIZE;
 		float yIndex = y / Game.TILES_SIZE;
+		
+		if (IsTileSolid((int) xIndex, (int) yIndex, lvlData)) {
+			int tileValue = lvlData[(int) yIndex][(int) xIndex];
+			if (tileValue >= 111 && tileValue <= 989) {
+				
+				int[][] triangleCoordinates = TriangleCoordinatesBaseLongShort((int) xIndex,  (int) yIndex, lvlData);
+				
+				// System.out.println(IsInsideTriangle(triangleCoordinates, new int[] {(int) x, (int) y}, 0.00001));
+				return IsInsideTriangle(triangleCoordinates, new float[] {x, y}, 0.00001);
 
-		return IsTileSolid((int) xIndex, (int) yIndex, lvlData);
+			}
+			else 
+				return true;
+		}
+		else
+			return false;
+	}
+	
+	private static boolean IsSolid(float x, float y, float width, float height, int[][] lvlData) {
+		int maxWidth = lvlData[0].length * Game.TILES_SIZE;
+		if (x < 0 || x+width-1 >= maxWidth)
+			return true;
+		if (y < 0 || y+height-1 >= Game.GAME_HEIGHT)
+			return true;
+		float[] xCoordinates = {x, (x+width-1), x, (x+width-1)};
+		float[] yCoordinates = {y, y, (y+height-1), (y+height-1)};
+		float xIndex, yIndex;
+		for (int i = 0; i < 4; i++) {
+			xIndex = xCoordinates[i]/Game.TILES_SIZE;
+			yIndex = yCoordinates[i]/Game.TILES_SIZE;
+			if (IsTileSolid((int) xIndex, (int) yIndex, lvlData)) {
+				int tileValue = lvlData[(int) yIndex][(int) xIndex];
+				if (tileValue >= 111 && tileValue <= 989) {
+					
+					int[][] triangleCoordinates = TriangleCoordinatesBaseLongShort((int) xIndex,  (int) yIndex, lvlData);
+					
+					if (IsRectIntersectingTriangle(x, y, width, height, triangleCoordinates)) {
+						return true;
+					}
+				}
+				else 
+					return true;
+			}
+		
+		}
+		return false;
+            
+		
+	}
+	
+	public static boolean IsRectIntersectingTriangle(float x, float y, float width, float height, int[][] triangleCoordinatesBaseLongShort) {
+		if (IsInsideTriangle(triangleCoordinatesBaseLongShort, new float[] {x, y}, 1.0)
+		 || IsInsideTriangle(triangleCoordinatesBaseLongShort, new float[] {x+width, y}, 1.0)
+		 || IsInsideTriangle(triangleCoordinatesBaseLongShort, new float[] {x, y+height}, 1.0)
+		 || IsInsideTriangle(triangleCoordinatesBaseLongShort, new float[] {x+width, y+height}, 1.0))
+			return true;
+		
+		int triangleBaseX = triangleCoordinatesBaseLongShort[0][0];
+		int triangleBaseY = triangleCoordinatesBaseLongShort[0][1];
+		if ((y <= triangleBaseY && y+height >= triangleBaseY) || (x <= triangleBaseX && x+width >= triangleBaseX))
+			return true;
+		return false;
 	}
 
 	public static boolean IsProjectileHittingLevel(Projectile p, int[][] lvlData) {
@@ -40,24 +103,237 @@ public class HelpMethods {
 				return false;
 		return true;
 	}
+	
+	public static int[][] TriangleCoordinatesBaseLongShort(int xTile, int yTile, int[][] lvlData) {
+		int tileValue = lvlData[yTile][xTile];
+		int x = Game.TILES_SIZE * xTile;
+		int y = Game.TILES_SIZE * yTile;
+		
+		int orientation = (tileValue%100)/10; // 1 to 8
+		int simple_orient = orientation; // 1 to 4
+		int length = tileValue/100;
+		int position = tileValue % 10;
+		int width=0, height=0, baseX=0, baseY=0, shortX=0, shortY=0, longX=0, longY=0;
+		
+		if (orientation <= 4) { //horizontal
+			width = length * Game.TILES_SIZE;
+			height = Game.TILES_SIZE;
+			x -= Game.TILES_SIZE * (position - 1);
+		}
+		else { //vertical
+			height = length * Game.TILES_SIZE;
+			width = Game.TILES_SIZE;
+			simple_orient -= 4;
+			y -= Game.TILES_SIZE * (position - 1);
+		}
+		
+		switch (simple_orient) {
+		case 1 -> {
+			baseX = x+width-1; 
+			baseY = y+height-1;
+			shortX = x+width-1;
+			shortY = y;
+			longX = x;
+			longY = y+height-1;
+		}
+		case 2 -> {
+			baseX = x+width-1; 
+			baseY = y;
+			shortX = x+width-1;
+			shortY = y+height-1;
+			longX = x;
+			longY = y;
+		}
+		case 3 -> {
+			baseX = x; 
+			baseY = y+height-1;
+			shortX = x;
+			shortY = y;
+			longX = x+width-1;
+			longY = y+height-1;
+		}
+		case 4 -> {
+			baseX = x; 
+			baseY = y;
+			shortX = x;
+			shortY = y+height-1;
+			longX = x+width-1;
+			longY = y;
+			}
+		}
 
+		return new int[][] {{baseX, baseY}, {longX, longY}, {shortX, shortY}};
+	}
+
+	public static double triangleArea(float[][] triangleCoordinates) {
+		float x1 = triangleCoordinates[0][0];
+		float y1 = triangleCoordinates[0][1];
+		float x2 = triangleCoordinates[1][0];
+		float y2 = triangleCoordinates[1][1];
+		float x3 = triangleCoordinates[2][0];
+		float y3 = triangleCoordinates[2][1];
+		return Math.abs((x1*(y2-y3) + x2*(y3-y1)+x3*(y1-y2))/2.0);
+	}
+	
+	public static boolean IsInsideTriangle(int[][] triangleCoordinates, float[] coordinate, double treshhold) {
+		int x1 = triangleCoordinates[0][0];
+		int y1 = triangleCoordinates[0][1];
+		int x2 = triangleCoordinates[1][0];
+		int y2 = triangleCoordinates[1][1];
+		int x3 = triangleCoordinates[2][0];
+		int y3 = triangleCoordinates[2][1];
+		float x = coordinate[0];
+		float y = coordinate[1];
+		/* Calculate area of triangle ABC */
+		double A = triangleArea(new float[][] {{x1, y1}, {x2, y2}, {x3, y3}});
+		
+		/* Calculate area of triangle PBC */ 
+		double A1 = triangleArea(new float[][] {{x, y}, {x2, y2}, {x3, y3}});
+		
+		/* Calculate area of triangle PAC */ 
+		double A2 = triangleArea(new float[][] {{x1, y1}, {x, y}, {x3, y3}});
+		
+		/* Calculate area of triangle PAB */  
+		double A3 = triangleArea(new float[][] {{x1, y1}, {x2, y2}, {x, y}});
+		
+		/* Check if sum of A1, A2 and A3 is same as A */
+		return (Math.abs(A - (A1 + A2 + A3)) < treshhold);
+	}
+	
+	private static double linearFuncOfTwoPoints(int[] point1, int[] point2, double xOrY, boolean useAsX) {
+		if (useAsX) {
+			if (point2[0] > point1[0]) 
+				return point1[1] + ((double)point2[1] - (double)point1[1]) * (xOrY-(double)point1[0])/((double)point2[0]-(double)point1[0]);
+			else
+				return point2[1] + ((double)point1[1] - (double)point2[1]) * (xOrY-(double)point2[0])/((double)point1[0]-(double)point2[0]);
+		}
+		else {
+			if (point2[1] > point1[1]) 
+				return point1[0] + ((double)point2[0] - (double)point1[0]) * (xOrY-(double)point1[1])/((double)point2[1]-(double)point1[1]);
+			else
+				return point2[0] + ((double)point1[0] - (double)point2[0]) * (xOrY-(double)point2[1])/((double)point1[1]-(double)point2[1]);
+		}
+	}
+	
+	public static double[] lowerAndUpperXOrYTriangleTouchingPoint(int[][] triangleCoordinatesBaseLongShort, double[] xOrYs, boolean useAsX, int simple_orient) {
+		double lowerBound = -1.0, upperBound = -1.0;
+		double x1 = xOrYs[0]; 
+		double x2 = xOrYs[1];
+		if (x1 > x2) {
+			x1 = xOrYs[1]; 
+			x2 = xOrYs[0];
+		}
+
+		int[] xCoordinates = new int[] {triangleCoordinatesBaseLongShort[0][0], 
+				triangleCoordinatesBaseLongShort[1][0], triangleCoordinatesBaseLongShort[2][0]}; 
+		int[] yCoordinates = new int[] {triangleCoordinatesBaseLongShort[0][1], 
+				triangleCoordinatesBaseLongShort[1][1], triangleCoordinatesBaseLongShort[2][1]}; 
+		int triangleMaxX = Arrays.stream(xCoordinates).max().getAsInt();
+		int triangleMaxY = Arrays.stream(yCoordinates).max().getAsInt();
+		int triangleMinX = Arrays.stream(xCoordinates).min().getAsInt();
+		int triangleMinY = Arrays.stream(yCoordinates).min().getAsInt();
+		
+		if (useAsX) {
+			switch (simple_orient) {
+				case 1 -> {
+					lowerBound = triangleMinY;
+					if (x2 >= triangleMaxX)
+						upperBound = triangleMaxY;
+					else {
+						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x2, true);
+					}
+				}
+				case 2 -> {
+					upperBound = triangleMaxY;
+					if (x2 >= triangleMaxX)
+						lowerBound = triangleMinY;
+					else {
+						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x2, true);
+					}
+				}
+				case 3 -> {
+					lowerBound = triangleMinY;
+					if (x1 <= triangleMinX)
+						upperBound = triangleMaxY;
+					else {
+						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x1, true);
+					}
+				}
+				case 4 -> {
+					upperBound = triangleMaxY;
+					if (x1 <= triangleMinX)
+						lowerBound = triangleMinY;
+					else {
+						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x1, true);
+					}
+				}
+			}
+		}
+		else {
+			switch (simple_orient) {
+				case 1 -> {
+					upperBound = triangleMaxX;
+					if (x2 >= triangleMaxY)
+						lowerBound = triangleMinX;
+					else {
+						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x2, true);
+					}
+				}
+				case 2 -> {
+					upperBound = triangleMaxX;
+					if (x1 <= triangleMinY)
+						lowerBound = triangleMinX;
+					else {
+						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x1, true);
+					}
+				}
+				case 3 -> {
+					lowerBound = triangleMinX;
+					if (x1 >= triangleMaxY)
+						upperBound = triangleMaxX;
+					else {
+						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x2, true);
+					}
+				}
+				case 4 -> {
+					lowerBound = triangleMinX;
+					if (x1 <= triangleMinY)
+						upperBound = triangleMaxX;
+					else {
+						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+								triangleCoordinatesBaseLongShort[2], x1, true);
+					}
+				}
+			}
+		}
+		
+		return (new double[] {lowerBound, upperBound});
+	}
+	
 	private static int GetTileValue(float xPos, float yPos, int[][] lvlData) {
 		int xCord = (int) (xPos / Game.TILES_SIZE);
 		int yCord = (int) (yPos / Game.TILES_SIZE);
 		return lvlData[yCord][xCord];
 	}
 
+	
 	public static boolean IsTileSolid(int xTile, int yTile, int[][] lvlData) {
-		int value = lvlData[yTile][xTile];
-
-		switch (value) {
-		case 11, 48, 49:
+		int tileValue = lvlData[yTile][xTile];
+		if (tileValue==11 || tileValue==48 || tileValue==49)
 			return false;
-		default:
+		else if (tileValue >= 111 && tileValue <= 989)
 			return true;
-		}
-
+		else
+			return true;
 	}
+	
 
 	public static float GetEntityXPosNextToWall(Rectangle2D.Float hitbox, float xSpeed) {
 		int currentTile = (int) (hitbox.x / Game.TILES_SIZE);
@@ -69,6 +345,110 @@ public class HelpMethods {
 		} else
 			// Left
 			return currentTile * Game.TILES_SIZE;
+	}
+	
+	public static int[] InterpretTriangleTileValue(int tileValue) {
+		int orientation = (tileValue%100)/10; // 1 to 8
+		int simpleOrient = orientation; // 1 to 4
+		if (orientation > 4)
+			simpleOrient = orientation-4;
+		int length = tileValue/100;
+		int position = tileValue % 10;
+		return new int[] {length, orientation, position, simpleOrient}; 
+	}
+	
+	public static double GradientOfTriangle(int tileValue) {
+		int[] interpretation = InterpretTriangleTileValue(tileValue);
+		int length = interpretation[0];
+		int orientation = interpretation[1]; // 1 to 8
+		switch (orientation) {
+			case 1,3 -> {
+				return 1.0d/length;
+			}
+			case 2,4 -> {
+				return -1.0d/length;
+			}
+			case 5,7 -> {
+				return length;
+			}
+			case 6,8 -> {
+				return -length;
+			}
+		}
+		return 0;
+	}
+	
+	public static float[] GetEntityXPosNextToWall(Rectangle2D.Float hitbox, float xSpeed, int[][] lvlData, float offset) {
+		int currentTile = (int) (hitbox.x / Game.TILES_SIZE);
+		int yIndex = (int) (hitbox.y+hitbox.height-1)/Game.TILES_SIZE;
+		int tileValue, xIndex;
+		if (xSpeed > 0) {
+			// Right
+			xIndex = (int) (hitbox.x+hitbox.width-1+xSpeed)/Game.TILES_SIZE;
+			tileValue = lvlData[yIndex][xIndex];
+			// System.out.println(tileValue);
+			if (tileValue >= 111 && tileValue <= 989) {
+				int[] interpretation = InterpretTriangleTileValue(tileValue);
+				int simpleOrient = interpretation[3]; // 1 to 4
+				switch (simpleOrient) {
+					case 1 -> {
+						double gradient = GradientOfTriangle(tileValue);
+						double factor = 1.0d/Math.sqrt(1+gradient*gradient);
+//						System.out.println("===STAT================");
+//						System.out.println(hitbox.x);
+//						System.out.println((float) (hitbox.x+xSpeed*factor));
+//						System.out.println("=======================");
+////						System.out.println(hitbox.y);
+////						System.out.println((float) (hitbox.y-Math.abs(xSpeed)*gradient*factor));
+//						
+//						System.out.println(factor);
+//						System.out.println(gradient);
+						return new float[] {(float) (hitbox.x+xSpeed*factor-offset), 
+								(float) (hitbox.y-Math.abs(xSpeed)*gradient*factor-offset)};
+	 				}
+					case 2 -> {
+						return new float[] {hitbox.x, hitbox.y};
+	 				}
+				}
+			}
+			int tileXPos = currentTile * Game.TILES_SIZE;
+			int xOffset = (int) (Game.TILES_SIZE - hitbox.width);
+			return new float[] {tileXPos + xOffset + 1, hitbox.y};
+		} else {
+			// Left
+			xIndex = (int) (hitbox.x+xSpeed)/Game.TILES_SIZE;
+			tileValue = lvlData[yIndex][xIndex];
+			System.out.println(xIndex);
+			if (tileValue >= 111 && tileValue <= 989) {
+				int[] interpretation = InterpretTriangleTileValue(tileValue);
+				int simpleOrient = interpretation[3]; // 1 to 4
+				switch (simpleOrient) {
+					case 3 -> {
+						double gradient = GradientOfTriangle(tileValue);
+						double factor = 1.0d/Math.sqrt(1+gradient*gradient);
+//						System.out.println("===STAT================");
+//						System.out.println(hitbox.x);
+//						System.out.println((float) (hitbox.x+xSpeed*factor));
+//						System.out.println("=======================");
+////						System.out.println(hitbox.y);
+////						System.out.println((float) (hitbox.y-Math.abs(xSpeed)*gradient*factor));
+////						
+//						System.out.println(factor);
+//						System.out.println(gradient);
+//						System.out.println(hitbox.x+xSpeed*factor+offset);
+//						System.out.println(hitbox.y-Math.abs(xSpeed)*gradient*factor-offset);
+//						
+						return new float[] {(float) (hitbox.x+xSpeed*factor+offset), 
+								(float) (hitbox.y-Math.abs(xSpeed)*gradient*factor-offset)};
+						
+	 				}
+					case 4 -> {
+						return new float[] {hitbox.x, hitbox.y};
+	 				}
+				}
+			}
+			return new float[] {currentTile * Game.TILES_SIZE + 1, hitbox.y};
+		}
 	}
 
 	public static float GetEntityYPosUnderRoofOrAboveFloor(Rectangle2D.Float hitbox, float airSpeed) {
