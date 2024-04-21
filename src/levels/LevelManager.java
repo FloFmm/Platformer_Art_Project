@@ -18,7 +18,7 @@ public class LevelManager {
 	private BufferedImage[] levelSprite;
 	private BufferedImage[] waterSprite;
 	private ArrayList<Level> levels;
-	private int lvlIndex = 0, aniTick, aniIndex;
+	private int lvlIndex = 2, aniTick, aniIndex;
 
 	public LevelManager(Game game) {
 		this.game = game;
@@ -40,7 +40,8 @@ public class LevelManager {
 		Level newLevel = levels.get(lvlIndex);
 		game.getPlaying().getEnemyManager().loadEnemies(newLevel);
 		game.getPlaying().getPlayer().loadLvlData(newLevel.getLevelData());
-		game.getPlaying().setMaxLvlOffset(newLevel.getLvlOffset());
+		game.getPlaying().setMaxLvlOffsetX(newLevel.getMaxLvlOffsetX());
+		game.getPlaying().setMaxLvlOffsetY(newLevel.getMaxLvlOffsetY());
 		game.getPlaying().getObjectManager().loadObjects(newLevel);
 	}
 
@@ -60,21 +61,26 @@ public class LevelManager {
 			}
 	}
 
-	public void draw(Graphics g, int lvlOffset) {
+	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
 		int[][] lvlData = levels.get(lvlIndex).getLevelData();
-		for (int j = 0; j < Game.TILES_IN_HEIGHT; j++)
+		for (int j = 0; j < lvlData.length; j++)
 			for (int i = 0; i < lvlData[0].length; i++) {
 				int index = levels.get(lvlIndex).getSpriteIndex(i, j);
-				int x = Game.TILES_SIZE * i - lvlOffset;
-				int y = Game.TILES_SIZE * j;
-			
+				int x = Game.TILES_SIZE * i - xLvlOffset;
+				int y = Game.TILES_SIZE * j - yLvlOffset;
+//				System.out.println("==============");
+//				System.out.println(i);
+//				System.out.println(j);
+//				System.out.println(index);
+//				System.out.println(x);
+//				System.out.println(y);
 				if (111 <= index && index <= 989) { // triangle
 					if  (index%10 == 1) {
 						int[][] c = TriangleCoordinatesBaseLongShort(i, j, lvlData);
-						g.drawPolygon(new int[] {c[0][0]- lvlOffset, c[1][0]- lvlOffset, c[2][0]- lvlOffset}, 
-								new int[] {c[0][1], c[1][1], c[2][1]}, 3);
-						g.fillPolygon(new int[] {c[0][0]- lvlOffset, c[1][0]- lvlOffset, c[2][0]- lvlOffset}, 
-								new int[] {c[0][1], c[1][1], c[2][1]}, 3);
+						g.drawPolygon(new int[] {c[0][0]- xLvlOffset, c[1][0]- xLvlOffset, c[2][0]- xLvlOffset}, 
+								new int[] {c[0][1] - yLvlOffset, c[1][1] - yLvlOffset, c[2][1] - yLvlOffset}, 3);
+						g.fillPolygon(new int[] {c[0][0]- xLvlOffset, c[1][0]- xLvlOffset, c[2][0]- xLvlOffset}, 
+								new int[] {c[0][1] - yLvlOffset, c[1][1] - yLvlOffset, c[2][1] - yLvlOffset}, 3);
 					}
 				}
 				else if (index == 48)

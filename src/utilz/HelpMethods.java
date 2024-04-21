@@ -21,9 +21,10 @@ public class HelpMethods {
 
 	private static boolean IsSolid(float x, float y, int[][] lvlData) {
 		int maxWidth = lvlData[0].length * Game.TILES_SIZE;
+		int maxHeight = lvlData.length * Game.TILES_SIZE;
 		if (x < 0 || x >= maxWidth)
 			return true;
-		if (y < 0 || y >= Game.GAME_HEIGHT)
+		if (y < 0 || y >= maxHeight)
 			return true;
 		float xIndex = x / Game.TILES_SIZE;
 		float yIndex = y / Game.TILES_SIZE;
@@ -47,9 +48,10 @@ public class HelpMethods {
 	
 	private static boolean IsSolid(float x, float y, float width, float height, int[][] lvlData) {
 		int maxWidth = lvlData[0].length * Game.TILES_SIZE;
+		int maxHeight = lvlData.length * Game.TILES_SIZE;
 		if (x < 0 || x+width-1 >= maxWidth)
 			return true;
-		if (y < 0 || y+height-1 >= Game.GAME_HEIGHT)
+		if (y < 0 || y+height-1 >= maxHeight)
 			return true;
 		float[] xCoordinates = {x, (x+width-1), x, (x+width-1)};
 		float[] yCoordinates = {y, y, (y+height-1), (y+height-1)};
@@ -57,8 +59,13 @@ public class HelpMethods {
 		for (int i = 0; i < 4; i++) {
 			xIndex = xCoordinates[i]/Game.TILES_SIZE;
 			yIndex = yCoordinates[i]/Game.TILES_SIZE;
+//			System.out.println("====================");
+//			System.out.println(xIndex);
+//			System.out.println(yIndex);
+//			System.out.println(lvlData[(int) yIndex][(int) xIndex]);
 			if (IsTileSolid((int) xIndex, (int) yIndex, lvlData)) {
 				int tileValue = lvlData[(int) yIndex][(int) xIndex];
+
 				if (tileValue >= 111 && tileValue <= 989) {
 					
 					int[][] triangleCoordinates = TriangleCoordinatesBaseLongShort((int) xIndex,  (int) yIndex, lvlData);
@@ -418,7 +425,6 @@ public class HelpMethods {
 			// Left
 			xIndex = (int) (hitbox.x+xSpeed)/Game.TILES_SIZE;
 			tileValue = lvlData[yIndex][xIndex];
-			System.out.println(xIndex);
 			if (tileValue >= 111 && tileValue <= 989) {
 				int[] interpretation = InterpretTriangleTileValue(tileValue);
 				int simpleOrient = interpretation[3]; // 1 to 4

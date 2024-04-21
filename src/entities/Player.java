@@ -218,9 +218,9 @@ public class Player extends Entity {
 		}
 	}
 
-	public void render(Graphics g, int lvlOffset) {
-		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - lvlOffset + flipX, (int) (hitbox.y - yDrawOffset + (int) (pushDrawOffset)), width * flipW, height, null);
-//		drawHitbox(g, lvlOffset);
+	public void render(Graphics g, int xLvlOffset, int yLvlOffset) {
+		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, (int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
+		drawHitbox(g, xLvlOffset,yLvlOffset);
 //		drawAttackBox(g, lvlOffset);
 		drawUI(g);
 	}
@@ -334,6 +334,7 @@ public class Player extends Entity {
 			xSpeed *= 3;
 		}
 
+		System.out.println(inAir);
 		if (!inAir)
 			if (!IsEntityOnFloor(hitbox, lvlData))
 				inAir = true;
@@ -355,6 +356,7 @@ public class Player extends Entity {
 			}
 
 		} else {
+			//System.out.println(y / Game.TILES_SIZE);
 			updateXPos(xSpeed);
 		}
 		moving = true;
@@ -374,6 +376,9 @@ public class Player extends Entity {
 	}
 
 	private void updateXPos(float xSpeed) {
+		System.out.println(hitbox.x);
+		System.out.println(hitbox.y);
+		
 		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
 			hitbox.x += xSpeed;
 		else {
@@ -383,7 +388,6 @@ public class Player extends Entity {
 			if (CanMoveHere(playerCoord[0], playerCoord[1], hitbox.width, hitbox.height, lvlData)) {
 				hitbox.x = playerCoord[0];
 				hitbox.y = playerCoord[1];
-				//System.out.println("climbing");
 			}
 			else if (CanMoveHere(playerCoord[0], playerCoord[1]-5.0f, hitbox.width, hitbox.height, lvlData)) {
 				hitbox.x = playerCoord[0];

@@ -39,10 +39,12 @@ public class Playing extends State implements Statemethods {
 
 	private boolean paused = false;
 
-	private int xLvlOffset;
+	private int xLvlOffset, yLvlOffset;
 	private int leftBorder = (int) (0.25 * Game.GAME_WIDTH);
 	private int rightBorder = (int) (0.75 * Game.GAME_WIDTH);
-	private int maxLvlOffsetX;
+	private int upperBorder = (int) (0.25 * Game.GAME_HEIGHT);
+	private int lowerBorder = (int) (0.75 * Game.GAME_HEIGHT);
+	private int maxLvlOffsetX, maxLvlOffsetY;
 
 	private BufferedImage backgroundImg, bigCloud, smallCloud, shipImgs[];
 	private BufferedImage[] questionImgs, exclamationImgs;
@@ -136,7 +138,8 @@ public class Playing extends State implements Statemethods {
 	}
 
 	private void calcLvlOffset() {
-		maxLvlOffsetX = levelManager.getCurrentLevel().getLvlOffset();
+		maxLvlOffsetX = levelManager.getCurrentLevel().getMaxLvlOffsetX();
+		maxLvlOffsetY = levelManager.getCurrentLevel().getMaxLvlOffsetY();
 	}
 
 	private void initClasses() {
@@ -207,13 +210,13 @@ public class Playing extends State implements Statemethods {
 				de.update();
 	}
 
-	private void drawDialogue(Graphics g, int xLvlOffset) {
+	private void drawDialogue(Graphics g, int xLvlOffset, int yLvlOffset) {
 		for (DialogueEffect de : dialogEffects)
 			if (de.isActive()) {
 				if (de.getType() == QUESTION)
-					g.drawImage(questionImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY(), DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
+					g.drawImage(questionImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY() - yLvlOffset, DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
 				else
-					g.drawImage(exclamationImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY(), DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
+					g.drawImage(exclamationImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY() - yLvlOffset, DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
 			}
 	}
 
@@ -230,14 +233,22 @@ public class Playing extends State implements Statemethods {
 
 	private void checkCloseToBorder() {
 		int playerX = (int) player.getHitbox().x;
-		int diff = playerX - xLvlOffset;
+		int playerY = (int) player.getHitbox().y;
+		int xDiff = playerX - xLvlOffset;
+		int yDiff = playerY - yLvlOffset;
 
-		if (diff > rightBorder)
-			xLvlOffset += diff - rightBorder;
-		else if (diff < leftBorder)
-			xLvlOffset += diff - leftBorder;
+		if (xDiff > rightBorder)
+			xLvlOffset += xDiff - rightBorder;
+		else if (xDiff < leftBorder)
+			xLvlOffset += xDiff - leftBorder;
+		
+		if (yDiff > lowerBorder)
+			yLvlOffset += yDiff - lowerBorder;
+		else if (yDiff < upperBorder)
+			yLvlOffset += yDiff - upperBorder;
 
 		xLvlOffset = Math.max(Math.min(xLvlOffset, maxLvlOffsetX), 0);
+		yLvlOffset = Math.max(Math.min(yLvlOffset, maxLvlOffsetY), 0);
 	}
 
 	@Override
@@ -246,17 +257,17 @@ public class Playing extends State implements Statemethods {
 
 		drawClouds(g);
 		if (drawRain)
-			rain.draw(g, xLvlOffset);
+			rain.draw(g, xLvlOffset, yLvlOffset);
 
 		if (drawShip)
 			g.drawImage(shipImgs[shipAni], (int) (100 * Game.SCALE) - xLvlOffset, (int) ((288 * Game.SCALE) + shipHeightDelta), (int) (78 * Game.SCALE), (int) (72 * Game.SCALE), null);
 
-		levelManager.draw(g, xLvlOffset);
-		objectManager.draw(g, xLvlOffset);
-		enemyManager.draw(g, xLvlOffset);
-		player.render(g, xLvlOffset);
-		objectManager.drawBackgroundTrees(g, xLvlOffset);
-		drawDialogue(g, xLvlOffset);
+		levelManager.draw(g, xLvlOffset, yLvlOffset);
+		objectManager.draw(g, xLvlOffset, yLvlOffset);
+		enemyManager.draw(g, xLvlOffset, yLvlOffset);
+		player.render(g, xLvlOffset, yLvlOffset);
+		objectManager.drawBackgroundTrees(g, xLvlOffset, yLvlOffset);
+		drawDialogue(g, xLvlOffset, yLvlOffset);
 
 		if (paused) {
 			g.setColor(new Color(0, 0, 0, 150));
@@ -429,8 +440,12 @@ public class Playing extends State implements Statemethods {
 		this.lvlCompleted = levelCompleted;
 	}
 
-	public void setMaxLvlOffset(int lvlOffset) {
+	public void setMaxLvlOffsetX(int lvlOffset) {
 		this.maxLvlOffsetX = lvlOffset;
+	}
+	
+	public void setMaxLvlOffsetY(int lvlOffset) {
+		this.maxLvlOffsetY = lvlOffset;
 	}
 
 	public void unpauseGame() {
