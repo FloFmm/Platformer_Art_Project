@@ -16,13 +16,13 @@ import main.Game;
 import utilz.LoadSave;
 
 public class Player extends Entity {
-
+	
 	private BufferedImage[][] animations;
 	private boolean moving = false, attacking = false;
 	private boolean left, right, jump;
 	private int[][] lvlData;
-	private float xDrawOffset = 21 * Game.SCALE;
-	private float yDrawOffset = 4 * Game.SCALE;
+	private float xDrawOffset = width*0.36f;//21 * Game.SCALE;
+	private float yDrawOffset = height*0.23f;//4 * Game.SCALE;
 
 	// Jumping / Gravity
 	private float jumpSpeed = -2.25f * Game.SCALE;
@@ -71,7 +71,7 @@ public class Player extends Entity {
 		this.currentHealth = maxHealth;
 		this.walkSpeed = Game.SCALE * 1.0f;
 		loadAnimations();
-		initHitbox(20, 27);
+		initHitbox(HITBOX_BASE_WIDTH, HITBOX_BASE_HEIGHT);
 		initAttackBox();
 	}
 
@@ -219,9 +219,11 @@ public class Player extends Entity {
 	}
 
 	public void render(Graphics g, int xLvlOffset, int yLvlOffset) {
-		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, (int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
-		drawHitbox(g, xLvlOffset,yLvlOffset);
-//		drawAttackBox(g, lvlOffset);
+		// System.out.println(width);
+		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
+				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
+		drawHitbox(g, xLvlOffset, yLvlOffset);
+		drawAttackBox(g, xLvlOffset, yLvlOffset);
 		drawUI(g);
 	}
 
@@ -334,7 +336,6 @@ public class Player extends Entity {
 			xSpeed *= 3;
 		}
 
-		System.out.println(inAir);
 		if (!inAir)
 			if (!IsEntityOnFloor(hitbox, lvlData))
 				inAir = true;
@@ -376,8 +377,6 @@ public class Player extends Entity {
 	}
 
 	private void updateXPos(float xSpeed) {
-		System.out.println(hitbox.x);
-		System.out.println(hitbox.y);
 		
 		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
 			hitbox.x += xSpeed;
@@ -441,11 +440,41 @@ public class Player extends Entity {
 
 	private void loadAnimations() {
 		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
-		animations = new BufferedImage[7][8];
-		for (int j = 0; j < animations.length; j++)
-			for (int i = 0; i < animations[j].length; i++)
-				animations[j][i] = img.getSubimage(i * 64, j * 40, 64, 40);
-
+		String fileName = "";
+		
+		animations = new BufferedImage[NUM_ANIMATIONS][MAX_ANIMATION_LENGTH];
+		for (int j = 0; j < animations.length; j++) {
+			switch(j) {
+				case IDLE:
+					fileName = "idle";
+					break;
+				case RUNNING:
+					fileName = "running";
+					break;
+				case JUMP:
+					fileName = "jump";
+					break;
+				case FALLING:
+					fileName = "falling";
+					break;
+				case ATTACK:
+					fileName = "attack";
+					break;
+				case HIT:
+					fileName = "hit";
+					break;
+				case DEAD:
+					fileName = "dead";
+					break;
+			}
+			for (int i = 0; i < animations[j].length; i++) {
+				//animations[j][i] = img.getSubimage(i * spriteImgWidth, j * spriteImgHeight, spriteImgWidth, spriteImgHeight);
+				if (i<GetSpriteAmount(j)) {
+					animations[j][i] = LoadSave.GetSpriteAtlas("animation/player/" + fileName + i + ".png");}
+				else 
+					animations[j][i] = null;
+			}
+		}
 		statusBarImg = LoadSave.GetSpriteAtlas(LoadSave.STATUS_BAR);
 	}
 

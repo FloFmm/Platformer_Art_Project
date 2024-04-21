@@ -11,7 +11,8 @@ public class GameWindow {
 	public GameWindow(GamePanel gamePanel) {
 
 		jframe = new JFrame();
-
+		// TODO
+		// jframe.setUndecorated(true);
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jframe.add(gamePanel);
 		

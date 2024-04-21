@@ -57,6 +57,7 @@ public class LevelManager {
 		for (int j = 0; j < 4; j++)
 			for (int i = 0; i < 12; i++) {
 				int index = j * 12 + i;
+				// TODO
 				levelSprite[index] = img.getSubimage(i * 32, j * 32, 32, 32);
 			}
 	}
@@ -68,12 +69,6 @@ public class LevelManager {
 				int index = levels.get(lvlIndex).getSpriteIndex(i, j);
 				int x = Game.TILES_SIZE * i - xLvlOffset;
 				int y = Game.TILES_SIZE * j - yLvlOffset;
-//				System.out.println("==============");
-//				System.out.println(i);
-//				System.out.println(j);
-//				System.out.println(index);
-//				System.out.println(x);
-//				System.out.println(y);
 				if (111 <= index && index <= 989) { // triangle
 					if  (index%10 == 1) {
 						int[][] c = TriangleCoordinatesBaseLongShort(i, j, lvlData);

@@ -26,11 +26,11 @@ public class Game implements Runnable {
 
 	public final static int TILES_DEFAULT_SIZE = 32;
 	public final static float SCALE = 2f;
-	public final static int TILES_IN_WIDTH = 26;//30;//26;
-	public final static int TILES_IN_HEIGHT = 12;//16;//14;
+	//public final static int TILES_IN_WIDTH = 15;//30;//26;
+	//public final static int TILES_IN_HEIGHT = 16;//16;//14;
 	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
-	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
-	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
+	public final static int GAME_WIDTH = 1920;//TILES_SIZE * TILES_IN_WIDTH;
+	public final static int GAME_HEIGHT = 1080;//TILES_SIZE * TILES_IN_HEIGHT;
 
 	private final boolean SHOW_FPS_UPS = true;
 

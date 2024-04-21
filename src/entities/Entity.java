@@ -62,9 +62,9 @@ public abstract class Entity {
 			hitbox.x += xSpeed * speedMulti;
 	}
 
-	protected void drawAttackBox(Graphics g, int xLvlOffset) {
+	protected void drawAttackBox(Graphics g, int xLvlOffset, int yLvlOffset) {
 		g.setColor(Color.red);
-		g.drawRect((int) (attackBox.x - xLvlOffset), (int) attackBox.y, (int) attackBox.width, (int) attackBox.height);
+		g.drawRect((int) (attackBox.x - xLvlOffset), (int) attackBox.y - yLvlOffset, (int) attackBox.width, (int) attackBox.height);
 	}
 
 	protected void drawHitbox(Graphics g, int xLvlOffset, int yLvlOffset) {

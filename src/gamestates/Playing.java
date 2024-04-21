@@ -24,6 +24,7 @@ import effects.Rain;
 
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.Dialogue.*;
+import static utilz.Constants.PlayerConstants.*;
 
 public class Playing extends State implements Statemethods {
 
@@ -147,7 +148,7 @@ public class Playing extends State implements Statemethods {
 		enemyManager = new EnemyManager(this);
 		objectManager = new ObjectManager(this);
 
-		player = new Player(200, 200, (int) (64 * Game.SCALE), (int) (40 * Game.SCALE), this);
+		player = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), (int) (PLAYER_BASE_HEIGHT * Game.SCALE), this);
 		player.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 
