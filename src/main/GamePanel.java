@@ -12,19 +12,22 @@ public class GamePanel extends JPanel {
 
 	private MouseInputs mouseInputs;
 	private Game game;
+	private final boolean isPlayer1;
 
-	public GamePanel(Game game) {
+	public GamePanel(Game game, boolean isPlayer1) {
 		mouseInputs = new MouseInputs(this);
 		this.game = game;
+		this.isPlayer1 = isPlayer1;
 		setPanelSize();
 		addKeyListener(new KeyboardInputs(this));
 		addMouseListener(mouseInputs);
 		addMouseMotionListener(mouseInputs);
 		
+		
 	}
 
 	private void setPanelSize() {
-		Dimension size = new Dimension(GAME_WIDTH, GAME_HEIGHT);
+		Dimension size = new Dimension(GAME_WIDTH/2, GAME_HEIGHT);
 		setPreferredSize(size);
 	}
 
@@ -34,7 +37,7 @@ public class GamePanel extends JPanel {
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		game.render(g);
+		game.render(g, isPlayer1);
 	}
 
 	public Game getGame() {

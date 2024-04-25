@@ -1,20 +1,29 @@
 package main;
 
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class GameWindow {
 	private JFrame jframe;
 
-	public GameWindow(GamePanel gamePanel) {
+	public GameWindow(GamePanel gamePanel1, GamePanel gamePanel2) {
 
 		jframe = new JFrame();
 		// TODO
 		// jframe.setUndecorated(true);
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		jframe.add(gamePanel);
+		
+		// Set Layout for the content pane of the frame
+		jframe.getContentPane().setLayout(new GridLayout(1, 2));
+        
+        // Add the panels to the frame
+		jframe.getContentPane().add(gamePanel1);
+		jframe.getContentPane().add(gamePanel2);
 		
 		jframe.setResizable(false);
 		jframe.pack();
@@ -24,7 +33,8 @@ public class GameWindow {
 
 			@Override
 			public void windowLostFocus(WindowEvent e) {
-				gamePanel.getGame().windowFocusLost();
+				gamePanel1.getGame().windowFocusLost();
+				gamePanel2.getGame().windowFocusLost();
 			}
 
 			@Override

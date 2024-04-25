@@ -32,46 +32,15 @@ public class EnemyManager {
 				isAnyActive = true;
 			}
 
-		for (Pinkstar p : currentLevel.getPinkstars())
-			if (p.isActive()) {
-				p.update(lvlData, playing);
-				isAnyActive = true;
-			}
-
-		for (Shark s : currentLevel.getSharks())
-			if (s.isActive()) {
-				s.update(lvlData, playing);
-				isAnyActive = true;
-			}
-
 		if (!isAnyActive)
 			playing.setLevelCompleted(true);
 	}
 
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
 		drawCrabs(g, xLvlOffset, yLvlOffset);
-		drawPinkstars(g, xLvlOffset, yLvlOffset);
-		drawSharks(g, xLvlOffset, yLvlOffset);
 	}
 
-	private void drawSharks(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Shark s : currentLevel.getSharks())
-			if (s.isActive()) {
-				g.drawImage(sharkArr[s.getState()][s.getAniIndex()], (int) s.getHitbox().x - xLvlOffset - SHARK_DRAWOFFSET_X + s.flipX(),
-						(int) s.getHitbox().y - yLvlOffset - SHARK_DRAWOFFSET_Y + (int) s.getPushDrawOffset(), SHARK_WIDTH * s.flipW(), SHARK_HEIGHT, null);
-//				s.drawHitbox(g, xLvlOffset);
-//				s.drawAttackBox(g, xLvlOffset);
-			}
-	}
 
-	private void drawPinkstars(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Pinkstar p : currentLevel.getPinkstars())
-			if (p.isActive()) {
-				g.drawImage(pinkstarArr[p.getState()][p.getAniIndex()], (int) p.getHitbox().x - xLvlOffset - PINKSTAR_DRAWOFFSET_X + p.flipX(),
-						(int) p.getHitbox().y - yLvlOffset - PINKSTAR_DRAWOFFSET_Y + (int) p.getPushDrawOffset(), PINKSTAR_WIDTH * p.flipW(), PINKSTAR_HEIGHT, null);
-//				p.drawHitbox(g, xLvlOffset);
-			}
-	}
 
 	private void drawCrabs(Graphics g, int xLvlOffset, int yLvlOffset) {
 		for (Crabby c : currentLevel.getCrabs())
@@ -94,28 +63,6 @@ public class EnemyManager {
 						c.hurt(20);
 						return;
 					}
-
-		for (Pinkstar p : currentLevel.getPinkstars())
-			if (p.isActive()) {
-				if (p.getState() == ATTACK && p.getAniIndex() >= 3)
-					return;
-				else {
-					if (p.getState() != DEAD && p.getState() != HIT)
-						if (attackBox.intersects(p.getHitbox())) {
-							p.hurt(20);
-							return;
-						}
-				}
-			}
-
-		for (Shark s : currentLevel.getSharks())
-			if (s.isActive()) {
-				if (s.getState() != DEAD && s.getState() != HIT)
-					if (attackBox.intersects(s.getHitbox())) {
-						s.hurt(20);
-						return;
-					}
-			}
 	}
 
 	private void loadEnemyImgs() {
@@ -135,10 +82,6 @@ public class EnemyManager {
 	public void resetAllEnemies() {
 		for (Crabby c : currentLevel.getCrabs())
 			c.resetEnemy();
-		for (Pinkstar p : currentLevel.getPinkstars())
-			p.resetEnemy();
-		for (Shark s : currentLevel.getSharks())
-			s.resetEnemy();
 	}
 
 }

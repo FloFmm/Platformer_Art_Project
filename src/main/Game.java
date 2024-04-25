@@ -12,7 +12,8 @@ import ui.AudioOptions;
 
 public class Game implements Runnable {
 
-	private GamePanel gamePanel;
+	private GamePanel gamePanel1;
+	private GamePanel gamePanel2;
 	private Thread gameThread;
 	private final int FPS_SET = 120;
 	private final int UPS_SET = 200;
@@ -37,9 +38,11 @@ public class Game implements Runnable {
 	public Game() {
 		System.out.println("size: " + GAME_WIDTH + " : " + GAME_HEIGHT);
 		initClasses();
-		gamePanel = new GamePanel(this);
-		new GameWindow(gamePanel);
-		gamePanel.requestFocusInWindow();
+		gamePanel1 = new GamePanel(this, true);
+		gamePanel2 = new GamePanel(this, false);
+		new GameWindow(gamePanel1, gamePanel2);
+		gamePanel1.requestFocusInWindow();
+		gamePanel2.requestFocusInWindow();
 		startGameLoop();
 	}
 
@@ -68,12 +71,12 @@ public class Game implements Runnable {
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	public void render(Graphics g) {
+	public void render(Graphics g, boolean isPlayer1) {
 		switch (Gamestate.state) {
-		case MENU -> menu.draw(g);
-		case PLAYING -> playing.draw(g);
-		case OPTIONS -> gameOptions.draw(g);
-		case CREDITS -> credits.draw(g);
+		case MENU -> menu.draw(g, isPlayer1);
+		case PLAYING -> playing.draw(g, isPlayer1);
+		case OPTIONS -> gameOptions.draw(g, isPlayer1);
+		case CREDITS -> credits.draw(g, isPlayer1);
 		}
 	}
 
@@ -109,7 +112,8 @@ public class Game implements Runnable {
 
 			if (deltaF >= 1) {
 
-				gamePanel.repaint();
+				gamePanel1.repaint();
+				gamePanel2.repaint();
 				frames++;
 				deltaF--;
 
@@ -129,8 +133,11 @@ public class Game implements Runnable {
 	}
 
 	public void windowFocusLost() {
-		if (Gamestate.state == Gamestate.PLAYING)
-			playing.getPlayer().resetDirBooleans();
+		if (Gamestate.state == Gamestate.PLAYING) {
+			playing.getPlayer1().resetDirBooleans();
+			playing.getPlayer2().resetDirBooleans();
+			
+		}
 	}
 
 	public Menu getMenu() {

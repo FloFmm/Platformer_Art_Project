@@ -23,7 +23,7 @@ public class Player extends Entity {
 	private int[][] lvlData;
 	private float xDrawOffset = width*0.36f;//21 * Game.SCALE;
 	private float yDrawOffset = height*0.23f;//4 * Game.SCALE;
-
+	private int xLvlOffset, yLvlOffset;
 	// Jumping / Gravity
 	private float jumpSpeed = -2.25f * Game.SCALE;
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
@@ -62,9 +62,12 @@ public class Player extends Entity {
 	private int powerAttackTick;
 	private int powerGrowSpeed = 15;
 	private int powerGrowTick;
+	
+	private final boolean isPlayerOne;
 
-	public Player(float x, float y, int width, int height, Playing playing) {
+	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayerOne) {
 		super(x, y, width, height);
+		this.isPlayerOne = isPlayerOne;
 		this.playing = playing;
 		this.state = IDLE;
 		this.maxHealth = 100;
@@ -154,6 +157,7 @@ public class Player extends Entity {
 		setAnimation();
 	}
 
+	
 	private void checkInsideWater() {
 		if (IsEntityInWater(hitbox, playing.getLevelManager().getCurrentLevel().getLevelData()))
 			currentHealth = 0;
@@ -164,7 +168,7 @@ public class Player extends Entity {
 	}
 
 	private void checkPotionTouched() {
-		playing.checkPotionTouched(hitbox);
+		playing.checkPotionTouched(this);
 	}
 
 	private void checkAttack() {
@@ -543,6 +547,7 @@ public class Player extends Entity {
 	public int getTileY() {
 		return tileY;
 	}
+	
 
 	public void powerAttack() {
 		if (powerAttackActive)
@@ -552,6 +557,22 @@ public class Player extends Entity {
 			changePower(-60);
 		}
 
+	}
+	
+	public int getXLvlOffset() {
+		return xLvlOffset;
+	}
+	
+	public int getYLvlOffset() {
+		return yLvlOffset;
+	}
+	
+	public void setXLvlOffset(int xLvlOffset) {
+		this.xLvlOffset = xLvlOffset;
+	}
+	
+	public void setYLvlOffset(int yLvlOffset) {
+		this.yLvlOffset = yLvlOffset;
 	}
 
 }

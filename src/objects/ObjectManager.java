@@ -47,21 +47,21 @@ public class ObjectManager {
 				e.hurt(200);
 	}
 
-	public void checkObjectTouched(Rectangle2D.Float hitbox) {
+	public void checkObjectTouched(Player player) {
 		for (Potion p : potions)
 			if (p.isActive()) {
-				if (hitbox.intersects(p.getHitbox())) {
+				if (player.getHitbox().intersects(p.getHitbox())) {
 					p.setActive(false);
-					applyEffectToPlayer(p);
+					applyEffectToPlayer(p, player);
 				}
 			}
 	}
 
-	public void applyEffectToPlayer(Potion p) {
+	public void applyEffectToPlayer(Potion p, Player player) {
 		if (p.getObjType() == RED_POTION)
-			playing.getPlayer().changeHealth(RED_POTION_VALUE);
+			player.changeHealth(RED_POTION_VALUE);
 		else
-			playing.getPlayer().changePower(BLUE_POTION_VALUE);
+			player.changePower(BLUE_POTION_VALUE);
 	}
 
 	public void checkObjectHit(Rectangle2D.Float attackbox) {
@@ -124,7 +124,7 @@ public class ObjectManager {
 			grassImgs[i] = grassTemp.getSubimage(32 * i, 0, 32, 32);
 	}
 
-	public void update(int[][] lvlData, Player player) {
+	public void update(int[][] lvlData, Player player1, Player player2) {
 		updateBackgroundTrees();
 		for (Potion p : potions)
 			if (p.isActive())
@@ -134,8 +134,10 @@ public class ObjectManager {
 			if (gc.isActive())
 				gc.update();
 
-		updateCannons(lvlData, player);
-		updateProjectiles(lvlData, player);
+		updateCannons(lvlData, player1);
+		updateCannons(lvlData, player2);
+		updateProjectiles(lvlData, player1);
+		updateProjectiles(lvlData, player2);
 
 	}
 

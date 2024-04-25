@@ -28,7 +28,7 @@ import static utilz.Constants.PlayerConstants.*;
 
 public class Playing extends State implements Statemethods {
 
-	private Player player;
+	private Player player1, player2;
 	private LevelManager levelManager;
 	private EnemyManager enemyManager;
 	private ObjectManager objectManager;
@@ -40,11 +40,10 @@ public class Playing extends State implements Statemethods {
 
 	private boolean paused = false;
 
-	private int xLvlOffset, yLvlOffset;
-	private int leftBorder = (int) (0.25 * Game.GAME_WIDTH);
-	private int rightBorder = (int) (0.75 * Game.GAME_WIDTH);
-	private int upperBorder = (int) (0.25 * Game.GAME_HEIGHT);
-	private int lowerBorder = (int) (0.75 * Game.GAME_HEIGHT);
+	private int leftBorder = (int) (0.25 * Game.GAME_WIDTH/2);
+	private int rightBorder = (int) (0.75 * Game.GAME_WIDTH/2);
+	private int upperBorder = (int) (0.25 * Game.GAME_HEIGHT/2);
+	private int lowerBorder = (int) (0.75 * Game.GAME_HEIGHT/2);
 	private int maxLvlOffsetX, maxLvlOffsetY;
 
 	private BufferedImage backgroundImg, bigCloud, smallCloud, shipImgs[];
@@ -128,7 +127,8 @@ public class Playing extends State implements Statemethods {
 	public void loadNextLevel() {
 		levelManager.setLevelIndex(levelManager.getLevelIndex() + 1);
 		levelManager.loadNextLevel();
-		player.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		resetAll();
 		drawShip = false;
 	}
@@ -148,9 +148,14 @@ public class Playing extends State implements Statemethods {
 		enemyManager = new EnemyManager(this);
 		objectManager = new ObjectManager(this);
 
-		player = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), (int) (PLAYER_BASE_HEIGHT * Game.SCALE), this);
-		player.loadLvlData(levelManager.getCurrentLevel().getLevelData());
-		player.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player1 = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
+				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, true);
+		player2 = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
+				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, false);
+		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 
 		pauseOverlay = new PauseOverlay(this);
 		gameOverOverlay = new GameOverOverlay(this);
@@ -170,45 +175,53 @@ public class Playing extends State implements Statemethods {
 			gameCompletedOverlay.update();
 		else if (gameOver)
 			gameOverOverlay.update();
-		else if (playerDying)
-			player.update();
+		else if (playerDying) {
+			player1.update();
+			player2.update();
+		}
 		else {
 			updateDialogue();
-			if (drawRain)
-				rain.update(xLvlOffset);
+			//if (drawRain)
+			//	rain.update(xLvlOffset);
 			levelManager.update();
-			objectManager.update(levelManager.getCurrentLevel().getLevelData(), player);
-			player.update();
+			objectManager.update(levelManager.getCurrentLevel().getLevelData(), player1, player2);
+			player1.update();
+			player2.update();
 			enemyManager.update(levelManager.getCurrentLevel().getLevelData());
-			checkCloseToBorder();
-			if (drawShip)
-				updateShipAni();
+			checkCloseToBorder(player1);
+			checkCloseToBorder(player2);
 		}
-	}
-
-	private void updateShipAni() {
-		shipTick++;
-		if (shipTick >= 35) {
-			shipTick = 0;
-			shipAni++;
-			if (shipAni >= 4)
-				shipAni = 0;
-		}
-
-		shipHeightDelta += shipHeightChange * shipDir;
-		shipHeightDelta = Math.max(Math.min(10 * Game.SCALE, shipHeightDelta), 0);
-
-		if (shipHeightDelta == 0)
-			shipDir = 1;
-		else if (shipHeightDelta == 10 * Game.SCALE)
-			shipDir = -1;
-
 	}
 
 	private void updateDialogue() {
 		for (DialogueEffect de : dialogEffects)
 			if (de.isActive())
 				de.update();
+	}
+	
+	private void checkCloseToBorder(Player player) {
+		int xLvlOffset = player.getXLvlOffset();
+		int yLvlOffset = player.getYLvlOffset();
+		int playerX = (int) player.getHitbox().x;
+		int playerY = (int) player.getHitbox().y;
+		int xDiff = playerX - xLvlOffset;
+		int yDiff = playerY - yLvlOffset;
+		
+
+		if (xDiff > rightBorder)
+			xLvlOffset += xDiff - rightBorder;
+		else if (xDiff < leftBorder)
+			xLvlOffset += xDiff - leftBorder;
+		
+		if (yDiff > lowerBorder)
+			yLvlOffset += yDiff - lowerBorder;
+		else if (yDiff < upperBorder)
+			yLvlOffset += yDiff - upperBorder;
+
+		xLvlOffset = Math.max(Math.min(xLvlOffset, maxLvlOffsetX), 0);
+		yLvlOffset = Math.max(Math.min(yLvlOffset, maxLvlOffsetY), 0);
+		player.setXLvlOffset(xLvlOffset);
+		player.setYLvlOffset(yLvlOffset);
 	}
 
 	private void drawDialogue(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -232,41 +245,31 @@ public class Playing extends State implements Statemethods {
 				}
 	}
 
-	private void checkCloseToBorder() {
-		int playerX = (int) player.getHitbox().x;
-		int playerY = (int) player.getHitbox().y;
-		int xDiff = playerX - xLvlOffset;
-		int yDiff = playerY - yLvlOffset;
-
-		if (xDiff > rightBorder)
-			xLvlOffset += xDiff - rightBorder;
-		else if (xDiff < leftBorder)
-			xLvlOffset += xDiff - leftBorder;
-		
-		if (yDiff > lowerBorder)
-			yLvlOffset += yDiff - lowerBorder;
-		else if (yDiff < upperBorder)
-			yLvlOffset += yDiff - upperBorder;
-
-		xLvlOffset = Math.max(Math.min(xLvlOffset, maxLvlOffsetX), 0);
-		yLvlOffset = Math.max(Math.min(yLvlOffset, maxLvlOffsetY), 0);
-	}
 
 	@Override
-	public void draw(Graphics g) {
+	public void draw(Graphics g, boolean isPlayer1) {
 		g.drawImage(backgroundImg, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
-
-		drawClouds(g);
-		if (drawRain)
-			rain.draw(g, xLvlOffset, yLvlOffset);
-
-		if (drawShip)
-			g.drawImage(shipImgs[shipAni], (int) (100 * Game.SCALE) - xLvlOffset, (int) ((288 * Game.SCALE) + shipHeightDelta), (int) (78 * Game.SCALE), (int) (72 * Game.SCALE), null);
+		int xLvlOffset, yLvlOffset;
+		if (isPlayer1) {
+			xLvlOffset = player1.getXLvlOffset();
+			yLvlOffset = player1.getYLvlOffset();
+		}
+		else {
+			xLvlOffset = player2.getXLvlOffset();
+			yLvlOffset = player2.getYLvlOffset();
+		}
+			
+		drawClouds(g, xLvlOffset);
+		//if (drawRain)
+		//	rain.draw(g, xLvlOffset, yLvlOffset);
 
 		levelManager.draw(g, xLvlOffset, yLvlOffset);
 		objectManager.draw(g, xLvlOffset, yLvlOffset);
 		enemyManager.draw(g, xLvlOffset, yLvlOffset);
-		player.render(g, xLvlOffset, yLvlOffset);
+		if (isPlayer1)
+			player1.render(g, xLvlOffset, yLvlOffset);
+		else
+			player2.render(g, xLvlOffset, yLvlOffset);
 		objectManager.drawBackgroundTrees(g, xLvlOffset, yLvlOffset);
 		drawDialogue(g, xLvlOffset, yLvlOffset);
 
@@ -283,7 +286,7 @@ public class Playing extends State implements Statemethods {
 
 	}
 
-	private void drawClouds(Graphics g) {
+	private void drawClouds(Graphics g, int xLvlOffset) {
 		for (int i = 0; i < 4; i++)
 			g.drawImage(bigCloud, i * BIG_CLOUD_WIDTH - (int) (xLvlOffset * 0.3), (int) (204 * Game.SCALE), BIG_CLOUD_WIDTH, BIG_CLOUD_HEIGHT, null);
 
@@ -308,7 +311,8 @@ public class Playing extends State implements Statemethods {
 
 		setDrawRainBoolean();
 
-		player.resetAll();
+		player1.resetAll();
+		player2.resetAll();
 		enemyManager.resetAllEnemies();
 		objectManager.resetAllObjects();
 		dialogEffects.clear();
@@ -332,8 +336,8 @@ public class Playing extends State implements Statemethods {
 		enemyManager.checkEnemyHit(attackBox);
 	}
 
-	public void checkPotionTouched(Rectangle2D.Float hitbox) {
-		objectManager.checkObjectTouched(hitbox);
+	public void checkPotionTouched(Player player) {
+		objectManager.checkObjectTouched(player);
 	}
 
 	public void checkSpikesTouched(Player p) {
@@ -342,12 +346,12 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (!gameOver) {
-			if (e.getButton() == MouseEvent.BUTTON1)
-				player.setAttacking(true);
-			else if (e.getButton() == MouseEvent.BUTTON3)
-				player.powerAttack();
-		}
+//		if (!gameOver) {
+//			if (e.getButton() == MouseEvent.BUTTON1)
+//				player1.setAttacking(true);
+//			else if (e.getButton() == MouseEvent.BUTTON3)
+//				player1.powerAttack();
+//		}
 	}
 
 	@Override
@@ -355,15 +359,37 @@ public class Playing extends State implements Statemethods {
 		if (!gameOver && !gameCompleted && !lvlCompleted)
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_A:
-				player.setLeft(true);
+				player1.setLeft(true);
 				break;
 			case KeyEvent.VK_D:
+				player1.setRight(true);
+				break;
+			case KeyEvent.VK_W:
+				player1.setJump(true);
+				break;
+			case KeyEvent.VK_Q:
+				player1.setAttacking(true);
+				break;
+			case KeyEvent.VK_E:
+				player1.powerAttack();
+				break;
+				
+			case KeyEvent.VK_LEFT:
+				player2.setLeft(true);
+				break;
+			case KeyEvent.VK_RIGHT:
+				player2.setRight(true);
+				break;
+			case KeyEvent.VK_UP:
+				player2.setJump(true);
+				break;
+			case KeyEvent.VK_NUMPAD1:
+				player2.setAttacking(true);
+				break;
+			case KeyEvent.VK_NUMPAD0:
+				player2.powerAttack();
+				break;
 
-				player.setRight(true);
-				break;
-			case KeyEvent.VK_SPACE:
-				player.setJump(true);
-				break;
 			case KeyEvent.VK_ESCAPE:
 				paused = !paused;
 			}
@@ -374,14 +400,18 @@ public class Playing extends State implements Statemethods {
 		if (!gameOver && !gameCompleted && !lvlCompleted)
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_A:
-				player.setLeft(false);
-				break;
+				player1.setLeft(false);
 			case KeyEvent.VK_D:
-				player.setRight(false);
-				break;
-			case KeyEvent.VK_SPACE:
-				player.setJump(false);
-				break;
+				player1.setRight(false);
+			case KeyEvent.VK_W:
+				player1.setJump(false);
+				
+			case KeyEvent.VK_LEFT:
+				player2.setLeft(false);
+			case KeyEvent.VK_RIGHT:
+				player2.setRight(false);
+			case KeyEvent.VK_UP:
+				player2.setJump(false);	
 			}
 	}
 
@@ -454,11 +484,16 @@ public class Playing extends State implements Statemethods {
 	}
 
 	public void windowFocusLost() {
-		player.resetDirBooleans();
+		player1.resetDirBooleans();
+		player2.resetDirBooleans();
 	}
 
-	public Player getPlayer() {
-		return player;
+	public Player getPlayer1() {
+		return player1;
+	}
+	
+	public Player getPlayer2() {
+		return player2;
 	}
 
 	public EnemyManager getEnemyManager() {

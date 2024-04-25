@@ -35,9 +35,9 @@ public class Crabby extends Enemy {
 					inAir = true;
 				break;
 			case RUNNING:
-				if (canSeePlayer(lvlData, playing.getPlayer())) {
-					turnTowardsPlayer(playing.getPlayer());
-					if (isPlayerCloseForAttack(playing.getPlayer()))
+				if (canSeePlayer(lvlData, playing.getPlayer1())) {
+					turnTowardsPlayer(playing.getPlayer1());
+					if (isPlayerCloseForAttack(playing.getPlayer1()))
 						newState(ATTACK);
 				}
 				move(lvlData);
@@ -50,7 +50,7 @@ public class Crabby extends Enemy {
 				if (aniIndex == 0)
 					attackChecked = false;
 				if (aniIndex == 3 && !attackChecked)
-					checkPlayerHit(attackBox, playing.getPlayer());
+					checkPlayerHit(attackBox, playing.getPlayer1());
 				break;
 			case HIT:
 				if (aniIndex <= GetSpriteAmount(enemyType, state) - 2)

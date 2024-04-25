@@ -50,7 +50,7 @@ public class GameOptions extends State implements Statemethods {
 	}
 
 	@Override
-	public void draw(Graphics g) {
+	public void draw(Graphics g, boolean isPlayer1) {
 		g.drawImage(backgroundImg, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
 		g.drawImage(optionsBackgroundImg, bgX, bgY, bgW, bgH, null);
 
