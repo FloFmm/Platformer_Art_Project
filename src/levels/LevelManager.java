@@ -18,7 +18,7 @@ public class LevelManager {
 	private BufferedImage[] levelSprite;
 	private BufferedImage[] waterSprite;
 	private ArrayList<Level> levels;
-	private int lvlIndex = 2, aniTick, aniIndex;
+	private int lvlIndex = 0, aniTick, aniIndex;
 
 	public LevelManager(Game game) {
 		this.game = game;
@@ -83,8 +83,13 @@ public class LevelManager {
 					g.drawImage(waterSprite[aniIndex], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
 				else if (index == 49)
 					g.drawImage(waterSprite[4], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
-				else
+				else {
+					//System.out.println(i);
+					//System.out.println(j);
+					// System.out.println(index);
 					g.drawImage(levelSprite[index], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
+				}
+					
 			}
 	}
 

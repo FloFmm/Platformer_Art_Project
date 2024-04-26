@@ -53,12 +53,12 @@ public class LoadSave {
 		try {
 			img = ImageIO.read(is);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				is.close();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

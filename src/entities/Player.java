@@ -9,11 +9,14 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
 import utilz.LoadSave;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Player extends Entity {
 	
@@ -21,8 +24,8 @@ public class Player extends Entity {
 	private boolean moving = false, attacking = false;
 	private boolean left, right, jump;
 	private int[][] lvlData;
-	private float xDrawOffset = width*0.36f;//21 * Game.SCALE;
-	private float yDrawOffset = height*0.23f;//4 * Game.SCALE;
+	private float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
+	private float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
 	private int xLvlOffset, yLvlOffset;
 	// Jumping / Gravity
 	private float jumpSpeed = -2.25f * Game.SCALE;
@@ -63,11 +66,11 @@ public class Player extends Entity {
 	private int powerGrowSpeed = 15;
 	private int powerGrowTick;
 	
-	private final boolean isPlayerOne;
+	private final boolean isPlayer1;
 
-	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayerOne) {
+	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
 		super(x, y, width, height);
-		this.isPlayerOne = isPlayerOne;
+		this.isPlayer1 = isPlayer1;
 		this.playing = playing;
 		this.state = IDLE;
 		this.maxHealth = 100;
@@ -222,16 +225,14 @@ public class Player extends Entity {
 		}
 	}
 
-	public void render(Graphics g, int xLvlOffset, int yLvlOffset) {
-		// System.out.println(width);
+	public void drawPlayer(Graphics g, int xLvlOffset, int yLvlOffset) {
 		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
 				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
 		drawHitbox(g, xLvlOffset, yLvlOffset);
 		drawAttackBox(g, xLvlOffset, yLvlOffset);
-		drawUI(g);
 	}
 
-	private void drawUI(Graphics g) {
+	public void drawUI(Graphics g) {
 		// Background ui
 		g.drawImage(statusBarImg, statusBarX, statusBarY, statusBarWidth, statusBarHeight, null);
 
@@ -307,7 +308,7 @@ public class Player extends Entity {
 
 	private void updatePos() {
 		moving = false;
-
+		//System.out.println(jump);
 		if (jump)
 			jump();
 
@@ -361,7 +362,6 @@ public class Player extends Entity {
 			}
 
 		} else {
-			//System.out.println(y / Game.TILES_SIZE);
 			updateXPos(xSpeed);
 		}
 		moving = true;
@@ -395,10 +395,10 @@ public class Player extends Entity {
 			else if (CanMoveHere(playerCoord[0], playerCoord[1]-5.0f, hitbox.width, hitbox.height, lvlData)) {
 				hitbox.x = playerCoord[0];
 				hitbox.y = playerCoord[1]-5.0f;
-				System.out.println("need little help to get up the hill");
+				// System.out.println("need little help to get up the hill");
 			}
 			else {
-				System.out.println("failed to move (slope uphill | next to wall) due to !CanMoveHere()");
+				// System.out.println("failed to move (slope uphill | next to wall) due to !CanMoveHere()");
 			}
 				
 			if (powerAttackActive) {
@@ -444,9 +444,14 @@ public class Player extends Entity {
 
 	private void loadAnimations() {
 		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
-		String fileName = "";
-		
+		String fileName="", baseDir="";
 		animations = new BufferedImage[NUM_ANIMATIONS][MAX_ANIMATION_LENGTH];
+		
+		if (isPlayer1)
+			baseDir = "animation/player" + 1;
+		else
+			baseDir = "animation/player" + 2;
+		
 		for (int j = 0; j < animations.length; j++) {
 			switch(j) {
 				case IDLE:
@@ -474,7 +479,11 @@ public class Player extends Entity {
 			for (int i = 0; i < animations[j].length; i++) {
 				//animations[j][i] = img.getSubimage(i * spriteImgWidth, j * spriteImgHeight, spriteImgWidth, spriteImgHeight);
 				if (i<GetSpriteAmount(j)) {
-					animations[j][i] = LoadSave.GetSpriteAtlas("animation/player/" + fileName + i + ".png");}
+					if (Files.exists(Paths.get(baseDir + "/" + fileName + i + ".png")))
+						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/" + fileName + i + ".png");
+					else
+						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
+				}
 				else 
 					animations[j][i] = null;
 			}

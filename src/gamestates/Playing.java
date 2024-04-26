@@ -266,10 +266,12 @@ public class Playing extends State implements Statemethods {
 		levelManager.draw(g, xLvlOffset, yLvlOffset);
 		objectManager.draw(g, xLvlOffset, yLvlOffset);
 		enemyManager.draw(g, xLvlOffset, yLvlOffset);
+		player1.drawPlayer(g, xLvlOffset, yLvlOffset);
+		player2.drawPlayer(g, xLvlOffset, yLvlOffset);
 		if (isPlayer1)
-			player1.render(g, xLvlOffset, yLvlOffset);
+			player1.drawUI(g);
 		else
-			player2.render(g, xLvlOffset, yLvlOffset);
+			player2.drawUI(g);
 		objectManager.drawBackgroundTrees(g, xLvlOffset, yLvlOffset);
 		drawDialogue(g, xLvlOffset, yLvlOffset);
 
@@ -356,6 +358,7 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		//System.out.println(e);
 		if (!gameOver && !gameCompleted && !lvlCompleted)
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_A:
@@ -397,21 +400,27 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		//System.out.println(e);
 		if (!gameOver && !gameCompleted && !lvlCompleted)
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_A:
 				player1.setLeft(false);
+				break;
 			case KeyEvent.VK_D:
 				player1.setRight(false);
+				break;
 			case KeyEvent.VK_W:
 				player1.setJump(false);
-				
+				break;
 			case KeyEvent.VK_LEFT:
 				player2.setLeft(false);
+				break;
 			case KeyEvent.VK_RIGHT:
 				player2.setRight(false);
+				break;
 			case KeyEvent.VK_UP:
 				player2.setJump(false);	
+				break;
 			}
 	}
 
