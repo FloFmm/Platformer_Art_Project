@@ -479,10 +479,13 @@ public class Player extends Entity {
 			for (int i = 0; i < animations[j].length; i++) {
 				//animations[j][i] = img.getSubimage(i * spriteImgWidth, j * spriteImgHeight, spriteImgWidth, spriteImgHeight);
 				if (i<GetSpriteAmount(j)) {
-					if (Files.exists(Paths.get(baseDir + "/" + fileName + i + ".png")))
+					if (Files.exists(Paths.get("res/" + baseDir + "/" + fileName + i + ".png"))) {
 						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/" + fileName + i + ".png");
-					else
+					}
+					else {
 						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
+						System.out.println("file does not exist: " + baseDir + "/" + fileName + i + ".png");
+					}
 				}
 				else 
 					animations[j][i] = null;

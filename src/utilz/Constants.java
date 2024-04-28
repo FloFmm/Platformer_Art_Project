@@ -5,7 +5,7 @@ import main.Game;
 public class Constants {
 
 	public static final float GRAVITY = 0.04f * Game.SCALE;
-	public static final int ANI_SPEED = 25;
+	public static final int ANI_SPEED = 11;//25;
 
 	public static class Dialogue {
 		public static final int QUESTION = 0;
@@ -252,14 +252,14 @@ public class Constants {
 		public static final int HIT = 5;
 		public static final int DEAD = 6;
 		public static final int NUM_ANIMATIONS = 7;
-		public static final int MAX_ANIMATION_LENGTH = 8;
+		public static final int MAX_ANIMATION_LENGTH = 12;
 		
 		public static int GetSpriteAmount(int player_action) {
 			switch (player_action) {
 			case DEAD:
 				return 1;//8;
 			case RUNNING:
-				return 1;//6;
+				return 12;//6;
 			case IDLE:
 				return 1;//5;
 			case HIT:

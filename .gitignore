@@ -11,3 +11,6 @@ local.properties
 .recommenders
 .project
 .classpath
+
+res/
+!res/lvls/
