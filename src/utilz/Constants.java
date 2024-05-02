@@ -1,6 +1,7 @@
 package utilz;
 
 import main.Game;
+import static utilz.HelpMethods.*;
 
 public class Constants {
 
@@ -238,6 +239,7 @@ public class Constants {
 	}
 
 	public static class PlayerConstants {
+		public static final int PLAYER_GREEN_VALUE = 100;
 		public static final int HITBOX_BASE_WIDTH = 16;
 		public static final int HITBOX_BASE_HEIGHT = 27;
 		
@@ -272,6 +274,53 @@ public class Constants {
 				return 1;
 			}
 		}
+	}
+	
+	public static class TetrisTileConstants {
+		public static final int TETRIS_TILE_GREEN_VALUE = 255;
+		
+		
+		public static final int TETRIS_TILE_WIDTH_DEFAULT = 32;
+		public static final int TETRIS_TILE_HEIGHT_DEFAULT = 32;
+		public static final int TETRIS_TILE_WIDTH = (int) (TETRIS_TILE_WIDTH_DEFAULT * Game.SCALE);
+		public static final int TETRIS_TILE_HEIGHT = (int) (TETRIS_TILE_HEIGHT_DEFAULT * Game.SCALE);
+		public static final int NUM_TETRIS_TILES = 1;
+		
+		public static final int T_TILE = 0;
+		public static final int L_TILE = 1;
+		public static final int J_TILE = 2;
+		public static final int Z_TILE = 3;
+		public static final int S_TILE = 4;
+		public static final int O_TILE = 5;
+		public static final int Q_TILE = 6;
+		public static final int CROSS_TILE = 7;
+		public static final int LONG_T_TILE = 8;
+		public static final int LONG_Z_TILE = 9;
+		public static final int LONG_S_TILE = 10;
+		
+		public static int[][] GetTetrisTileShape (int tileIndex, int rotation) {
+			int[][] matrix;
+			switch (tileIndex) {
+			case T_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,1,0,0},
+									{1,1,1,0},
+									{0,0,0,0}};
+				break;									
+			default:
+				matrix = new int[][] {{1,1,1,1}, 
+									{1,1,1,1},
+									{1,1,1,1},
+									{1,1,1,1}};
+				break;
+			}
+			
+			for (int i = 0; i < rotation; i++) {
+				matrix = rotateMatrixBy90Degree(matrix);
+			}
+			return matrix;
+		}
+
 	}
 
 }

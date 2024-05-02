@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import entities.Crabby;
+import entities.TetrisTile;
 import main.Game;
 import objects.BackgroundTree;
 import objects.Cannon;
@@ -16,6 +17,8 @@ import objects.Spike;
 
 import static utilz.Constants.EnemyConstants.*;
 import static utilz.Constants.ObjectConstants.*;
+import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.PlayerConstants.*;
 
 public class Level {
 
@@ -23,6 +26,7 @@ public class Level {
 	private int[][] lvlData;
 
 	private ArrayList<Crabby> crabs = new ArrayList<>();
+	private ArrayList<TetrisTile> tetrisTiles = new ArrayList<>();
 	private ArrayList<Potion> potions = new ArrayList<>();
 	private ArrayList<Spike> spikes = new ArrayList<>();
 	private ArrayList<GameContainer> containers = new ArrayList<>();
@@ -121,7 +125,9 @@ public class Level {
 	private void loadEntities(int greenValue, int x, int y) {
 		switch (greenValue) {
 		case CRABBY -> crabs.add(new Crabby(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
-		case 100 -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
+		case TETRIS_TILE_GREEN_VALUE -> tetrisTiles.add(new TetrisTile(x * Game.TILES_SIZE, y * Game.TILES_SIZE, 
+				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, 0, lvlData));
+		case PLAYER_GREEN_VALUE -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
 		}
 	}
 
@@ -168,7 +174,10 @@ public class Level {
 	public ArrayList<Crabby> getCrabs() {
 		return crabs;
 	}
-
+	
+	public ArrayList<TetrisTile> getTetrisTiles() {
+		return tetrisTiles;
+	}
 
 	public ArrayList<Potion> getPotions() {
 		return potions;

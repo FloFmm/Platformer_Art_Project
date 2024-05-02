@@ -2,7 +2,10 @@ package utilz;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
-import java.util.Collections;
+import java.awt.image.BufferedImage;
+
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 
 import main.Game;
 import objects.Projectile;
@@ -548,4 +551,43 @@ public class HelpMethods {
 		else
 			return IsAllTilesWalkable(firstXTile, secondXTile, yTile, lvlData);
 	}
+	
+
+    public static BufferedImage rotateImage(BufferedImage sourceImage, double angle) {
+        int width = sourceImage.getWidth();
+        int height = sourceImage.getHeight();
+        BufferedImage destImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = destImage.createGraphics();
+
+        AffineTransform transform = new AffineTransform();
+        transform.rotate(angle / 180 * Math.PI, width / 2 , height / 2);
+        g2d.drawRenderedImage(sourceImage, transform);
+
+        g2d.dispose();
+        return destImage;
+    }
+    
+    
+    public static int[][] rotateMatrixBy90Degree(int[][] matrix) {
+        int n = matrix.length;
+        int[][] rotated = new int[n][n];
+        
+        // Transpose the matrix
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                rotated[i][j] = matrix[j][i];
+            }
+        }
+        
+        // Reverse each row to rotate 90 degrees
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n / 2; j++) {
+                int temp = rotated[i][j];
+                rotated[i][j] = rotated[i][n - 1 - j];
+                rotated[i][n - 1 - j] = temp;
+            }
+        }
+        
+        return rotated;
+    }
 }
