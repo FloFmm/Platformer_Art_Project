@@ -2,9 +2,9 @@ package utilz;
 
 import main.Game;
 import static utilz.HelpMethods.*;
-
 public class Constants {
-
+	public static final int FPS_SET = 120;
+	public static final int UPS_SET = 200;
 	public static final float GRAVITY = 0.04f * Game.SCALE;
 	public static final int ANI_SPEED = 11;//25;
 
@@ -241,7 +241,9 @@ public class Constants {
 	public static class PlayerConstants {
 		public static final int PLAYER_GREEN_VALUE = 100;
 		public static final int HITBOX_BASE_WIDTH = 16;
+		public static final int GRABBOX_BASE_WIDTH = (int) (HITBOX_BASE_WIDTH * 1.75f);
 		public static final int HITBOX_BASE_HEIGHT = 27;
+		public static final int GRABBOX_BASE_HEIGHT = (int) (HITBOX_BASE_HEIGHT * 1.25f);
 		
 		public static final int PLAYER_BASE_HEIGHT = 64;
 		public static final int PLAYER_BASE_WIDTH = 64;
@@ -297,6 +299,13 @@ public class Constants {
 		public static final int LONG_T_TILE = 8;
 		public static final int LONG_Z_TILE = 9;
 		public static final int LONG_S_TILE = 10;
+		
+		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*5.0f;
+		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
+		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 2.0f;
+		
+		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 4.0f;
+		
 		
 		public static int[][] GetTetrisTileShape (int tileIndex, int rotation) {
 			int[][] matrix;

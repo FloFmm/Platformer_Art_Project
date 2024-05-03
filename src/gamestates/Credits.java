@@ -118,4 +118,10 @@ public class Credits extends State implements Statemethods {
 		}
 	}
 
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

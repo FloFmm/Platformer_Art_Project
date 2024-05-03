@@ -33,9 +33,14 @@ public class KeyboardInputs implements KeyListener {
 		case OPTIONS -> gamePanel.getGame().getGameOptions().keyPressed(e);
 		}
 	}
-
+	
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// Not In Use
+		switch (Gamestate.state) {
+		case MENU -> gamePanel.getGame().getMenu().keyTyped(e);
+		case PLAYING -> gamePanel.getGame().getPlaying().keyTyped(e);
+		case OPTIONS -> gamePanel.getGame().getGameOptions().keyTyped(e);
+		}
 	}
 }

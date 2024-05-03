@@ -9,14 +9,14 @@ import gamestates.Gamestate;
 import gamestates.Menu;
 import gamestates.Playing;
 import ui.AudioOptions;
+import static utilz.Constants.*;
 
 public class Game implements Runnable {
 
 	private GamePanel gamePanel1;
 	private GamePanel gamePanel2;
 	private Thread gameThread;
-	private final int FPS_SET = 120;
-	private final int UPS_SET = 200;
+	
 
 	private Playing playing;
 	private Menu menu;

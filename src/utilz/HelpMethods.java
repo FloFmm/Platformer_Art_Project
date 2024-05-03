@@ -590,4 +590,10 @@ public class HelpMethods {
         
         return rotated;
     }
+    
+    public static float calculateYOfThrowArc(float t, float xSpeed, float ySpeed, float gravity) {
+        return  (ySpeed * t - 0.5f * gravity * t * t); 
+    }
+    
+    
 }

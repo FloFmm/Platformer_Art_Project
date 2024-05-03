@@ -4,6 +4,7 @@ import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.*;
 import static utilz.Constants.*;
 import static utilz.Constants.Directions.*;
+import static utilz.Constants.TetrisTileConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -22,7 +23,10 @@ public class Player extends Entity {
 	
 	private BufferedImage[][] animations;
 	private boolean moving = false, attacking = false;
-	private boolean left, right, jump;
+	private boolean left, right, jump, grabOrThrow;
+	protected Rectangle2D.Float grabBox;
+	private TetrisTile isCarrying;
+	private long throwPushDownStartTime;
 	private int[][] lvlData;
 	private float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
 	private float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
@@ -66,6 +70,8 @@ public class Player extends Entity {
 	private int powerGrowSpeed = 15;
 	private int powerGrowTick;
 	
+	
+	
 	private final boolean isPlayer1;
 
 	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
@@ -78,6 +84,7 @@ public class Player extends Entity {
 		this.walkSpeed = Game.SCALE * 1.0f;
 		loadAnimations();
 		initHitbox(HITBOX_BASE_WIDTH, HITBOX_BASE_HEIGHT);
+		initGrabBox(GRABBOX_BASE_WIDTH, GRABBOX_BASE_HEIGHT);
 		initAttackBox();
 	}
 
@@ -91,6 +98,10 @@ public class Player extends Entity {
 	private void initAttackBox() {
 		attackBox = new Rectangle2D.Float(x, y, (int) (35 * Game.SCALE), (int) (20 * Game.SCALE));
 		resetAttackBox();
+	}
+	
+	protected void initGrabBox(int width, int height) {
+		grabBox = new Rectangle2D.Float(x, y, (int) (width * Game.SCALE), (int) (height * Game.SCALE));
 	}
 
 	public void update() {
@@ -131,6 +142,7 @@ public class Player extends Entity {
 		}
 
 		updateAttackBox();
+		updateGrabBox();
 
 		if (state == HIT) {
 			if (aniIndex <= GetSpriteAmount(state) - 3)
@@ -186,6 +198,26 @@ public class Player extends Entity {
 		playing.checkObjectHit(attackBox);
 		playing.getGame().getAudioPlayer().playAttackSound();
 	}
+	
+	public float calcThrowSpeed() {
+		long now = System.nanoTime();
+		float pushDownDuration = ((float)now-throwPushDownStartTime)/1000000000.0f;
+		
+		float throwSpeed = (float) Math.min(TETRIS_TILE_MAX_THROW_SPEED, 
+				TETRIS_TILE_MAX_THROW_SPEED*Math.sqrt(pushDownDuration/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED));
+		return throwSpeed;
+	}
+	
+	public void grabOrThrow() {
+		if (isCarrying != null) {
+			isCarrying.airSpeed = -calcThrowSpeed();
+			isCarrying.setIsCarriedBy(null);
+			isCarrying = null;			
+		}
+		else {
+			playing.checkTetrisTileGrabbed(grabBox, this);
+		}
+	}
 
 	private void setAttackBoxOnRightSide() {
 		attackBox.x = hitbox.x + hitbox.width - (int) (Game.SCALE * 5);
@@ -210,6 +242,13 @@ public class Player extends Entity {
 
 		attackBox.y = hitbox.y + (Game.SCALE * 10);
 	}
+	
+
+	private void updateGrabBox() {
+		grabBox.x = hitbox.x - (grabBox.width-hitbox.width)/2;
+		grabBox.y = hitbox.y - (grabBox.height-hitbox.height)/2;
+		
+	}
 
 	private void updateHealthBar() {
 		healthWidth = (int) ((currentHealth / (float) maxHealth) * healthBarWidth);
@@ -229,9 +268,45 @@ public class Player extends Entity {
 		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
 				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
 		drawHitbox(g, xLvlOffset, yLvlOffset);
+		drawGrabBox(g, xLvlOffset, yLvlOffset);
 		drawAttackBox(g, xLvlOffset, yLvlOffset);
+		if (grabOrThrow && (isCarrying != null))
+			drawThrowArc(g, xLvlOffset, yLvlOffset, 21);
+	}
+	
+	protected void drawGrabBox(Graphics g, int xLvlOffset, int yLvlOffset) {
+		g.setColor(Color.BLACK);
+		g.drawRect((int) grabBox.x - xLvlOffset, (int) grabBox.y - yLvlOffset, (int) grabBox.width, (int) grabBox.height);
 	}
 
+	protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset, int numArcPoints) {
+		g.setColor(Color.RED);
+		int circle_x , circle_y;
+		int radius, maxRadius = 11, minRadius = 7;
+		float throwSpeed = calcThrowSpeed();
+		float maxThrowTime = throwSpeed / GRAVITY * 2;
+		float xDistanceTraveled, time;
+		for (int i=0; i < numArcPoints; i++) {
+			time = i/(numArcPoints-1.0f)*maxThrowTime;
+			radius = (int)(minRadius + (numArcPoints/2.0f - Math.abs(numArcPoints/2.0f - i))/(numArcPoints/2.0f) * (maxRadius-minRadius));
+			
+			if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET)
+				xDistanceTraveled = playing.getWindSpeed()/(TETRIS_TILE_TIME_TO_REACH_WINDSPEED) * 0.5f * time * time;
+			else
+				xDistanceTraveled = playing.getWindSpeed()/TETRIS_TILE_TIME_TO_REACH_WINDSPEED * 0.5f + 
+						playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED);
+			
+			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - radius/2 + xDistanceTraveled); 
+			
+			circle_y = (int) (hitbox.y - yLvlOffset - isCarrying.hitbox.height/2 - radius/2 - 
+					calculateYOfThrowArc(time, playing.getWindSpeed(), throwSpeed, GRAVITY));
+
+			g.fillOval(circle_x,circle_y,radius,radius);
+		}
+		
+	
+	}
+	
 	public void drawUI(Graphics g) {
 		// Background ui
 		g.drawImage(statusBarImg, statusBarX, statusBarY, statusBarWidth, statusBarHeight, null);
@@ -528,6 +603,24 @@ public class Player extends Entity {
 	public void setJump(boolean jump) {
 		this.jump = jump;
 	}
+	
+	public void setGrabOrThrow(boolean grabOrThrow) {
+		this.grabOrThrow = grabOrThrow;
+	}
+	
+	public void setIsCarrying(TetrisTile isCarrying) {
+		this.isCarrying = isCarrying;
+	}
+	
+	public TetrisTile getIsCarrying() {
+		return isCarrying;
+	}
+	
+	
+	public void setThrowPushDownStartTime(long throwPushDownStartTime) {
+		
+		this.throwPushDownStartTime = System.nanoTime();
+	}
 
 	public void resetAll() {
 		resetDirBooleans();
@@ -577,6 +670,10 @@ public class Player extends Entity {
 	
 	public int getYLvlOffset() {
 		return yLvlOffset;
+	}
+	
+	public boolean getGrabOrThrow() {
+		return grabOrThrow;
 	}
 	
 	public void setXLvlOffset(int xLvlOffset) {

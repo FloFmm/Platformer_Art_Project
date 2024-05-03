@@ -101,14 +101,14 @@ public class Menu extends State implements Statemethods {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
 	}
 
 }

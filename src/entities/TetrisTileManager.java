@@ -37,19 +37,21 @@ public class TetrisTileManager {
 
 	private void drawTetrisTiles(Graphics g, int xLvlOffset, int yLvlOffset) {
 		for (TetrisTile c : currentLevel.getTetrisTiles()) {
-			g.drawImage(tetrisTileArr[c.getTileIndex()][c.getRotation()], (int) c.getHitbox().x - xLvlOffset,
-					(int) c.getHitbox().y - yLvlOffset, TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, null);
+			g.drawImage(tetrisTileArr[c.getTileIndex()][c.getRotation()], 
+					(int) (c.getHitbox().x - xLvlOffset - c.getXDrawOffset()),
+					(int) (c.getHitbox().y - yLvlOffset - c.getYDrawOffset()), 
+					TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, null);
 			c.drawHitbox(g, xLvlOffset, yLvlOffset);
 		}
 	}
-
-	public void checkEnemyHit(Rectangle2D.Float attackBox) {
-		for (Crabby c : currentLevel.getCrabs())
-			if (c.isActive())
-				if (attackBox.intersects(c.getHitbox())) {
-					c.hurt(20);
-					return;
-				}
+	
+	public void checkTetrisTileGrabbed(Rectangle2D.Float grabBox, Player player) {
+		for (TetrisTile c : currentLevel.getTetrisTiles())
+			if (grabBox.intersects(c.getHitbox())) {
+				c.setIsCarriedBy(player);
+				player.setIsCarrying(c);
+				return;
+			}
 	}
 
 	private void loadTetrisTileImgs() {

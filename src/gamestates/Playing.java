@@ -61,7 +61,7 @@ public class Playing extends State implements Statemethods {
 	private boolean playerDying;
 	private boolean drawRain;
 
-	private float windSpeed;
+	private float windSpeed = 1.0f;
 	
 	public Playing(Game game) {
 		super(game);
@@ -326,6 +326,10 @@ public class Playing extends State implements Statemethods {
 	public void checkEnemyHit(Rectangle2D.Float attackBox) {
 		enemyManager.checkEnemyHit(attackBox);
 	}
+	
+	public void checkTetrisTileGrabbed(Rectangle2D.Float grabBox, Player player) {
+		tetrisTileManager.checkTetrisTileGrabbed(grabBox, player);
+	}
 
 	public void checkPotionTouched(Player player) {
 		objectManager.checkObjectTouched(player);
@@ -365,6 +369,12 @@ public class Playing extends State implements Statemethods {
 			case KeyEvent.VK_E:
 				player1.powerAttack();
 				break;
+			case KeyEvent.VK_R:
+				if (!player1.getGrabOrThrow()) {
+					player1.setGrabOrThrow(true);
+					player1.setThrowPushDownStartTime(System.nanoTime());	
+				}
+				break;
 				
 			case KeyEvent.VK_LEFT:
 				player2.setLeft(true);
@@ -380,6 +390,12 @@ public class Playing extends State implements Statemethods {
 				break;
 			case KeyEvent.VK_NUMPAD0:
 				player2.powerAttack();
+				break;
+			case KeyEvent.VK_NUMPAD2:
+				if (!player2.getGrabOrThrow()) {
+					player2.setGrabOrThrow(true);
+					player2.setThrowPushDownStartTime(System.nanoTime());	
+				}
 				break;
 
 			case KeyEvent.VK_ESCAPE:
@@ -401,6 +417,11 @@ public class Playing extends State implements Statemethods {
 			case KeyEvent.VK_W:
 				player1.setJump(false);
 				break;
+			case KeyEvent.VK_R:
+				player1.setGrabOrThrow(false);
+				player1.grabOrThrow();
+				break;	
+				
 			case KeyEvent.VK_LEFT:
 				player2.setLeft(false);
 				break;
@@ -409,6 +430,31 @@ public class Playing extends State implements Statemethods {
 				break;
 			case KeyEvent.VK_UP:
 				player2.setJump(false);	
+				break;
+			case KeyEvent.VK_NUMPAD2:
+				player2.setGrabOrThrow(false);
+				player2.grabOrThrow();
+				break;
+			}
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		//System.out.println(e);
+		if (!gameOver && !gameCompleted && !lvlCompleted)
+			switch (e.getKeyChar()) {
+			case 'f':
+				if (player1.getIsCarrying() != null) {
+					int old_rotation_player1 = player1.getIsCarrying().getRotation();
+					player1.getIsCarrying().setRotation((old_rotation_player1 + 1) % 4);
+				}
+				break;	
+
+			case '3':
+				if (player2.getIsCarrying() != null) {
+					int old_rotation_player2 = player2.getIsCarrying().getRotation();
+					player2.getIsCarrying().setRotation((old_rotation_player2 + 1) % 4);
+				}
 				break;
 			}
 	}

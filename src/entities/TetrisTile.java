@@ -1,8 +1,11 @@
 package entities;
 
 import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.UPS_SET;
 import static utilz.HelpMethods.*;
 import static utilz.Constants.*;
+import static utilz.Constants.PlayerConstants.HITBOX_BASE_HEIGHT;
+import static utilz.Constants.PlayerConstants.HITBOX_BASE_WIDTH;
 
 import java.util.Random;
 
@@ -11,13 +14,17 @@ import main.Game;
 
 public class TetrisTile extends Entity {
 	
-	private boolean moving = false;
 	private int[][] lvlData;
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 	private int rotation = 0;
 	private int tileY = 0;
 	private int tileIndex;
-	private int xSpeed = 0;
+
+
+	private float xSpeed = 0;
+	private float xDrawOffset=0;
+	private float yDrawOffset=0;
+	private Player isCarriedBy;
 	int[][] matrix;
 
 	public TetrisTile(float x, float y, int width, int height, int tileIndex, int[][] lvlData) {
@@ -34,7 +41,7 @@ public class TetrisTile extends Entity {
 		updatePos(playing.getWindSpeed());
 		updateHitBox();
 	}
-
+	
 	private void updateHitBox() {
 		//TODO
 		matrix = GetTetrisTileShape(tileIndex, rotation);
@@ -58,17 +65,23 @@ public class TetrisTile extends Entity {
             }
         }
         
-        //hitbox.x = x + minColIndex * Game.TILES_SIZE/4;
-        //hitbox.y = y + minRowIndex * Game.TILES_SIZE/4;
+        xDrawOffset = minColIndex * Game.TILES_SIZE/4;
+        yDrawOffset = minRowIndex * Game.TILES_SIZE/4;
 		hitbox.width = (maxColIndex - minColIndex + 1) * Game.TILES_SIZE/4;
 		hitbox.height =  (maxRowIndex - minRowIndex + 1) * Game.TILES_SIZE/4;
 	}
 
 	private void updatePos(float windSpeed) {
-		moving = false;
 		
-		if (Math.abs(windSpeed) < Math.abs(windSpeed))
-			xSpeed += windSpeed/(200*4);
+		if (isCarriedBy != null) {
+			hitbox.x = isCarriedBy.hitbox.x + isCarriedBy.hitbox.width/2 - hitbox.width/2; 
+			hitbox.y = isCarriedBy.hitbox.y - hitbox.height;
+			xSpeed = 0;
+			return;
+		}
+		
+		if (Math.abs(xSpeed) < Math.abs(windSpeed))
+			xSpeed += windSpeed/(UPS_SET*TETRIS_TILE_TIME_TO_REACH_WINDSPEED);
 
 
 		if (!inAir)
@@ -94,7 +107,6 @@ public class TetrisTile extends Entity {
 		} else {
 			updateXPos(xSpeed);
 		}
-		moving = true;
 	}
 
 	private void resetInAir() {
@@ -149,5 +161,32 @@ public class TetrisTile extends Entity {
 
 	public int getRotation() {
 		return rotation;
+	}
+	
+	public float getXDrawOffset() {
+		return xDrawOffset;
+	}
+	
+	public float getYDrawOffset() {
+		return yDrawOffset;
+	}
+	
+	public float getXSpeed() {
+		return xSpeed;
+	}
+	public void setXSpeed(float xSpeed) {
+		this.xSpeed = xSpeed;
+	}
+	
+	public Player getIsCarriedBy() {
+		return isCarriedBy;
+	}
+
+	public void setIsCarriedBy(Player isCarriedBy) {
+		this.isCarriedBy = isCarriedBy;
+	}
+	
+	public void setRotation(int rotation) {
+		this.rotation = rotation;
 	}
 }
