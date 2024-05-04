@@ -304,7 +304,8 @@ public class Constants {
 		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
 		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 2.0f;
 		
-		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 4.0f;
+		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 0.5f;
+		public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.2f;
 		
 		
 		public static int[][] GetTetrisTileShape (int tileIndex, int rotation) {

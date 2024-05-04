@@ -80,13 +80,22 @@ public class TetrisTile extends Entity {
 			return;
 		}
 		
-		if (Math.abs(xSpeed) < Math.abs(windSpeed))
-			xSpeed += windSpeed/(UPS_SET*TETRIS_TILE_TIME_TO_REACH_WINDSPEED);
-
-
-		if (!inAir)
-			if (!IsEntityOnFloor(hitbox, lvlData))
-				inAir = true;
+		
+		if (IsEntityOnFloor(hitbox, lvlData)) {
+			if (Math.abs(xSpeed) > 0) {
+				float abs_deceleration_on_floor = Math.abs(windSpeed/(UPS_SET*TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR));
+				if (Math.abs(xSpeed) > abs_deceleration_on_floor)
+					xSpeed -= Math.signum(xSpeed)*abs_deceleration_on_floor;
+				else
+					xSpeed = 0;
+			}
+		}
+		else {
+			inAir = true;
+			if (Math.abs(xSpeed) < Math.abs(windSpeed))
+				xSpeed += windSpeed/(UPS_SET*TETRIS_TILE_TIME_TO_REACH_WINDSPEED);
+		}
+			
  
 		if (inAir) {
 			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
@@ -96,8 +105,10 @@ public class TetrisTile extends Entity {
 			} else {
 				//TODO
 				//hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
-				if (airSpeed > 0)
-					resetInAir();
+				if (airSpeed > 0) {
+					inAir = false;
+					airSpeed = 0;
+				}
 				else
 					airSpeed = fallSpeedAfterCollision;
 				// TODO
@@ -109,11 +120,7 @@ public class TetrisTile extends Entity {
 		}
 	}
 
-	private void resetInAir() {
-		inAir = false;
-		airSpeed = 0;
-	}
-
+		
 	private void updateXPos(float xSpeed) {
 		
 		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))

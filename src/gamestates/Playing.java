@@ -59,9 +59,8 @@ public class Playing extends State implements Statemethods {
 	private boolean lvlCompleted;
 	private boolean gameCompleted;
 	private boolean playerDying;
-	private boolean drawRain;
 
-	private float windSpeed = 1.0f;
+	private float windSpeed = 5.0f;
 	
 	public Playing(Game game) {
 		super(game);
@@ -78,7 +77,6 @@ public class Playing extends State implements Statemethods {
 		loadDialogue();
 		calcLvlOffset();
 		loadStartLevel();
-		setDrawRainBoolean();
 	}
 
 	private void loadDialogue() {
@@ -297,9 +295,7 @@ public class Playing extends State implements Statemethods {
 		paused = false;
 		lvlCompleted = false;
 		playerDying = false;
-		drawRain = false;
 
-		setDrawRainBoolean();
 
 		player1.resetAll();
 		player2.resetAll();
@@ -307,12 +303,6 @@ public class Playing extends State implements Statemethods {
 		objectManager.resetAllObjects();
 		tetrisTileManager.resetAllTetrisTiles();
 		dialogEffects.clear();
-	}
-
-	private void setDrawRainBoolean() {
-		// This method makes it rain 20% of the time you load a level.
-		if (rnd.nextFloat() >= 0.8f)
-			drawRain = true;
 	}
 
 	public void setGameOver(boolean gameOver) {

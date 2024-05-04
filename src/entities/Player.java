@@ -201,8 +201,14 @@ public class Player extends Entity {
 	
 	public float calcThrowSpeed() {
 		long now = System.nanoTime();
-		float pushDownDuration = ((float)now-throwPushDownStartTime)/1000000000.0f;
-		
+		float pushDownDuration = (now-throwPushDownStartTime)/1000000000.0f;
+		int increasingOrDecreasing = (int)((now-throwPushDownStartTime)/1000000000.0f/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED % 2);
+		if (increasingOrDecreasing == 0) {
+			pushDownDuration = pushDownDuration % TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED;
+		}
+		else {
+			pushDownDuration = TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED - (pushDownDuration % TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED);
+		}
 		float throwSpeed = (float) Math.min(TETRIS_TILE_MAX_THROW_SPEED, 
 				TETRIS_TILE_MAX_THROW_SPEED*Math.sqrt(pushDownDuration/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED));
 		return throwSpeed;
@@ -289,12 +295,14 @@ public class Player extends Entity {
 		for (int i=0; i < numArcPoints; i++) {
 			time = i/(numArcPoints-1.0f)*maxThrowTime;
 			radius = (int)(minRadius + (numArcPoints/2.0f - Math.abs(numArcPoints/2.0f - i))/(numArcPoints/2.0f) * (maxRadius-minRadius));
-			
+			System.out.println("====================");
+			System.out.println(time);
+			System.out.println(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET);
 			if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET)
-				xDistanceTraveled = playing.getWindSpeed()/(TETRIS_TILE_TIME_TO_REACH_WINDSPEED) * 0.5f * time * time;
+				xDistanceTraveled = playing.getWindSpeed()/(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f * time * time;
 			else
-				xDistanceTraveled = playing.getWindSpeed()/TETRIS_TILE_TIME_TO_REACH_WINDSPEED * 0.5f + 
-						playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED);
+				xDistanceTraveled = playing.getWindSpeed()*(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f + 
+						playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET);
 			
 			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - radius/2 + xDistanceTraveled); 
 			
