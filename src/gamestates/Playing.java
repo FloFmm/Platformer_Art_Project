@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import entities.EnemyManager;
 import entities.Player;
 import entities.TetrisTileManager;
+import entities.BuildingZoneManager;
 import levels.LevelManager;
 import main.Game;
 import objects.ObjectManager;
@@ -34,6 +35,7 @@ public class Playing extends State implements Statemethods {
 	private EnemyManager enemyManager;
 	private ObjectManager objectManager;
 	private TetrisTileManager tetrisTileManager;
+	private BuildingZoneManager buildingZoneManager;
 	private PauseOverlay pauseOverlay;
 	private GameOverOverlay gameOverOverlay;
 	private GameCompletedOverlay gameCompletedOverlay;
@@ -120,6 +122,7 @@ public class Playing extends State implements Statemethods {
 		enemyManager.loadEnemies(levelManager.getCurrentLevel());
 		objectManager.loadObjects(levelManager.getCurrentLevel());
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
+		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
 	}
 
 	private void calcLvlOffset() {
@@ -132,6 +135,7 @@ public class Playing extends State implements Statemethods {
 		enemyManager = new EnemyManager(this);
 		objectManager = new ObjectManager(this);
 		tetrisTileManager = new TetrisTileManager(this);
+		buildingZoneManager = new BuildingZoneManager(this);
 		player1 = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, true);
 		player2 = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
@@ -170,6 +174,7 @@ public class Playing extends State implements Statemethods {
 			levelManager.update();
 			objectManager.update(levelManager.getCurrentLevel().getLevelData(), player1, player2);
 			tetrisTileManager.update();
+			buildingZoneManager.update();
 			player1.update();
 			player2.update();
 			enemyManager.update(levelManager.getCurrentLevel().getLevelData());
@@ -544,6 +549,11 @@ public class Playing extends State implements Statemethods {
 	
 	public TetrisTileManager getTetrisTileManager() {
 		return tetrisTileManager;
+	}
+	
+	
+	public BuildingZoneManager getBuildingZoneManager() {
+		return buildingZoneManager;
 	}
 	
 	public float getWindSpeed() {

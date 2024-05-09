@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import entities.Crabby;
 import entities.TetrisTile;
+import entities.BuildingZone;
 import main.Game;
 import objects.BackgroundTree;
 import objects.Cannon;
@@ -27,6 +28,7 @@ public class Level {
 
 	private ArrayList<Crabby> crabs = new ArrayList<>();
 	private ArrayList<TetrisTile> tetrisTiles = new ArrayList<>();
+	private ArrayList<BuildingZone> buildingZones = new ArrayList<>();
 	private ArrayList<Potion> potions = new ArrayList<>();
 	private ArrayList<Spike> spikes = new ArrayList<>();
 	private ArrayList<GameContainer> containers = new ArrayList<>();
@@ -113,8 +115,10 @@ public class Level {
 		else
 			lvlData[y][x] = redValue;
 		switch (redValue) {
-		case 0, 1, 2, 3, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> 
-		grass.add(new Grass((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE) - Game.TILES_SIZE, getRndGrassType(x)));
+		case 0, 1, 2, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> grass.add(new Grass((int) (x * Game.TILES_SIZE), 
+					(int) (y * Game.TILES_SIZE) - Game.TILES_SIZE, getRndGrassType(x)));
+		case 3 -> buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), 
+				(int) (y * Game.TILES_SIZE), Game.TILES_SIZE, Game.TILES_SIZE,1));
 		}
 	}
 
@@ -179,6 +183,10 @@ public class Level {
 		return tetrisTiles;
 	}
 
+	public ArrayList<BuildingZone> getBuildingZones() {
+		return buildingZones;
+	}
+	
 	public ArrayList<Potion> getPotions() {
 		return potions;
 	}

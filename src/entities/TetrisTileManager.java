@@ -47,11 +47,12 @@ public class TetrisTileManager {
 	
 	public void checkTetrisTileGrabbed(Rectangle2D.Float grabBox, Player player) {
 		for (TetrisTile c : currentLevel.getTetrisTiles())
-			if (grabBox.intersects(c.getHitbox())) {
-				c.setIsCarriedBy(player);
-				player.setIsCarrying(c);
-				return;
-			}
+			if (!c.getLockedInBuilding())
+				if (grabBox.intersects(c.getHitbox())) {
+					c.setIsCarriedBy(player);
+					player.setIsCarrying(c);
+					return;
+				}
 	}
 
 	private void loadTetrisTileImgs() {

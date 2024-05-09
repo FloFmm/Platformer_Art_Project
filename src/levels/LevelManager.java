@@ -40,6 +40,7 @@ public class LevelManager {
 		Level newLevel = levels.get(lvlIndex);
 		game.getPlaying().getEnemyManager().loadEnemies(newLevel);
 		game.getPlaying().getTetrisTileManager().loadTetrisTiles(newLevel);
+		game.getPlaying().getBuildingZoneManager().loadBuildingZones(newLevel);
 		game.getPlaying().getPlayer1().loadLvlData(newLevel.getLevelData());
 		game.getPlaying().getPlayer2().loadLvlData(newLevel.getLevelData());
 		game.getPlaying().setMaxLvlOffsetX(newLevel.getMaxLvlOffsetX());

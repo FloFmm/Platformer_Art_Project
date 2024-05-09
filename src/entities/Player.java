@@ -295,9 +295,6 @@ public class Player extends Entity {
 		for (int i=0; i < numArcPoints; i++) {
 			time = i/(numArcPoints-1.0f)*maxThrowTime;
 			radius = (int)(minRadius + (numArcPoints/2.0f - Math.abs(numArcPoints/2.0f - i))/(numArcPoints/2.0f) * (maxRadius-minRadius));
-			System.out.println("====================");
-			System.out.println(time);
-			System.out.println(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET);
 			if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET)
 				xDistanceTraveled = playing.getWindSpeed()/(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f * time * time;
 			else
@@ -312,7 +309,6 @@ public class Player extends Entity {
 			g.fillOval(circle_x,circle_y,radius,radius);
 		}
 		
-	
 	}
 	
 	public void drawUI(Graphics g) {

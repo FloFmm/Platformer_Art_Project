@@ -62,10 +62,6 @@ public class HelpMethods {
 		for (int i = 0; i < 4; i++) {
 			xIndex = xCoordinates[i]/Game.TILES_SIZE;
 			yIndex = yCoordinates[i]/Game.TILES_SIZE;
-//			System.out.println("====================");
-//			System.out.println(xIndex);
-//			System.out.println(yIndex);
-//			System.out.println(lvlData[(int) yIndex][(int) xIndex]);
 			if (IsTileSolid((int) xIndex, (int) yIndex, lvlData)) {
 				int tileValue = lvlData[(int) yIndex][(int) xIndex];
 
@@ -80,12 +76,10 @@ public class HelpMethods {
 				else 
 					return true;
 			}
-		
 		}
 		return false;
-            
-		
 	}
+	
 	
 	public static boolean IsRectIntersectingTriangle(float x, float y, float width, float height, int[][] triangleCoordinatesBaseLongShort) {
 		if (IsInsideTriangle(triangleCoordinatesBaseLongShort, new float[] {x, y}, 1.0)
@@ -336,7 +330,7 @@ public class HelpMethods {
 	
 	public static boolean IsTileSolid(int xTile, int yTile, int[][] lvlData) {
 		int tileValue = lvlData[yTile][xTile];
-		if (tileValue==11 || tileValue==48 || tileValue==49)
+		if (tileValue==11 || tileValue==3 || tileValue==48 || tileValue==49)
 			return false;
 		else if (tileValue >= 111 && tileValue <= 989)
 			return true;

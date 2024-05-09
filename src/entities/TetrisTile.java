@@ -19,6 +19,7 @@ public class TetrisTile extends Entity {
 	private int rotation = 0;
 	private int tileY = 0;
 	private int tileIndex;
+	private boolean lockedInBuilding = false;
 
 
 	private float xSpeed = 0;
@@ -72,6 +73,8 @@ public class TetrisTile extends Entity {
 	}
 
 	private void updatePos(float windSpeed) {
+		if (lockedInBuilding)
+			return;
 		
 		if (isCarriedBy != null) {
 			hitbox.x = isCarriedBy.hitbox.x + isCarriedBy.hitbox.width/2 - hitbox.width/2; 
@@ -103,16 +106,27 @@ public class TetrisTile extends Entity {
 				airSpeed += GRAVITY;
 				updateXPos(xSpeed);
 			} else {
-				//TODO
-				//hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
-				if (airSpeed > 0) {
-					inAir = false;
+				if (isInBuildingZone()) {
+					int gridSize = Game.TILES_SIZE/4;
+					hitbox.x = Math.round((hitbox.x + xSpeed)/gridSize)*gridSize;
+					hitbox.y = Math.round((hitbox.y + airSpeed)/gridSize)*gridSize;
 					airSpeed = 0;
+					xSpeed = 0;
+					lockedInBuilding = true;
+					inAir = false;
 				}
-				else
-					airSpeed = fallSpeedAfterCollision;
-				// TODO
-				// updateXPos(xSpeed);
+				else {
+					//TODO
+					//hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
+					if (airSpeed > 0) {
+						inAir = false;
+						airSpeed = 0;
+					}
+					else
+						airSpeed = fallSpeedAfterCollision;
+					// TODO
+					// updateXPos(xSpeed);
+				}
 			}
 
 		} else {
@@ -120,7 +134,6 @@ public class TetrisTile extends Entity {
 		}
 	}
 
-		
 	private void updateXPos(float xSpeed) {
 		
 		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
@@ -145,6 +158,19 @@ public class TetrisTile extends Entity {
 		}
 	}
 
+	private boolean isInBuildingZone() {
+		float[] xCoordinates = {hitbox.x, (hitbox.x+hitbox.width-1), hitbox.x, (hitbox.x+hitbox.width-1)};
+		float[] yCoordinates = {hitbox.y, hitbox.y, (hitbox.y+hitbox.height-1), (hitbox.y+hitbox.height-1)};
+		int xIndex, yIndex;
+		for (int i = 0; i < 4; i++) {
+			xIndex = (int) (xCoordinates[i]/Game.TILES_SIZE);
+			yIndex = (int) (yCoordinates[i]/Game.TILES_SIZE);
+			if (lvlData[yIndex][xIndex] == 3)
+				return true;
+		}
+		return false;
+	}
+	
 	public void loadLvlData(int[][] lvlData) {
 		this.lvlData = lvlData;
 		if (!IsEntityOnFloor(hitbox, lvlData))
@@ -176,6 +202,11 @@ public class TetrisTile extends Entity {
 	
 	public float getYDrawOffset() {
 		return yDrawOffset;
+	}
+
+
+	public boolean getLockedInBuilding() {
+		return lockedInBuilding;
 	}
 	
 	public float getXSpeed() {
