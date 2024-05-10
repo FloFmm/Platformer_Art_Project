@@ -330,15 +330,18 @@ public class Player extends Entity {
 			aniTick = 0;
 			aniIndex++;
 			if (aniIndex >= GetSpriteAmount(state)) {
-				aniIndex = 0;
-				attacking = false;
-				attackChecked = false;
+				if (state == JUMP || state == FALLING)
+					aniIndex--;
+				else
+					aniIndex = 0;
 				if (state == HIT) {
 					newState(IDLE);
 					airSpeed = 0f;
 					if (!IsFloor(hitbox, 0, lvlData))
 						inAir = true;
 				}
+				attacking = false;
+				attackChecked = false;
 			}
 		}
 	}

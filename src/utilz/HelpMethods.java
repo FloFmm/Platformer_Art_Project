@@ -620,7 +620,7 @@ public class HelpMethods {
 		return new int[] {leftBound, rightBound, upperBound, lowerBound};
 	}
 	
-	public int[][] matrixAdd(int[][] matrixA, int[][] matrixB , int xIndex, int yIndex) {
+	public static int[][] matrixAdd(int[][] matrixA, int[][] matrixB , int xIndex, int yIndex) {
 		int rowsA = matrixA.length;
         int colsA = matrixA[0].length;
         int rowsB = matrixB.length;
@@ -632,11 +632,20 @@ public class HelpMethods {
                 result[i][j] = matrixA[i][j];
                 int iB = i - yIndex;
                 int jB = j - xIndex;
-                if (iB >= 0 && iB <= rowsB && jB >= 0 && jB <= colsB)
-                	result[i][j] = matrixB[iB][jB];
+                if (iB >= 0 && iB < rowsB && jB >= 0 && jB < colsB)
+                	result[i][j] += matrixB[iB][jB];
             }
         }
 		return result;
 	}
+	
+	public static void printArray(int[][] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                System.out.print(arr[i][j] + "\t");
+            }
+            System.out.println(); // Move to the next line for the next row
+        }
+    }
     
 }

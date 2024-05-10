@@ -48,14 +48,14 @@ public class TetrisTile extends Entity {
 		//TODO
 		matrix = GetTetrisTileShape(tileIndex, rotation);
 		int maxRowIndex = -1;
-        int minRowIndex = matrix.length;
+        int minRowIndex = getMatrix().length;
         int maxColIndex = -1;
-        int minColIndex = matrix[0].length;
+        int minColIndex = getMatrix()[0].length;
         
         // Iterate through the matrix to find the max and min indices
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[0].length; j++) {
-                if (matrix[i][j] == 1) {
+        for (int i = 0; i < getMatrix().length; i++) {
+            for (int j = 0; j < getMatrix()[0].length; j++) {
+                if (getMatrix()[i][j] == 1) {
                     // Update max and min indices for rows
                     maxRowIndex = Math.max(maxRowIndex, i);
                     minRowIndex = Math.min(minRowIndex, i);
@@ -116,6 +116,7 @@ public class TetrisTile extends Entity {
 					airSpeed = 0;
 					xSpeed = 0;
 					inAir = false;
+					lockedInBuildingZone.addTetrisTile(this);
 				}
 				else {
 					//TODO
@@ -232,5 +233,9 @@ public class TetrisTile extends Entity {
 
 	public void setTetrisTileManager(TetrisTileManager tetrisTileManager) {
 		this.tetrisTileManager = tetrisTileManager;		
+	}
+
+	public int[][] getMatrix() {
+		return matrix;
 	}
 }

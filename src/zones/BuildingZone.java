@@ -21,13 +21,33 @@ public class BuildingZone {
 	public BuildingZone(int x, int y, int width, int height, int buildingZoneIndex) {
 		this.buildingZoneIndex = buildingZoneIndex;
 		hitbox = new Rectangle2D.Float(x, y, (int) (width), (int) (height));
+		initMatrix((int) height/Game.TILES_SIZE*4, (int) width/Game.TILES_SIZE*4);
+	}
+	
+	private void initMatrix(int rows, int cols) {
+		matrix = new int[rows][cols];
 
+        // Fill matrix with zeros
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix[i][j] = 0;
+            }
+        }
 	}
 
 	public boolean isTetrisTileColliding(TetrisTile tetrisTile) {
 		//matrixAdd(int[][] matrixA, int[][] matrixB , int xIndex, int yIndex)
 		
 		return false;
+	}
+	
+	public void addTetrisTile(TetrisTile tetrisTile) {
+		int xIndexShift = 0, yIndexShift = 0;
+		printArray(matrix);
+		System.out.println("=============");
+		matrix = matrixAdd(matrix, tetrisTile.getMatrix(), xIndexShift, yIndexShift);
+		printArray(matrix);
+		
 	}
 	
 	public void update(Playing playing) {
