@@ -19,10 +19,13 @@ public class TetrisTileManager {
 	public TetrisTileManager(Playing playing) {
 		this.playing = playing;
 		loadTetrisTileImgs();
+		
 	}
 	
 	public void loadTetrisTiles(Level level) {
 		this.currentLevel = level;
+		for (TetrisTile c : currentLevel.getTetrisTiles())
+			c.setTetrisTileManager(this);
 	}
 
 	public void update() {
@@ -47,7 +50,7 @@ public class TetrisTileManager {
 	
 	public void checkTetrisTileGrabbed(Rectangle2D.Float grabBox, Player player) {
 		for (TetrisTile c : currentLevel.getTetrisTiles())
-			if (!c.getLockedInBuilding())
+			if (c.getLockedInBuildingZone() == null)
 				if (grabBox.intersects(c.getHitbox())) {
 					c.setIsCarriedBy(player);
 					player.setIsCarrying(c);
@@ -68,4 +71,10 @@ public class TetrisTileManager {
 		for (TetrisTile c : currentLevel.getTetrisTiles())
 			c.resetTetrisTile();
 	}
+
+	public Playing getPlaying() {
+		return playing;
+	}
+	
+	
 }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import entities.Crabby;
 import entities.TetrisTile;
-import entities.BuildingZone;
 import main.Game;
 import objects.BackgroundTree;
 import objects.Cannon;
@@ -15,11 +14,13 @@ import objects.GameContainer;
 import objects.Grass;
 import objects.Potion;
 import objects.Spike;
+import zones.BuildingZone;
 
 import static utilz.Constants.EnemyConstants.*;
 import static utilz.Constants.ObjectConstants.*;
 import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.PlayerConstants.*;
+import static utilz.HelpMethods.*;
 
 public class Level {
 
@@ -42,6 +43,7 @@ public class Level {
 	private int maxLvlOffsetX;
 	private int maxLvlOffsetY;
 	private Point playerSpawn;
+	private int buildingZoneIndex = 0;
 
 	public Level(BufferedImage img) {
 		this.img = img;
@@ -72,33 +74,11 @@ public class Level {
 	}
 
 	private int calculateTriangleLengthOrientationPosition(int red, int x, int y, BufferedImage img) {
-		int imgHeight = img.getHeight();
-		int imgWidth = img.getWidth();
-		
-		// look up
-		int yTest = y;
-		while (yTest < imgHeight && (new Color(img.getRGB(x, yTest)).getRed() == red))
-			yTest += 1;
-		int upperBound = yTest - 1;
-
-		// look down
-		yTest = y;
-		while (yTest >= 0 && (new Color(img.getRGB(x, yTest)).getRed() == red))
-			yTest -= 1;
-		int lowerBound = yTest + 1;
-		
-		// look right
-		int xTest = x;
-		while (xTest < imgWidth && (new Color(img.getRGB(xTest, y)).getRed() == red))
-			xTest += 1;
-		int rightBound = xTest - 1;
-		
-		// look left
-		xTest = x;
-		while (xTest >= 0 && (new Color(img.getRGB(xTest, y)).getRed() == red))
-			xTest -= 1;
-		int leftBound = xTest + 1;
-		
+		int[] leftRightUpperLower = calculateAreaCoveredByEquivalentTiles(red, x, y, img);
+		int leftBound = leftRightUpperLower[0];
+		int rightBound = leftRightUpperLower[1];
+		int upperBound = leftRightUpperLower[2];
+		int lowerBound = leftRightUpperLower[3];
 		int xLength = rightBound - leftBound + 1;
 		int yLength = upperBound - lowerBound + 1;
 		if (xLength == 1) // vertical
@@ -117,8 +97,19 @@ public class Level {
 		switch (redValue) {
 		case 0, 1, 2, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> grass.add(new Grass((int) (x * Game.TILES_SIZE), 
 					(int) (y * Game.TILES_SIZE) - Game.TILES_SIZE, getRndGrassType(x)));
-		case 3 -> buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), 
-				(int) (y * Game.TILES_SIZE), Game.TILES_SIZE, Game.TILES_SIZE,1));
+		case 3 -> {
+			int[] leftRightUpperLower = calculateAreaCoveredByEquivalentTiles(redValue, x, y, img);
+			int leftBound = leftRightUpperLower[0];
+			int rightBound = leftRightUpperLower[1];
+			int upperBound = leftRightUpperLower[2];
+			int lowerBound = leftRightUpperLower[3];
+			if (x == leftBound && y == lowerBound)
+				buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE), 
+						(rightBound-leftBound+1) * Game.TILES_SIZE, 
+						(upperBound-lowerBound+1) * Game.TILES_SIZE, buildingZoneIndex));
+			buildingZoneIndex += 1;
+		}
+		
 		}
 	}
 

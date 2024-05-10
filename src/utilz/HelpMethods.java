@@ -3,7 +3,7 @@ package utilz;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.awt.image.BufferedImage;
-
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
@@ -589,5 +589,54 @@ public class HelpMethods {
         return  (ySpeed * t - 0.5f * gravity * t * t); 
     }
     
+	public static int[] calculateAreaCoveredByEquivalentTiles(int red, int x, int y, BufferedImage img) {
+		int imgHeight = img.getHeight();
+		int imgWidth = img.getWidth();
+		
+		// look up
+		int yTest = y;
+		while (yTest < imgHeight && (new Color(img.getRGB(x, yTest)).getRed() == red))
+			yTest += 1;
+		int upperBound = yTest - 1;
+
+		// look down
+		yTest = y;
+		while (yTest >= 0 && (new Color(img.getRGB(x, yTest)).getRed() == red))
+			yTest -= 1;
+		int lowerBound = yTest + 1;
+		
+		// look right
+		int xTest = x;
+		while (xTest < imgWidth && (new Color(img.getRGB(xTest, y)).getRed() == red))
+			xTest += 1;
+		int rightBound = xTest - 1;
+		
+		// look left
+		xTest = x;
+		while (xTest >= 0 && (new Color(img.getRGB(xTest, y)).getRed() == red))
+			xTest -= 1;
+		int leftBound = xTest + 1;
+		
+		return new int[] {leftBound, rightBound, upperBound, lowerBound};
+	}
+	
+	public int[][] matrixAdd(int[][] matrixA, int[][] matrixB , int xIndex, int yIndex) {
+		int rowsA = matrixA.length;
+        int colsA = matrixA[0].length;
+        int rowsB = matrixB.length;
+        int colsB = matrixB[0].length;
+        int[][] result = new int[rowsA][colsA];
+        
+		for (int i = 0; i < rowsA; i++) {
+            for (int j = 0; j < colsA; j++) {
+                result[i][j] = matrixA[i][j];
+                int iB = i - yIndex;
+                int jB = j - xIndex;
+                if (iB >= 0 && iB <= rowsB && jB >= 0 && jB <= colsB)
+                	result[i][j] = matrixB[iB][jB];
+            }
+        }
+		return result;
+	}
     
 }

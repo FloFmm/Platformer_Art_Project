@@ -10,7 +10,9 @@ import static utilz.Constants.PlayerConstants.HITBOX_BASE_WIDTH;
 import java.util.Random;
 
 import gamestates.Playing;
+import levels.Level;
 import main.Game;
+import zones.BuildingZone;
 
 public class TetrisTile extends Entity {
 	
@@ -19,9 +21,8 @@ public class TetrisTile extends Entity {
 	private int rotation = 0;
 	private int tileY = 0;
 	private int tileIndex;
-	private boolean lockedInBuilding = false;
-
-
+	private BuildingZone lockedInBuildingZone = null;
+	private TetrisTileManager tetrisTileManager;
 	private float xSpeed = 0;
 	private float xDrawOffset=0;
 	private float yDrawOffset=0;
@@ -73,7 +74,7 @@ public class TetrisTile extends Entity {
 	}
 
 	private void updatePos(float windSpeed) {
-		if (lockedInBuilding)
+		if (lockedInBuildingZone != null)
 			return;
 		
 		if (isCarriedBy != null) {
@@ -106,13 +107,14 @@ public class TetrisTile extends Entity {
 				airSpeed += GRAVITY;
 				updateXPos(xSpeed);
 			} else {
-				if (isInBuildingZone()) {
+				if (isInBuildingZone() && airSpeed > 0) {
+					lockedInBuildingZone = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
+					
 					int gridSize = Game.TILES_SIZE/4;
 					hitbox.x = Math.round((hitbox.x + xSpeed)/gridSize)*gridSize;
 					hitbox.y = Math.round((hitbox.y + airSpeed)/gridSize)*gridSize;
 					airSpeed = 0;
 					xSpeed = 0;
-					lockedInBuilding = true;
 					inAir = false;
 				}
 				else {
@@ -205,8 +207,8 @@ public class TetrisTile extends Entity {
 	}
 
 
-	public boolean getLockedInBuilding() {
-		return lockedInBuilding;
+	public BuildingZone getLockedInBuildingZone() {
+		return lockedInBuildingZone;
 	}
 	
 	public float getXSpeed() {
@@ -226,5 +228,9 @@ public class TetrisTile extends Entity {
 	
 	public void setRotation(int rotation) {
 		this.rotation = rotation;
+	}
+
+	public void setTetrisTileManager(TetrisTileManager tetrisTileManager) {
+		this.tetrisTileManager = tetrisTileManager;		
 	}
 }

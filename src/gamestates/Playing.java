@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import entities.EnemyManager;
 import entities.Player;
 import entities.TetrisTileManager;
-import entities.BuildingZoneManager;
 import levels.LevelManager;
 import main.Game;
 import objects.ObjectManager;
@@ -21,6 +20,7 @@ import ui.GameOverOverlay;
 import ui.LevelCompletedOverlay;
 import ui.PauseOverlay;
 import utilz.LoadSave;
+import zones.BuildingZoneManager;
 import effects.DialogueEffect;
 import effects.Rain;
 
@@ -257,6 +257,7 @@ public class Playing extends State implements Statemethods {
 		objectManager.draw(g, xLvlOffset, yLvlOffset);
 		enemyManager.draw(g, xLvlOffset, yLvlOffset);
 		tetrisTileManager.draw(g, xLvlOffset, yLvlOffset);
+		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
 		player1.drawPlayer(g, xLvlOffset, yLvlOffset);
 		player2.drawPlayer(g, xLvlOffset, yLvlOffset);
 		if (isPlayer1)
