@@ -308,7 +308,7 @@ public class Constants {
 		
 		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 0.5f;
 		public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.2f;
-		
+		public static final int TETRIS_GRID_SIZE = Game.TILES_SIZE/4;
 		
 		public static int[][] GetTetrisTileShape (int tileIndex, int rotation) {
 			int[][] matrix;

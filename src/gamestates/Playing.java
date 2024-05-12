@@ -62,7 +62,7 @@ public class Playing extends State implements Statemethods {
 	private boolean gameCompleted;
 	private boolean playerDying;
 
-	private float windSpeed = 5.0f;
+	private float windSpeed = 0;//5.0f;
 	
 	public Playing(Game game) {
 		super(game);

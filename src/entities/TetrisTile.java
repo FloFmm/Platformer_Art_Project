@@ -13,6 +13,7 @@ import gamestates.Playing;
 import levels.Level;
 import main.Game;
 import zones.BuildingZone;
+import java.awt.geom.Rectangle2D;
 
 public class TetrisTile extends Entity {
 	
@@ -42,6 +43,75 @@ public class TetrisTile extends Entity {
 	public void update(Playing playing) {
 		updatePos(playing.getWindSpeed());
 		updateHitBox();
+	}
+	
+	private boolean tetrisTileCanMoveHere(float x, float y, BuildingZone buildingZone) {
+		double xGridIndex = Math.round(x)/TETRIS_GRID_SIZE;
+		double yGridIndex = Math.round(y)/TETRIS_GRID_SIZE;
+		int xGridIndexFloor = (int) Math.floor(xGridIndex)*TETRIS_GRID_SIZE;
+		int yGridIndexFloor = (int) Math.floor(yGridIndex)*TETRIS_GRID_SIZE;
+		int xGridIndexCeil = (int) Math.ceil(xGridIndex)*TETRIS_GRID_SIZE;
+		int yGridIndexCeil = (int) Math.ceil(yGridIndex)*TETRIS_GRID_SIZE;
+
+		if (matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexCeil, yGridIndexCeil, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return false;
+		}
+		
+		if (matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexCeil, yGridIndexFloor, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return false;
+		}
+		
+		if (matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexFloor, yGridIndexCeil, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return false;
+		}
+			
+		if (matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexFloor, yGridIndexFloor, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private int[] closestLockingXY(float x, float y, BuildingZone buildingZone) {
+		double xGridIndex = Math.round(x)/TETRIS_GRID_SIZE;
+		double yGridIndex = Math.round(y)/TETRIS_GRID_SIZE;
+		int xGridIndexFloor = (int) Math.floor(xGridIndex)*TETRIS_GRID_SIZE;
+		int yGridIndexFloor = (int) Math.floor(yGridIndex)*TETRIS_GRID_SIZE;
+		int xGridIndexCeil = (int) Math.ceil(xGridIndex)*TETRIS_GRID_SIZE;
+		int yGridIndexCeil = (int) Math.ceil(yGridIndex)*TETRIS_GRID_SIZE;
+		int xGridIndexRound = (int) Math.round(xGridIndex)*TETRIS_GRID_SIZE;
+		int yGridIndexRound = (int) Math.round(yGridIndex)*TETRIS_GRID_SIZE;
+		int xGridIndexNotRound = xGridIndexFloor, yGridIndexNotRound = yGridIndexFloor;
+		if (xGridIndexNotRound == xGridIndexRound)
+			xGridIndexNotRound = xGridIndexCeil;
+		if (yGridIndexNotRound == yGridIndexRound)
+			yGridIndexNotRound = yGridIndexCeil;
+
+		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexRound, yGridIndexRound, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return new int[] {xGridIndexRound, yGridIndexRound};
+		}
+		
+		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexRound, yGridIndexNotRound, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return new int[] {xGridIndexRound, yGridIndexNotRound};
+		}
+		
+		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexNotRound, yGridIndexRound, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return new int[] {xGridIndexNotRound, yGridIndexRound};
+		}
+			
+		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexNotRound, yGridIndexNotRound, 
+				matrix, xDrawOffset, yDrawOffset), 2)) {
+			return new int[] {xGridIndexNotRound, yGridIndexNotRound};
+		}
+		
+		return null;
 	}
 	
 	private void updateHitBox() {
@@ -103,6 +173,22 @@ public class TetrisTile extends Entity {
  
 		if (inAir) {
 			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
+				if (isInBuildingZone() && airSpeed > 0) {
+					BuildingZone currentBuildingZone = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
+					if (!tetrisTileCanMoveHere(hitbox.x, hitbox.y + airSpeed, currentBuildingZone)) {
+						int[] xy = closestLockingXY(hitbox.x, hitbox.y + airSpeed, currentBuildingZone);
+						hitbox.x = xy[0];
+						hitbox.y = xy[1];
+						airSpeed = 0;
+						xSpeed = 0;
+						inAir = false;
+						lockedInBuildingZone = currentBuildingZone;
+						lockedInBuildingZone.addTetrisTile(this);
+						System.out.println("segeherhrttjtr");
+						return;
+					}
+				}
+				
 				hitbox.y += airSpeed;
 				airSpeed += GRAVITY;
 				updateXPos(xSpeed);
@@ -110,9 +196,8 @@ public class TetrisTile extends Entity {
 				if (isInBuildingZone() && airSpeed > 0) {
 					lockedInBuildingZone = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
 					
-					int gridSize = Game.TILES_SIZE/4;
-					hitbox.x = Math.round((hitbox.x + xSpeed)/gridSize)*gridSize;
-					hitbox.y = Math.round((hitbox.y + airSpeed)/gridSize)*gridSize;
+					hitbox.x = Math.round((hitbox.x + xSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
+					hitbox.y = Math.round((hitbox.y + airSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
 					airSpeed = 0;
 					xSpeed = 0;
 					inAir = false;

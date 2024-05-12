@@ -1,7 +1,7 @@
 package utilz;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -219,107 +219,107 @@ public class HelpMethods {
 		}
 	}
 	
-	public static double[] lowerAndUpperXOrYTriangleTouchingPoint(int[][] triangleCoordinatesBaseLongShort, double[] xOrYs, boolean useAsX, int simple_orient) {
-		double lowerBound = -1.0, upperBound = -1.0;
-		double x1 = xOrYs[0]; 
-		double x2 = xOrYs[1];
-		if (x1 > x2) {
-			x1 = xOrYs[1]; 
-			x2 = xOrYs[0];
-		}
-
-		int[] xCoordinates = new int[] {triangleCoordinatesBaseLongShort[0][0], 
-				triangleCoordinatesBaseLongShort[1][0], triangleCoordinatesBaseLongShort[2][0]}; 
-		int[] yCoordinates = new int[] {triangleCoordinatesBaseLongShort[0][1], 
-				triangleCoordinatesBaseLongShort[1][1], triangleCoordinatesBaseLongShort[2][1]}; 
-		int triangleMaxX = Arrays.stream(xCoordinates).max().getAsInt();
-		int triangleMaxY = Arrays.stream(yCoordinates).max().getAsInt();
-		int triangleMinX = Arrays.stream(xCoordinates).min().getAsInt();
-		int triangleMinY = Arrays.stream(yCoordinates).min().getAsInt();
-		
-		if (useAsX) {
-			switch (simple_orient) {
-				case 1 -> {
-					lowerBound = triangleMinY;
-					if (x2 >= triangleMaxX)
-						upperBound = triangleMaxY;
-					else {
-						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x2, true);
-					}
-				}
-				case 2 -> {
-					upperBound = triangleMaxY;
-					if (x2 >= triangleMaxX)
-						lowerBound = triangleMinY;
-					else {
-						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x2, true);
-					}
-				}
-				case 3 -> {
-					lowerBound = triangleMinY;
-					if (x1 <= triangleMinX)
-						upperBound = triangleMaxY;
-					else {
-						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x1, true);
-					}
-				}
-				case 4 -> {
-					upperBound = triangleMaxY;
-					if (x1 <= triangleMinX)
-						lowerBound = triangleMinY;
-					else {
-						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x1, true);
-					}
-				}
-			}
-		}
-		else {
-			switch (simple_orient) {
-				case 1 -> {
-					upperBound = triangleMaxX;
-					if (x2 >= triangleMaxY)
-						lowerBound = triangleMinX;
-					else {
-						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x2, true);
-					}
-				}
-				case 2 -> {
-					upperBound = triangleMaxX;
-					if (x1 <= triangleMinY)
-						lowerBound = triangleMinX;
-					else {
-						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x1, true);
-					}
-				}
-				case 3 -> {
-					lowerBound = triangleMinX;
-					if (x1 >= triangleMaxY)
-						upperBound = triangleMaxX;
-					else {
-						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x2, true);
-					}
-				}
-				case 4 -> {
-					lowerBound = triangleMinX;
-					if (x1 <= triangleMinY)
-						upperBound = triangleMaxX;
-					else {
-						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
-								triangleCoordinatesBaseLongShort[2], x1, true);
-					}
-				}
-			}
-		}
-		
-		return (new double[] {lowerBound, upperBound});
-	}
+//	public static double[] lowerAndUpperXOrYTriangleTouchingPoint(int[][] triangleCoordinatesBaseLongShort, double[] xOrYs, boolean useAsX, int simple_orient) {
+//		double lowerBound = -1.0, upperBound = -1.0;
+//		double x1 = xOrYs[0]; 
+//		double x2 = xOrYs[1];
+//		if (x1 > x2) {
+//			x1 = xOrYs[1]; 
+//			x2 = xOrYs[0];
+//		}
+//
+//		int[] xCoordinates = new int[] {triangleCoordinatesBaseLongShort[0][0], 
+//				triangleCoordinatesBaseLongShort[1][0], triangleCoordinatesBaseLongShort[2][0]}; 
+//		int[] yCoordinates = new int[] {triangleCoordinatesBaseLongShort[0][1], 
+//				triangleCoordinatesBaseLongShort[1][1], triangleCoordinatesBaseLongShort[2][1]}; 
+//		int triangleMaxX = Arrays.stream(xCoordinates).max().getAsInt();
+//		int triangleMaxY = Arrays.stream(yCoordinates).max().getAsInt();
+//		int triangleMinX = Arrays.stream(xCoordinates).min().getAsInt();
+//		int triangleMinY = Arrays.stream(yCoordinates).min().getAsInt();
+//		
+//		if (useAsX) {
+//			switch (simple_orient) {
+//				case 1 -> {
+//					lowerBound = triangleMinY;
+//					if (x2 >= triangleMaxX)
+//						upperBound = triangleMaxY;
+//					else {
+//						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x2, true);
+//					}
+//				}
+//				case 2 -> {
+//					upperBound = triangleMaxY;
+//					if (x2 >= triangleMaxX)
+//						lowerBound = triangleMinY;
+//					else {
+//						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x2, true);
+//					}
+//				}
+//				case 3 -> {
+//					lowerBound = triangleMinY;
+//					if (x1 <= triangleMinX)
+//						upperBound = triangleMaxY;
+//					else {
+//						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x1, true);
+//					}
+//				}
+//				case 4 -> {
+//					upperBound = triangleMaxY;
+//					if (x1 <= triangleMinX)
+//						lowerBound = triangleMinY;
+//					else {
+//						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x1, true);
+//					}
+//				}
+//			}
+//		}
+//		else {
+//			switch (simple_orient) {
+//				case 1 -> {
+//					upperBound = triangleMaxX;
+//					if (x2 >= triangleMaxY)
+//						lowerBound = triangleMinX;
+//					else {
+//						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x2, true);
+//					}
+//				}
+//				case 2 -> {
+//					upperBound = triangleMaxX;
+//					if (x1 <= triangleMinY)
+//						lowerBound = triangleMinX;
+//					else {
+//						lowerBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x1, true);
+//					}
+//				}
+//				case 3 -> {
+//					lowerBound = triangleMinX;
+//					if (x1 >= triangleMaxY)
+//						upperBound = triangleMaxX;
+//					else {
+//						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x2, true);
+//					}
+//				}
+//				case 4 -> {
+//					lowerBound = triangleMinX;
+//					if (x1 <= triangleMinY)
+//						upperBound = triangleMaxX;
+//					else {
+//						upperBound = linearFuncOfTwoPoints(triangleCoordinatesBaseLongShort[1], 
+//								triangleCoordinatesBaseLongShort[2], x1, true);
+//					}
+//				}
+//			}
+//		}
+//		
+//		return (new double[] {lowerBound, upperBound});
+//	}
 	
 	private static int GetTileValue(float xPos, float yPos, int[][] lvlData) {
 		int xCord = (int) (xPos / Game.TILES_SIZE);
@@ -637,6 +637,32 @@ public class HelpMethods {
             }
         }
 		return result;
+	}
+	
+	public static int[][] matrixDeepCopy(int[][] matrixA) {
+		int rowsA = matrixA.length;
+        int colsA = matrixA[0].length;
+        int[][] result = new int[rowsA][colsA];
+        
+		for (int i = 0; i < rowsA; i++) {
+            for (int j = 0; j < colsA; j++) {
+                result[i][j] = matrixA[i][j];
+            }
+        }
+		return result;
+	}
+	
+	public static boolean matrixContainsValue(int[][] matrix, int containedValue) {
+		int rowsA = matrix.length;
+        int colsA = matrix[0].length;
+		for (int i = 0; i < rowsA; i++) {
+            for (int j = 0; j < colsA; j++) {
+                if (matrix[i][j] == containedValue) {
+                	return true;
+                }
+            }
+        }
+		return false;
 	}
 	
 	public static void printArray(int[][] arr) {
