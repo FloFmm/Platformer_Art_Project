@@ -288,7 +288,7 @@ public class Constants {
 		public static final int TETRIS_TILE_HEIGHT_DEFAULT = 32;
 		public static final int TETRIS_TILE_WIDTH = (int) (TETRIS_TILE_WIDTH_DEFAULT * Game.SCALE);
 		public static final int TETRIS_TILE_HEIGHT = (int) (TETRIS_TILE_HEIGHT_DEFAULT * Game.SCALE);
-		public static final int NUM_TETRIS_TILES = 1;
+		public static final int NUM_TETRIS_TILES = 13;
 		
 		public static final int T_TILE = 0;
 		public static final int L_TILE = 1;
@@ -301,17 +301,19 @@ public class Constants {
 		public static final int LONG_T_TILE = 8;
 		public static final int LONG_Z_TILE = 9;
 		public static final int LONG_S_TILE = 10;
+		public static final int I_TILE = 11;
+		public static final int LONG_I_TILE = 12;
 		
 		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*5.0f;
 		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
 		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 2.0f;
 		
-		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = -2.0f;
-		public static final float TETRIS_TILE_MIN_EXPLOSION_Y_SPEED = 5.0f;
-		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = +2.0f;
-		public static final float TETRIS_TILE_MAX_EXPLOSION_Y_SPEED = 10.0f;
+		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = -TETRIS_TILE_MAX_THROW_SPEED*1.0f;
+		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*1.0f;
+		public static final float TETRIS_TILE_MIN_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.75f;
+		public static final float TETRIS_TILE_MAX_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED*1.5f;
 		
-		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 0.5f;
+		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 1.0f;
 		public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.2f;
 		public static final int TETRIS_GRID_SIZE = Game.TILES_SIZE/4;
 		
@@ -375,10 +377,82 @@ public class Constants {
 			switch (tileIndex) {
 			case T_TILE:
 				matrix = new int[][] {{0,0,0,0}, 
+									 {0,1,0,0},
+									 {1,1,1,0},
+									 {0,0,0,0}};
+				break;		
+			case L_TILE:
+				matrix = new int[][] {{0,1,0,0}, 
+									 {0,1,0,0},
+									 {0,1,1,0},
+									 {0,0,0,0}};
+				break;		
+			case J_TILE:
+				matrix = new int[][] {{0,0,1,0}, 
+									{0,0,1,0},
+									{0,1,1,0},
+									{0,0,0,0}};
+				break;		
+			case Z_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{1,1,0,0},
+									{0,1,1,0},
+									{0,0,0,0}};
+				break;		
+			case S_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,1,1,0},
+									{1,1,0,0},
+									{0,0,0,0}};
+				break;		
+			case O_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,1,1,0},
+									{0,1,1,0},
+									{0,0,0,0}};
+				break;		
+			case LONG_T_TILE:
+				matrix = new int[][] {{0,1,0,0}, 
 									{0,1,0,0},
 									{1,1,1,0},
 									{0,0,0,0}};
-				break;									
+				break;	
+			case CROSS_TILE:
+				matrix = new int[][] {{0,1,0,0}, 
+									{1,1,1,0},
+									{0,1,0,0},
+									{0,0,0,0}};
+				break;	
+			case Q_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,1,1,0},
+									{1,1,1,0},
+									{0,0,0,0}};
+				break;	
+			case LONG_Z_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{1,1,0,0},
+									{0,1,1,1},
+									{0,0,0,0}};
+				break;	
+			case LONG_S_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,1,1,1},
+									{1,1,0,0},
+									{0,0,0,0}};
+				break;	
+			case I_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,1,0,0},
+									{0,1,0,0},
+									{0,1,0,0}};
+				break;
+			case LONG_I_TILE:
+				matrix = new int[][] {{0,1,0,0}, 
+									{0,1,0,0},
+									{0,1,0,0},
+									{0,1,0,0}};
+				break;
 			default:
 				matrix = new int[][] {{1,1,1,1}, 
 									{1,1,1,1},

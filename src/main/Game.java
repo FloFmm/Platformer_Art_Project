@@ -33,7 +33,7 @@ public class Game implements Runnable {
 	public final static int GAME_WIDTH = 1920;//TILES_SIZE * TILES_IN_WIDTH;
 	public final static int GAME_HEIGHT = 1080;//TILES_SIZE * TILES_IN_HEIGHT;
 
-	private final boolean SHOW_FPS_UPS = true;
+	private final boolean SHOW_FPS_UPS = false;
 
 	public Game() {
 		System.out.println("size: " + GAME_WIDTH + " : " + GAME_HEIGHT);
@@ -123,7 +123,7 @@ public class Game implements Runnable {
 				if (System.currentTimeMillis() - lastCheck >= 1000) {
 
 					lastCheck = System.currentTimeMillis();
-					// System.out.println("FPS: " + frames + " | UPS: " + updates);
+					System.out.println("FPS: " + frames + " | UPS: " + updates);
 					frames = 0;
 					updates = 0;
 

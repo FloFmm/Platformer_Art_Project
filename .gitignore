@@ -12,5 +12,6 @@ local.properties
 .project
 .classpath
 
-res/
-!res/lvls/
+res/animation
+res/audio
+

@@ -191,19 +191,21 @@ public class TetrisTile extends Entity {
 					BuildingZone currentBuildingZone = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
 					if (!tetrisTileCanMoveHere(hitbox.x, hitbox.y + airSpeed, currentBuildingZone)) {
 						int[] xy = closestLockingXY(hitbox.x, hitbox.y + airSpeed, currentBuildingZone);
-						hitbox.x = xy[0];
-						hitbox.y = xy[1];
-						xSpeed = 0;
-						if (movingInRaster) {
-							airSpeed = 0;
-							inAir = false;
-							lockedInBuildingZone = currentBuildingZone;
-							lockedInBuildingZone.addTetrisTile(this);
-							return;
-						}
-						else {
-							airSpeed = 4.0f;
-							movingInRaster = true;
+						if (xy != null) {
+							hitbox.x = xy[0];
+							hitbox.y = xy[1];
+							xSpeed = 0;
+							if (movingInRaster) {
+								airSpeed = 0;
+								inAir = false;
+								lockedInBuildingZone = currentBuildingZone;
+								lockedInBuildingZone.addTetrisTile(this);
+							}
+							else {
+								airSpeed = 4.0f;
+								System.out.println("208");
+								movingInRaster = true;
+							}
 						}
 					}
 				}
@@ -214,13 +216,16 @@ public class TetrisTile extends Entity {
 			} else {
 				if (isInBuildingZone() && airSpeed > 0) {
 					lockedInBuildingZone = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
-					int[] xy = closestLockingXY(hitbox.x, hitbox.y + airSpeed, lockedInBuildingZone);
-					hitbox.x = xy[0];
-					hitbox.y = (int) Math.floor((double) Math.round(hitbox.y + airSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
 					airSpeed = 0;
-					xSpeed = 0;
 					inAir = false;
-					lockedInBuildingZone.addTetrisTile(this);
+					
+					int[] xy = closestLockingXY(hitbox.x, hitbox.y + airSpeed, lockedInBuildingZone);
+					if (xy != null) {
+						hitbox.x = xy[0];
+						hitbox.y = (int) Math.floor((double) Math.round(hitbox.y + airSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
+						xSpeed = 0;
+						lockedInBuildingZone.addTetrisTile(this);
+					}
 				}
 				else {
 					//TODO
@@ -268,9 +273,10 @@ public class TetrisTile extends Entity {
 	public void explosion() {
 		isCarriedBy = null;
 		movingInRaster = false;
+		inAir = true;
 		lockedInBuildingZone = null;
 		Random random = new Random();
-		hitbox.y -= 5;
+		hitbox.y -= 100.0f;
         xSpeed = random.nextFloat()*
         		(TETRIS_TILE_MAX_EXPLOSION_X_SPEED - TETRIS_TILE_MIN_EXPLOSION_X_SPEED) + 
         		TETRIS_TILE_MIN_EXPLOSION_X_SPEED;
@@ -299,6 +305,7 @@ public class TetrisTile extends Entity {
 	}
 	
 	public void resetTetrisTile() {
+		System.out.println("312");
 		xSpeed = 0;
 		airSpeed = 0;
 		isCarriedBy = null;
@@ -357,5 +364,9 @@ public class TetrisTile extends Entity {
 
 	public int[][] getMatrix() {
 		return matrix;
+	}
+
+	public void setLockedInBuildingZone(BuildingZone lockedInBuildingZone) {
+		this.lockedInBuildingZone = lockedInBuildingZone;		
 	}
 }

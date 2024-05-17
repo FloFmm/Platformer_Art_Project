@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
 import entities.Crabby;
 import entities.TetrisTile;
@@ -95,24 +96,31 @@ public class Level {
 		else
 			lvlData[y][x] = redValue;
 		switch (redValue) {
-		case 0, 1, 2, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> grass.add(new Grass((int) (x * Game.TILES_SIZE), 
-					(int) (y * Game.TILES_SIZE) - Game.TILES_SIZE, getRndGrassType(x)));
-		case 3 -> {
-			int[] leftRightUpperLower = calculateAreaCoveredByEquivalentTiles(redValue, x, y, img);
-			int leftBound = leftRightUpperLower[0];
-			int rightBound = leftRightUpperLower[1];
-			int upperBound = leftRightUpperLower[2];
-			int lowerBound = leftRightUpperLower[3];
-			if (x == leftBound && y == lowerBound)
-				buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE), 
-						(rightBound-leftBound+1) * Game.TILES_SIZE, 
-						(upperBound-lowerBound+1) * Game.TILES_SIZE, 
-						buildingZoneIndex,
-						ROCKET_MATRIX,
-						"rocket"));
-			buildingZoneIndex += 1;
-		}
-		
+			case 0, 1, 2, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> grass.add(new Grass((int) (x * Game.TILES_SIZE), 
+						(int) (y * Game.TILES_SIZE) - Game.TILES_SIZE, getRndGrassType(x)));
+			case 3 -> {
+				int[] leftRightUpperLower = calculateAreaCoveredByEquivalentTiles(redValue, x, y, img);
+				int leftBound = leftRightUpperLower[0];
+				int rightBound = leftRightUpperLower[1];
+				int upperBound = leftRightUpperLower[2];
+				int lowerBound = leftRightUpperLower[3];
+				if (x == leftBound && y == lowerBound) {
+					int[][] goalMatrix = WINDMILL_MATRIX;
+					String type = "windmill";
+					if (buildingZoneIndex == 0) {
+						goalMatrix = ROCKET_MATRIX;
+						type = "rocket";
+					}
+	
+					buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE), 
+							(rightBound-leftBound+1) * Game.TILES_SIZE, 
+							(upperBound-lowerBound+1) * Game.TILES_SIZE, 
+							buildingZoneIndex,
+							goalMatrix,
+							type));
+					buildingZoneIndex += 1;
+				}
+			}
 		}
 	}
 
@@ -121,10 +129,11 @@ public class Level {
 	}
 
 	private void loadEntities(int greenValue, int x, int y) {
+		Random random = new Random();
 		switch (greenValue) {
 		case CRABBY -> crabs.add(new Crabby(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
 		case TETRIS_TILE_GREEN_VALUE -> tetrisTiles.add(new TetrisTile(x * Game.TILES_SIZE, y * Game.TILES_SIZE, 
-				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, 0, lvlData));
+				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES-1), lvlData));
 		case PLAYER_GREEN_VALUE -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
 		}
 	}

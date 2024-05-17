@@ -52,7 +52,6 @@ public class BuildingZoneManager {
 			else if (c.getZoneType() == "windmill")
 				zoneImg = windmillImg;
 			
-			
 			g.drawImage(zoneImg, 
 					(int) (c.getHitbox().x - xLvlOffset),
 					(int) (c.getHitbox().y - yLvlOffset), 
@@ -65,6 +64,6 @@ public class BuildingZoneManager {
 
 	private void loadBuildingZoneImgs() {
 		rocketImg = LoadSave.GetSpriteAtlas("building_zones/rocket.png");
-		//BufferedImage windmill = LoadSave.GetSpriteAtlas("tetris_tiles/windmill.png");
+		windmillImg = LoadSave.GetSpriteAtlas("building_zones/windmill.png");
 	}
 }

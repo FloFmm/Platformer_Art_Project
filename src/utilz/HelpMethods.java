@@ -639,6 +639,22 @@ public class HelpMethods {
 		return result;
 	}
 	
+	public static boolean matrixEquiv(int[][] matrixA, int[][] matrixB) {
+		int rowsA = matrixA.length;
+        int colsA = matrixA[0].length;
+        int rowsB = matrixB.length;
+        int colsB = matrixB[0].length;
+        if (rowsA != rowsB || colsA != colsB)
+        	return false;
+        
+		for (int i = 0; i < rowsA; i++) {
+            for (int j = 0; j < colsA; j++) {
+            	if (matrixA[i][j] != matrixB[i][j])
+            		return false;
+            }
+        }
+		return true;
+	}
 	
 	public static int[][] matrixScalarMul(int[][] matrixA, int factor) {
 		int rowsA = matrixA.length;

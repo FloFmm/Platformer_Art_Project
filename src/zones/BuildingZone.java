@@ -46,23 +46,35 @@ public class BuildingZone {
         return m;
 	}
 	
-	public void addTetrisTile(TetrisTile tetrisTile) {
+	public boolean addTetrisTile(TetrisTile tetrisTile) {
+		int[][] oldMatrix = matrixDeepCopy(matrix);
 		matrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
 				tetrisTile.getHitbox().y, 
 				tetrisTile.getMatrix(), 
 				tetrisTile.getXDrawOffset(), 
 				tetrisTile.getYDrawOffset());
-		tetrisTiles.add(tetrisTile);
+		if (matrixEquiv(oldMatrix, matrix)) {
+			tetrisTile.setLockedInBuildingZone(null);
+			return false;
+		}
+		
+		
 		if (!matrixIsCompletable()) {
-			TetrisTile lastAddedTile = tetrisTiles.remove(tetrisTiles.size() - 1);
+			//TetrisTile lastAddedTile = tetrisTiles.remove(tetrisTiles.size() - 1);
+			TetrisTile lastAddedTile = tetrisTile;
 			matrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
 					tetrisTile.getHitbox().y, 
 					matrixScalarMul(tetrisTile.getMatrix(),-1), 
 					tetrisTile.getXDrawOffset(), 
 					tetrisTile.getYDrawOffset());
-			lastAddedTile.explosion();
 			
+			lastAddedTile.explosion();
+			return false;
 		}
+		else {
+			tetrisTiles.add(tetrisTile);
+		}
+		return true;
 	}
 	
 	private boolean matrixIsCompletable() {
