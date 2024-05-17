@@ -14,7 +14,7 @@ import levels.Level;
 import main.Game;
 import zones.BuildingZone;
 import java.awt.geom.Rectangle2D;
-
+import java.util.Random;
 public class TetrisTile extends Entity {
 	
 	private int[][] lvlData;
@@ -29,6 +29,7 @@ public class TetrisTile extends Entity {
 	private float yDrawOffset=0;
 	private Player isCarriedBy;
 	int[][] matrix;
+	boolean movingInRaster = false;
 
 	public TetrisTile(float x, float y, int width, int height, int tileIndex, int[][] lvlData) {
 		super(x, y, width, height);
@@ -46,8 +47,8 @@ public class TetrisTile extends Entity {
 	}
 	
 	private boolean tetrisTileCanMoveHere(float x, float y, BuildingZone buildingZone) {
-		double xGridIndex = Math.round(x)/TETRIS_GRID_SIZE;
-		double yGridIndex = Math.round(y)/TETRIS_GRID_SIZE;
+		double xGridIndex = (double) Math.round(x)/TETRIS_GRID_SIZE;
+		double yGridIndex = (double) Math.round(y)/TETRIS_GRID_SIZE;
 		int xGridIndexFloor = (int) Math.floor(xGridIndex)*TETRIS_GRID_SIZE;
 		int yGridIndexFloor = (int) Math.floor(yGridIndex)*TETRIS_GRID_SIZE;
 		int xGridIndexCeil = (int) Math.ceil(xGridIndex)*TETRIS_GRID_SIZE;
@@ -77,8 +78,8 @@ public class TetrisTile extends Entity {
 	}
 	
 	private int[] closestLockingXY(float x, float y, BuildingZone buildingZone) {
-		double xGridIndex = Math.round(x)/TETRIS_GRID_SIZE;
-		double yGridIndex = Math.round(y)/TETRIS_GRID_SIZE;
+		double xGridIndex = (double) Math.round(x)/TETRIS_GRID_SIZE;
+		double yGridIndex = (double) Math.round(y)/TETRIS_GRID_SIZE;
 		int xGridIndexFloor = (int) Math.floor(xGridIndex)*TETRIS_GRID_SIZE;
 		int yGridIndexFloor = (int) Math.floor(yGridIndex)*TETRIS_GRID_SIZE;
 		int xGridIndexCeil = (int) Math.ceil(xGridIndex)*TETRIS_GRID_SIZE;
@@ -90,27 +91,40 @@ public class TetrisTile extends Entity {
 			xGridIndexNotRound = xGridIndexCeil;
 		if (yGridIndexNotRound == yGridIndexRound)
 			yGridIndexNotRound = yGridIndexCeil;
+		
 
 		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexRound, yGridIndexRound, 
 				matrix, xDrawOffset, yDrawOffset), 2)) {
 			return new int[] {xGridIndexRound, yGridIndexRound};
 		}
-		
+//		printArray(buildingZone.addTetrisTileMatrix(xGridIndexRound, yGridIndexRound, 
+//				matrix, xDrawOffset, yDrawOffset));
+//		System.out.println("==========================");
+//		
 		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexRound, yGridIndexNotRound, 
 				matrix, xDrawOffset, yDrawOffset), 2)) {
 			return new int[] {xGridIndexRound, yGridIndexNotRound};
 		}
-		
+//		printArray(buildingZone.addTetrisTileMatrix(xGridIndexRound, yGridIndexNotRound, 
+//				matrix, xDrawOffset, yDrawOffset));
+//		System.out.println("==========================");
+//		
 		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexNotRound, yGridIndexRound, 
 				matrix, xDrawOffset, yDrawOffset), 2)) {
 			return new int[] {xGridIndexNotRound, yGridIndexRound};
 		}
-			
+//		printArray(buildingZone.addTetrisTileMatrix(xGridIndexNotRound, yGridIndexRound, 
+//				matrix, xDrawOffset, yDrawOffset));
+//		System.out.println("==========================");
+//		
 		if (!matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexNotRound, yGridIndexNotRound, 
 				matrix, xDrawOffset, yDrawOffset), 2)) {
 			return new int[] {xGridIndexNotRound, yGridIndexNotRound};
 		}
-		
+//		printArray(buildingZone.addTetrisTileMatrix(xGridIndexNotRound, yGridIndexNotRound, 
+//				matrix, xDrawOffset, yDrawOffset));
+//		System.out.println("==========================");
+//		
 		return null;
 	}
 	
@@ -179,13 +193,18 @@ public class TetrisTile extends Entity {
 						int[] xy = closestLockingXY(hitbox.x, hitbox.y + airSpeed, currentBuildingZone);
 						hitbox.x = xy[0];
 						hitbox.y = xy[1];
-						airSpeed = 0;
 						xSpeed = 0;
-						inAir = false;
-						lockedInBuildingZone = currentBuildingZone;
-						lockedInBuildingZone.addTetrisTile(this);
-						System.out.println("segeherhrttjtr");
-						return;
+						if (movingInRaster) {
+							airSpeed = 0;
+							inAir = false;
+							lockedInBuildingZone = currentBuildingZone;
+							lockedInBuildingZone.addTetrisTile(this);
+							return;
+						}
+						else {
+							airSpeed = 4.0f;
+							movingInRaster = true;
+						}
 					}
 				}
 				
@@ -195,9 +214,9 @@ public class TetrisTile extends Entity {
 			} else {
 				if (isInBuildingZone() && airSpeed > 0) {
 					lockedInBuildingZone = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
-					
-					hitbox.x = Math.round((hitbox.x + xSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
-					hitbox.y = Math.round((hitbox.y + airSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
+					int[] xy = closestLockingXY(hitbox.x, hitbox.y + airSpeed, lockedInBuildingZone);
+					hitbox.x = xy[0];
+					hitbox.y = (int) Math.floor((double) Math.round(hitbox.y + airSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
 					airSpeed = 0;
 					xSpeed = 0;
 					inAir = false;
@@ -246,6 +265,20 @@ public class TetrisTile extends Entity {
 		}
 	}
 
+	public void explosion() {
+		isCarriedBy = null;
+		movingInRaster = false;
+		lockedInBuildingZone = null;
+		Random random = new Random();
+		hitbox.y -= 5;
+        xSpeed = random.nextFloat()*
+        		(TETRIS_TILE_MAX_EXPLOSION_X_SPEED - TETRIS_TILE_MIN_EXPLOSION_X_SPEED) + 
+        		TETRIS_TILE_MIN_EXPLOSION_X_SPEED;
+		airSpeed = -(random.nextFloat()*
+        		(TETRIS_TILE_MAX_EXPLOSION_Y_SPEED - TETRIS_TILE_MIN_EXPLOSION_Y_SPEED) + 
+        		TETRIS_TILE_MIN_EXPLOSION_Y_SPEED);
+	}
+	
 	private boolean isInBuildingZone() {
 		float[] xCoordinates = {hitbox.x, (hitbox.x+hitbox.width-1), hitbox.x, (hitbox.x+hitbox.width-1)};
 		float[] yCoordinates = {hitbox.y, hitbox.y, (hitbox.y+hitbox.height-1), (hitbox.y+hitbox.height-1)};
@@ -268,6 +301,8 @@ public class TetrisTile extends Entity {
 	public void resetTetrisTile() {
 		xSpeed = 0;
 		airSpeed = 0;
+		isCarriedBy = null;
+		movingInRaster = false;
 
 	}
 

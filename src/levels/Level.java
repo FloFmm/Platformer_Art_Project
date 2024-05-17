@@ -106,7 +106,10 @@ public class Level {
 			if (x == leftBound && y == lowerBound)
 				buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE), 
 						(rightBound-leftBound+1) * Game.TILES_SIZE, 
-						(upperBound-lowerBound+1) * Game.TILES_SIZE, buildingZoneIndex));
+						(upperBound-lowerBound+1) * Game.TILES_SIZE, 
+						buildingZoneIndex,
+						ROCKET_MATRIX,
+						"rocket"));
 			buildingZoneIndex += 1;
 		}
 		

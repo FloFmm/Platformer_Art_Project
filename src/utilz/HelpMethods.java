@@ -639,6 +639,20 @@ public class HelpMethods {
 		return result;
 	}
 	
+	
+	public static int[][] matrixScalarMul(int[][] matrixA, int factor) {
+		int rowsA = matrixA.length;
+        int colsA = matrixA[0].length;
+        int[][] result = new int[rowsA][colsA];
+        
+		for (int i = 0; i < rowsA; i++) {
+            for (int j = 0; j < colsA; j++) {
+                result[i][j] = matrixA[i][j]*factor;
+            }
+        }
+		return result;
+	}
+	
 	public static int[][] matrixDeepCopy(int[][] matrixA) {
 		int rowsA = matrixA.length;
         int colsA = matrixA[0].length;

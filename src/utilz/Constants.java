@@ -306,9 +306,69 @@ public class Constants {
 		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
 		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 2.0f;
 		
+		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = -2.0f;
+		public static final float TETRIS_TILE_MIN_EXPLOSION_Y_SPEED = 5.0f;
+		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = +2.0f;
+		public static final float TETRIS_TILE_MAX_EXPLOSION_Y_SPEED = 10.0f;
+		
 		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 0.5f;
 		public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.2f;
 		public static final int TETRIS_GRID_SIZE = Game.TILES_SIZE/4;
+		
+		public static final int[][] ROCKET_MATRIX = new int[][] {
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			
+			{0,0,0,0, 1,1,1,0, 0,0,0,0},
+			{0,0,0,0, 1,1,1,0, 0,0,0,0},
+			{0,0,0,0, 1,1,1,0, 0,0,0,0},
+			{0,0,0,0, 1,1,1,0, 0,0,0,0},
+			
+			{0,0,0,0, 1,1,1,0, 0,0,0,0},
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			{0,0,0,1, 1,1,1,1, 0,0,0,0},
+			{0,0,0,1, 0,1,0,1, 0,0,0,0},
+			{0,0,0,1, 0,1,0,1, 0,0,0,0}
+		};
+		
+		public static final int[][] WINDMILL_MATRIX = new int[][] {
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 1,1,1,0, 0,0,0,0},
+			{0,0,0,0, 1,1,1,1, 0,0,0,0},
+			
+			{0,0,0,1, 1,1,0,1, 0,0,0,0},
+			{0,0,1,1, 0,1,0,1, 1,0,0,0},
+			{0,1,1,0, 0,1,0,0, 1,1,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 1,1,1,0, 0,0,0,0},
+		};
+		
 		
 		public static int[][] GetTetrisTileShape (int tileIndex, int rotation) {
 			int[][] matrix;

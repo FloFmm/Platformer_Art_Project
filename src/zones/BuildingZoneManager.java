@@ -16,7 +16,7 @@ public class BuildingZoneManager {
 
 	private Playing playing;
 	private Level currentLevel;
-	private BufferedImage[] buildingZoneImgs;
+	private BufferedImage rocketImg, windmillImg;
 	
 	public BuildingZoneManager(Playing playing) {
 		this.playing = playing;
@@ -46,15 +46,25 @@ public class BuildingZoneManager {
 
 	private void drawBuildingZones(Graphics g, int xLvlOffset, int yLvlOffset) {
 		for (BuildingZone c : currentLevel.getBuildingZones()) {
-			//g.drawImage(buildingZoneImgs[c.getBuildingZoneIndex()], 
-			//		(int) (c.getHitbox().x - xLvlOffset),
-			//		(int) (c.getHitbox().y - yLvlOffset), 
-			//		(int) c.getHitbox().width, (int) c.getHitbox().height, null);
+			BufferedImage zoneImg = null;
+			if (c.getZoneType() == "rocket") 
+				zoneImg = rocketImg;
+			else if (c.getZoneType() == "windmill")
+				zoneImg = windmillImg;
+			
+			
+			g.drawImage(zoneImg, 
+					(int) (c.getHitbox().x - xLvlOffset),
+					(int) (c.getHitbox().y - yLvlOffset), 
+					(int) c.getHitbox().width, (int) c.getHitbox().height, null);
 			c.drawHitbox(g, xLvlOffset, yLvlOffset);
+				
 		}
 	}
 	
 
 	private void loadBuildingZoneImgs() {
+		rocketImg = LoadSave.GetSpriteAtlas("building_zones/rocket.png");
+		//BufferedImage windmill = LoadSave.GetSpriteAtlas("tetris_tiles/windmill.png");
 	}
 }
