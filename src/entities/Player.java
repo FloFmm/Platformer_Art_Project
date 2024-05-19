@@ -5,6 +5,7 @@ import static utilz.HelpMethods.*;
 import static utilz.Constants.*;
 import static utilz.Constants.Directions.*;
 import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.ControllerConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -16,14 +17,19 @@ import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
 import utilz.LoadSave;
+
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import org.lwjgl.glfw.GLFW;
 
 public class Player extends Entity {
 	
 	private BufferedImage[][] animations;
 	private boolean moving = false, attacking = false;
-	private boolean left, right, jump, grabOrThrow;
+	private boolean left, right, jump, grabOrThrow = false;
 	protected Rectangle2D.Float grabBox;
 	private TetrisTile isCarrying;
 	private long throwPushDownStartTime;
@@ -70,13 +76,19 @@ public class Player extends Entity {
 	private int powerGrowSpeed = 15;
 	private int powerGrowTick;
 	
-	
+	//controller
+	private int controllerID; 
+	private int prevGrabOrThrowControllerState = GLFW.GLFW_RELEASE, grabOrThrowControllerState = GLFW.GLFW_RELEASE;
 	
 	private final boolean isPlayer1;
 
 	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
 		super(x, y, width, height);
 		this.isPlayer1 = isPlayer1;
+		if (isPlayer1) 
+			controllerID = GLFW.GLFW_JOYSTICK_1;
+		else
+			controllerID = GLFW.GLFW_JOYSTICK_2;
 		this.playing = playing;
 		this.state = IDLE;
 		this.maxHealth = 100;
@@ -105,6 +117,8 @@ public class Player extends Entity {
 	}
 
 	public void update() {
+		if (playing.useController)
+			updateControllerInputs();
 		updateHealthBar();
 		updatePowerBar();
 
@@ -170,6 +184,54 @@ public class Player extends Entity {
 
 		updateAnimationTick();
 		setAnimation();
+	}
+	
+	private void updateControllerInputs() {
+		boolean controllerIsPresent = GLFW.glfwJoystickPresent(controllerID);
+		if (controllerIsPresent) {
+			ByteBuffer buttons = GLFW.glfwGetJoystickButtons(controllerID);
+
+			// jump
+	        int jumpControllerState = buttons.get(3);
+	        if (jumpControllerState == GLFW.GLFW_PRESS) {
+	        	jump = true;
+	        }
+	        if (jumpControllerState == GLFW.GLFW_RELEASE) {
+	        	jump = false;
+	        }
+	        
+	        // grab or throw
+	        prevGrabOrThrowControllerState = grabOrThrowControllerState;
+	        grabOrThrowControllerState = buttons.get(2);
+	        if (grabOrThrowControllerState == GLFW.GLFW_PRESS) {
+	        	
+	        	if (!grabOrThrow) {
+					grabOrThrow = true;
+					throwPushDownStartTime = System.nanoTime();	
+				}
+	        }
+	        if (grabOrThrowControllerState == GLFW.GLFW_RELEASE && prevGrabOrThrowControllerState == GLFW.GLFW_PRESS) {
+				grabOrThrow = false;
+				grabOrThrow();
+	        }
+	        
+	        
+		
+	        // left joystick for running
+			FloatBuffer axes = GLFW.glfwGetJoystickAxes(controllerID);
+			if (axes.get(0) > JOYSTICK_DEAD_ZONE) {
+				setRight(true);
+				setLeft(false);
+			}
+			else if (axes.get(0) < -JOYSTICK_DEAD_ZONE) {
+				setRight(false);
+				setLeft(true);
+			}
+			else {
+				setRight(false);
+				setLeft(false);
+			}
+		}
 	}
 
 	

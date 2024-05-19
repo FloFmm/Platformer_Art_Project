@@ -27,6 +27,7 @@ public class KeyboardInputs implements KeyListener {
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void keyPressed(KeyEvent e) {
+		System.out.println(e);
 		switch (Gamestate.state) {
 		case MENU -> gamePanel.getGame().getMenu().keyPressed(e);
 		case PLAYING -> gamePanel.getGame().getPlaying().keyPressed(e);

@@ -466,7 +466,11 @@ public class Constants {
 			}
 			return matrix;
 		}
-
+	}
+	
+	public static class ControllerConstants {
+		public static final float JOYSTICK_DEAD_ZONE = 0.75f;
+		
 	}
 
 }

@@ -2,6 +2,8 @@ package main;
 
 import java.awt.Graphics;
 
+import org.lwjgl.glfw.GLFW;
+
 import audio.AudioPlayer;
 import gamestates.Credits;
 import gamestates.GameOptions;
@@ -9,7 +11,9 @@ import gamestates.Gamestate;
 import gamestates.Menu;
 import gamestates.Playing;
 import ui.AudioOptions;
+
 import static utilz.Constants.*;
+
 
 public class Game implements Runnable {
 
@@ -36,6 +40,7 @@ public class Game implements Runnable {
 	private final boolean SHOW_FPS_UPS = false;
 
 	public Game() {
+	
 		System.out.println("size: " + GAME_WIDTH + " : " + GAME_HEIGHT);
 		initClasses();
 		gamePanel1 = new GamePanel(this, true);
@@ -53,6 +58,11 @@ public class Game implements Runnable {
 		playing = new Playing(this);
 		credits = new Credits(this);
 		gameOptions = new GameOptions(this);
+		
+		// joystick listener
+		if (!GLFW.glfwInit()) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
 	}
 
 	private void startGameLoop() {

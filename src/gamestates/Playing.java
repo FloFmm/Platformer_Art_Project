@@ -9,6 +9,12 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.GLFW;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
+import org.lwjgl.BufferUtils;
+
 import entities.EnemyManager;
 import entities.Player;
 import entities.TetrisTileManager;
@@ -63,6 +69,8 @@ public class Playing extends State implements Statemethods {
 	private boolean playerDying;
 
 	private float windSpeed = 2.0f;//5.0f;
+	public boolean useController = true;
+	
 	
 	public Playing(Game game) {
 		super(game);
@@ -168,6 +176,7 @@ public class Playing extends State implements Statemethods {
 			player2.update();
 		}
 		else {
+			
 			updateDialogue();
 			//if (drawRain)
 			//	rain.update(xLvlOffset);
@@ -182,6 +191,8 @@ public class Playing extends State implements Statemethods {
 			checkCloseToBorder(player2);
 		}
 	}
+
+
 
 	private void updateDialogue() {
 		for (DialogueEffect de : dialogEffects)
@@ -347,6 +358,8 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		if (useController)
+			return;
 		//System.out.println(e);
 		if (!gameOver && !gameCompleted && !lvlCompleted)
 			switch (e.getKeyCode()) {
@@ -401,6 +414,8 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		if (useController)
+			return;
 		//System.out.println(e);
 		if (!gameOver && !gameCompleted && !lvlCompleted)
 			switch (e.getKeyCode()) {
@@ -436,6 +451,8 @@ public class Playing extends State implements Statemethods {
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
+		if (useController)
+			return;
 		//System.out.println(e);
 		if (!gameOver && !gameCompleted && !lvlCompleted)
 			switch (e.getKeyChar()) {
