@@ -25,10 +25,11 @@ public class Menu extends State implements Statemethods {
 
 	private void loadBackground() {
 		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND);
-		menuWidth = (int) (backgroundImg.getWidth() * Game.SCALE);
-		menuHeight = (int) (backgroundImg.getHeight() * Game.SCALE);
+		float heightFactor = 0.8f, widthFactor = 0.4f;
+		menuWidth = (int) (Game.GAME_WIDTH*widthFactor);
+		menuHeight = (int) (Game.GAME_HEIGHT*heightFactor);
 		menuX = Game.GAME_WIDTH / 2 - menuWidth / 2;
-		menuY = (int) (25 * Game.SCALE);
+		menuY = Game.GAME_HEIGHT / 2 - menuHeight / 2 - (int) ((1-heightFactor)/3*Game.GAME_HEIGHT);
 	}
 
 	private void loadButtons() {
@@ -46,11 +47,14 @@ public class Menu extends State implements Statemethods {
 
 	@Override
 	public void draw(Graphics g, boolean isPlayer1) {
-		g.drawImage(backgroundImgPink, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
-		g.drawImage(backgroundImg, menuX, menuY, menuWidth, menuHeight, null);
+		int xDrawOffset = 0;
+		if (!isPlayer1)
+			xDrawOffset = -Game.GAME_WIDTH/2;
+		g.drawImage(backgroundImgPink, xDrawOffset, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
+		g.drawImage(backgroundImg, menuX + xDrawOffset, menuY, menuWidth, menuHeight, null);
 
 		for (MenuButton mb : buttons)
-			mb.draw(g);
+			mb.draw(g, xDrawOffset);
 	}
 
 	@Override

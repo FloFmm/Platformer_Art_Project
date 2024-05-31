@@ -15,3 +15,7 @@ local.properties
 res/animation
 res/audio
 
+res/building_zones/Untitled.xcf
+res/playing_fg_img.png
+res/tetris_tiles/0_old.png
+

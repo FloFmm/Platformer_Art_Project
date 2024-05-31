@@ -56,7 +56,7 @@ public class Playing extends State implements Statemethods {
 	private int lowerBorder = (int) (0.75 * Game.GAME_HEIGHT/2);
 	private int maxLvlOffsetX, maxLvlOffsetY;
 
-	private BufferedImage backgroundImg, bigCloud, smallCloud, shipImgs[];
+	private BufferedImage backgroundImg, foregroundImg, bigCloud, smallCloud, shipImgs[];
 	private BufferedImage[] questionImgs, exclamationImgs;
 	private ArrayList<DialogueEffect> dialogEffects = new ArrayList<>();
 
@@ -77,6 +77,7 @@ public class Playing extends State implements Statemethods {
 		initClasses();
 
 		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.PLAYING_BG_IMG);
+		foregroundImg =  LoadSave.GetSpriteAtlas(LoadSave.PLAYING_FG_IMG);
 		bigCloud = LoadSave.GetSpriteAtlas(LoadSave.BIG_CLOUDS);
 		smallCloud = LoadSave.GetSpriteAtlas(LoadSave.SMALL_CLOUDS);
 		smallCloudsPos = new int[8];
@@ -249,6 +250,7 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void draw(Graphics g, boolean isPlayer1) {
+		
 		g.drawImage(backgroundImg, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
 		int xLvlOffset, yLvlOffset;
 		if (isPlayer1) {
@@ -259,12 +261,16 @@ public class Playing extends State implements Statemethods {
 			xLvlOffset = player2.getXLvlOffset();
 			yLvlOffset = player2.getYLvlOffset();
 		}
+		
 			
 		drawClouds(g, xLvlOffset);
 		//if (drawRain)
 		//	rain.draw(g, xLvlOffset, yLvlOffset);
 
 		levelManager.draw(g, xLvlOffset, yLvlOffset);
+		g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, foregroundImg.getWidth(), foregroundImg.getHeight(), null);
+
+		
 		objectManager.draw(g, xLvlOffset, yLvlOffset);
 		enemyManager.draw(g, xLvlOffset, yLvlOffset);
 		tetrisTileManager.draw(g, xLvlOffset, yLvlOffset);
@@ -288,7 +294,8 @@ public class Playing extends State implements Statemethods {
 			levelCompletedOverlay.draw(g);
 		else if (gameCompleted)
 			gameCompletedOverlay.draw(g);
-
+		
+		
 	}
 
 	private void drawClouds(Graphics g, int xLvlOffset) {

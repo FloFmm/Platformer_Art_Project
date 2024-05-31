@@ -56,7 +56,9 @@ public class AudioPlayer {
 	}
 
 	private Clip getClip(String name) {
+		
 		URL url = getClass().getResource("/audio/" + name + ".wav");
+		System.out.println(url);
 		AudioInputStream audio;
 
 		try {

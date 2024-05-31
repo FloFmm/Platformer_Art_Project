@@ -36,8 +36,8 @@ public class MenuButton {
 			imgs[i] = temp.getSubimage(i * B_WIDTH_DEFAULT, rowIndex * B_HEIGHT_DEFAULT, B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT);
 	}
 
-	public void draw(Graphics g) {
-		g.drawImage(imgs[index], xPos - xOffsetCenter, yPos, B_WIDTH, B_HEIGHT, null);
+	public void draw(Graphics g, int xDrawOffset) {
+		g.drawImage(imgs[index], xPos - xOffsetCenter + xDrawOffset, yPos, B_WIDTH, B_HEIGHT, null);
 	}
 
 	public void update() {

@@ -79,7 +79,7 @@ public class Player extends Entity {
 	//controller
 	private int controllerID; 
 	private int prevGrabOrThrowControllerState = GLFW.GLFW_RELEASE, grabOrThrowControllerState = GLFW.GLFW_RELEASE;
-	
+	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
 	private final boolean isPlayer1;
 
 	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
@@ -192,7 +192,7 @@ public class Player extends Entity {
 			ByteBuffer buttons = GLFW.glfwGetJoystickButtons(controllerID);
 
 			// jump
-	        int jumpControllerState = buttons.get(3);
+	        int jumpControllerState = buttons.get(1);
 	        if (jumpControllerState == GLFW.GLFW_PRESS) {
 	        	jump = true;
 	        }
@@ -215,8 +215,17 @@ public class Player extends Entity {
 				grabOrThrow();
 	        }
 	        
+	        // rotate tetris tile
+	        prevRotateControllerState = rotateControllerState;
+	        rotateControllerState = buttons.get(3);
+	        if (rotateControllerState == GLFW.GLFW_RELEASE && prevRotateControllerState == GLFW.GLFW_PRESS) {
+	        	if (isCarrying != null) {
+					int old_rotation_player1 = isCarrying.getRotation();
+					isCarrying.setRotation((old_rotation_player1 + 1) % 4);
+				}
+	        } 
 	        
-		
+	        
 	        // left joystick for running
 			FloatBuffer axes = GLFW.glfwGetJoystickAxes(controllerID);
 			if (axes.get(0) > JOYSTICK_DEAD_ZONE) {

@@ -23,13 +23,13 @@ public class AudioOptions {
 	}
 
 	private void createVolumeButton() {
-		int vX = (int) (309 * Game.SCALE);
+		int vX = (int) (Game.GAME_WIDTH/4 - SLIDER_WIDTH/2);
 		int vY = (int) (278 * Game.SCALE);
 		volumeButton = new VolumeButton(vX, vY, SLIDER_WIDTH, VOLUME_HEIGHT);
 	}
 
 	private void createSoundButtons() {
-		int soundX = (int) (450 * Game.SCALE);
+		int soundX = (int) (450/2 * Game.SCALE);
 		int musicY = (int) (140 * Game.SCALE);
 		int sfxY = (int) (186 * Game.SCALE);
 		musicButton = new SoundButton(soundX, musicY, SOUND_SIZE, SOUND_SIZE);

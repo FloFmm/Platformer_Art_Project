@@ -18,6 +18,7 @@ public class GameOptions extends State implements Statemethods {
 	private BufferedImage backgroundImg, optionsBackgroundImg;
 	private int bgX, bgY, bgW, bgH;
 	private UrmButton menuB;
+	
 
 	public GameOptions(Game game) {
 		super(game);
@@ -37,10 +38,12 @@ public class GameOptions extends State implements Statemethods {
 		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
 		optionsBackgroundImg = LoadSave.GetSpriteAtlas(LoadSave.OPTIONS_MENU);
 
-		bgW = (int) (optionsBackgroundImg.getWidth() * Game.SCALE);
-		bgH = (int) (optionsBackgroundImg.getHeight() * Game.SCALE);
+		
+		float heightFactor = 0.8f, widthFactor = 0.6f;
+		bgW = (int) (Game.GAME_WIDTH*widthFactor);
+		bgH = (int) (Game.GAME_HEIGHT*heightFactor);
 		bgX = Game.GAME_WIDTH / 2 - bgW / 2;
-		bgY = (int) (33 * Game.SCALE);
+		bgY = Game.GAME_HEIGHT / 2 - bgH / 2 - (int) ((1-heightFactor)/3*Game.GAME_HEIGHT);
 	}
 
 	@Override
@@ -83,7 +86,7 @@ public class GameOptions extends State implements Statemethods {
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		menuB.setMouseOver(false);
-
+		
 		if (isIn(e, menuB))
 			menuB.setMouseOver(true);
 		else

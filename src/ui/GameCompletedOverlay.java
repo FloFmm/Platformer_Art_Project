@@ -42,8 +42,8 @@ public class GameCompletedOverlay {
 
 		g.drawImage(img, imgX, imgY, imgW, imgH, null);
 
-		credit.draw(g);
-		quit.draw(g);
+		credit.draw(g, 0);
+		quit.draw(g, 0);
 	}
 
 	public void update() {
