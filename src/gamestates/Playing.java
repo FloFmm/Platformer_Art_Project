@@ -277,21 +277,25 @@ public class Playing extends State implements Statemethods {
 		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
 		player1.drawPlayer(g, xLvlOffset, yLvlOffset);
 		player2.drawPlayer(g, xLvlOffset, yLvlOffset);
+		int xDrawOffset = 0;
 		if (isPlayer1)
 			player1.drawUI(g);
-		else
+		else {
 			player2.drawUI(g);
+			xDrawOffset = -Game.GAME_WIDTH/2;
+		}
+
 		objectManager.drawBackgroundTrees(g, xLvlOffset, yLvlOffset);
 		drawDialogue(g, xLvlOffset, yLvlOffset);
 
 		if (paused) {
 			g.setColor(new Color(0, 0, 0, 150));
 			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
-			pauseOverlay.draw(g);
+			pauseOverlay.draw(g, xDrawOffset);
 		} else if (gameOver)
-			gameOverOverlay.draw(g);
+			gameOverOverlay.draw(g, xDrawOffset);
 		else if (lvlCompleted)
-			levelCompletedOverlay.draw(g);
+			levelCompletedOverlay.draw(g, xDrawOffset);
 		else if (gameCompleted)
 			gameCompletedOverlay.draw(g);
 		
@@ -353,15 +357,6 @@ public class Playing extends State implements Statemethods {
 		objectManager.checkSpikesTouched(p);
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-//		if (!gameOver) {
-//			if (e.getButton() == MouseEvent.BUTTON1)
-//				player1.setAttacking(true);
-//			else if (e.getButton() == MouseEvent.BUTTON3)
-//				player1.powerAttack();
-//		}
-	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -479,48 +474,43 @@ public class Playing extends State implements Statemethods {
 			}
 	}
 
-	public void mouseDragged(MouseEvent e) {
-		if (!gameOver && !gameCompleted && !lvlCompleted)
-			if (paused)
-				pauseOverlay.mouseDragged(e);
-	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		if (gameOver)
-			gameOverOverlay.mousePressed(e);
-		else if (paused)
-			pauseOverlay.mousePressed(e);
-		else if (lvlCompleted)
-			levelCompletedOverlay.mousePressed(e);
-		else if (gameCompleted)
-			gameCompletedOverlay.mousePressed(e);
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		if (gameOver)
-			gameOverOverlay.mouseReleased(e);
-		else if (paused)
-			pauseOverlay.mouseReleased(e);
-		else if (lvlCompleted)
-			levelCompletedOverlay.mouseReleased(e);
-		else if (gameCompleted)
-			gameCompletedOverlay.mouseReleased(e);
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		if (gameOver)
-			gameOverOverlay.mouseMoved(e);
-		else if (paused)
-			pauseOverlay.mouseMoved(e);
-		else if (lvlCompleted)
-			levelCompletedOverlay.mouseMoved(e);
-		else if (gameCompleted)
-			gameCompletedOverlay.mouseMoved(e);
-	}
+//	@Override TODO
+//	public void mousePressed(MouseEvent e) {
+//		if (gameOver)
+//			gameOverOverlay.mousePressed(e);
+//		else if (paused)
+//			pauseOverlay.mousePressed(e);
+//		else if (lvlCompleted)
+//			levelCompletedOverlay.mousePressed(e);
+//		else if (gameCompleted)
+//			gameCompletedOverlay.mousePressed(e);
+//
+//	}
+//
+//	@Override
+//	public void mouseReleased(MouseEvent e) {
+//		if (gameOver)
+//			gameOverOverlay.mouseReleased(e);
+//		else if (paused)
+//			pauseOverlay.mouseReleased(e);
+//		else if (lvlCompleted)
+//			levelCompletedOverlay.mouseReleased(e);
+//		else if (gameCompleted)
+//			gameCompletedOverlay.mouseReleased(e);
+//	}
+//
+//	@Override
+//	public void mouseMoved(MouseEvent e) {
+//		if (gameOver)
+//			gameOverOverlay.mouseMoved(e);
+//		else if (paused)
+//			pauseOverlay.mouseMoved(e);
+//		else if (lvlCompleted)
+//			levelCompletedOverlay.mouseMoved(e);
+//		else if (gameCompleted)
+//			gameCompletedOverlay.mouseMoved(e);
+//	}
 
 	public void setLevelCompleted(boolean levelCompleted) {
 		game.getAudioPlayer().lvlCompleted();
@@ -587,5 +577,13 @@ public class Playing extends State implements Statemethods {
 
 	public void setPlayerDying(boolean playerDying) {
 		this.playerDying = playerDying;
+	}
+
+	public boolean getPaused() {
+		return paused;
+	}
+
+	public void setPaused(boolean paused) {
+		this.paused = paused;
 	}
 }

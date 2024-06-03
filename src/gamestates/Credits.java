@@ -67,28 +67,6 @@ public class Credits extends State implements Statemethods {
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	}
-
-	@Override
 	public void keyPressed(KeyEvent e) {
 	}
 

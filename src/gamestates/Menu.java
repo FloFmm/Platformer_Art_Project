@@ -4,9 +4,15 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import static utilz.Constants.ControllerConstants.*;
+import static utilz.Constants.UI.VolumeButtons.SLIDER_WIDTH;
+import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
+
+import org.lwjgl.glfw.GLFW;
 
 import main.Game;
 import ui.MenuButton;
+import ui.VolumeButton;
 import utilz.LoadSave;
 
 public class Menu extends State implements Statemethods {
@@ -14,7 +20,8 @@ public class Menu extends State implements Statemethods {
 	private MenuButton[] buttons = new MenuButton[4];
 	private BufferedImage backgroundImg, backgroundImgPink;
 	private int menuX, menuY, menuWidth, menuHeight;
-
+	private VolumeButton volumeButton;
+	
 	public Menu(Game game) {
 		super(game);
 		loadButtons();
@@ -33,16 +40,26 @@ public class Menu extends State implements Statemethods {
 	}
 
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 2, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING);
-		buttons[1] = new MenuButton(Game.GAME_WIDTH / 2, (int) (200 * Game.SCALE), 1, Gamestate.OPTIONS);
-		buttons[2] = new MenuButton(Game.GAME_WIDTH / 2, (int) (270 * Game.SCALE), 3, Gamestate.CREDITS);
-		buttons[3] = new MenuButton(Game.GAME_WIDTH / 2, (int) (340 * Game.SCALE), 2, Gamestate.QUIT);
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 2, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID);
+		buttons[1] = new MenuButton(Game.GAME_WIDTH / 2, (int) (200 * Game.SCALE), 1, Gamestate.OPTIONS, CONTROLLER_X_BUTTON_ID);
+		buttons[2] = new MenuButton(Game.GAME_WIDTH / 2, (int) (270 * Game.SCALE), 3, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID);
+		buttons[3] = new MenuButton(Game.GAME_WIDTH / 2, (int) (340 * Game.SCALE), 2, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID);
+		volumeButton = new VolumeButton((Game.GAME_WIDTH/2 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
 	}
 
 	@Override
 	public void update() {
-		for (MenuButton mb : buttons)
+		for (MenuButton mb : buttons) {
 			mb.update();
+			if (mb.getButtonState() == GLFW.GLFW_RELEASE && mb.getPrevButtonState() == GLFW.GLFW_PRESS) {
+				mb.applyGamestate();
+				if (mb.getState() == Gamestate.PLAYING)
+					game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
+				resetButtons();
+			}
+		}
+		
+		volumeButton.update();
 	}
 
 	@Override
@@ -55,29 +72,8 @@ public class Menu extends State implements Statemethods {
 
 		for (MenuButton mb : buttons)
 			mb.draw(g, xDrawOffset);
-	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		for (MenuButton mb : buttons) {
-			if (isIn(e, mb)) {
-				mb.setMousePressed(true);
-			}
-		}
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		for (MenuButton mb : buttons) {
-			if (isIn(e, mb)) {
-				if (mb.isMousePressed())
-					mb.applyGamestate();
-				if (mb.getState() == Gamestate.PLAYING)
-					game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
-				break;
-			}
-		}
-		resetButtons();
+		volumeButton.draw(g, xDrawOffset);
 	}
 
 	private void resetButtons() {
@@ -87,24 +83,7 @@ public class Menu extends State implements Statemethods {
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		for (MenuButton mb : buttons)
-			mb.setMouseOver(false);
-
-		for (MenuButton mb : buttons)
-			if (isIn(e, mb)) {
-				mb.setMouseOver(true);
-				break;
-			}
-
-	}
-
-	@Override
 	public void keyPressed(KeyEvent e) {
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package ui;
 
 import static utilz.Constants.UI.URMButtons.URM_SIZE;
-
+import static utilz.Constants.ControllerConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -29,8 +29,8 @@ public class GameOverOverlay {
 		int menuX = (int) (335 * Game.SCALE);
 		int playX = (int) (440 * Game.SCALE);
 		int y = (int) (195 * Game.SCALE);
-		play = new UrmButton(playX, y, URM_SIZE, URM_SIZE, 0);
-		menu = new UrmButton(menuX, y, URM_SIZE, URM_SIZE, 2);
+		play = new UrmButton(playX, y, URM_SIZE, URM_SIZE, 0, CONTROLLER_H_BUTTON_ID);
+		menu = new UrmButton(menuX, y, URM_SIZE, URM_SIZE, 2, CONTROLLER_B_BUTTON_ID);
 
 	}
 
@@ -43,14 +43,14 @@ public class GameOverOverlay {
 
 	}
 
-	public void draw(Graphics g) {
+	public void draw(Graphics g, int xDrawOffset) {
 		g.setColor(new Color(0, 0, 0, 200));
 		g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
 
 		g.drawImage(img, imgX, imgY, imgW, imgH, null);
 
-		menu.draw(g);
-		play.draw(g);
+		menu.draw(g, xDrawOffset);
+		play.draw(g, xDrawOffset);
 	}
 
 	public void update() {

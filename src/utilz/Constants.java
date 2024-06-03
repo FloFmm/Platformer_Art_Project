@@ -470,6 +470,25 @@ public class Constants {
 	
 	public static class ControllerConstants {
 		public static final float JOYSTICK_DEAD_ZONE = 0.75f;
+		public static final int CONTROLLER_B_BUTTON_ID = 0;
+		public static final int CONTROLLER_A_BUTTON_ID = 1;
+		public static final int CONTROLLER_X_BUTTON_ID = 2;
+		public static final int CONTROLLER_Y_BUTTON_ID = 3;
+		public static final int CONTROLLER_O_BUTTON_ID = 4;
+		public static final int CONTROLLER_L_BUTTON_ID = 5;
+		public static final int CONTROLLER_R_BUTTON_ID = 6;
+		public static final int CONTROLLER_ZL_BUTTON_ID = 7;
+		public static final int CONTROLLER__BUTTON_ID = 8;
+		public static final int CONTROLLER_MINUS_BUTTON_ID = 9;
+		public static final int CONTROLLER_PLUS_BUTTON_ID = 10;
+		public static final int CONTROLLER_H_BUTTON_ID = 11;
+		public static final int CONTROLLER_LJS_BUTTON_ID = 12;
+		public static final int CONTROLLER_RJS_BUTTON_ID = 13;
+		public static final int CONTROLLER_UP_BUTTON_ID = 14;
+		public static final int CONTROLLER_RIGHT_BUTTON_ID = 15;
+		public static final int CONTROLLER_DOWN_BUTTON_ID = 16;
+		public static final int CONTROLLER_LEFT_BUTTON_ID = 17;
+		
 		
 	}
 

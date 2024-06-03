@@ -10,7 +10,7 @@ import gamestates.Playing;
 import main.Game;
 import utilz.LoadSave;
 import static utilz.Constants.UI.URMButtons.*;
-
+import static utilz.Constants.ControllerConstants.*;
 public class LevelCompletedOverlay {
 
 	private Playing playing;
@@ -28,8 +28,8 @@ public class LevelCompletedOverlay {
 		int menuX = (int) (330 * Game.SCALE);
 		int nextX = (int) (445 * Game.SCALE);
 		int y = (int) (195 * Game.SCALE);
-		next = new UrmButton(nextX, y, URM_SIZE, URM_SIZE, 0);
-		menu = new UrmButton(menuX, y, URM_SIZE, URM_SIZE, 2);
+		next = new UrmButton(nextX, y, URM_SIZE, URM_SIZE, 0, CONTROLLER_H_BUTTON_ID);
+		menu = new UrmButton(menuX, y, URM_SIZE, URM_SIZE, 2, CONTROLLER_B_BUTTON_ID);
 	}
 
 	private void initImg() {
@@ -40,13 +40,13 @@ public class LevelCompletedOverlay {
 		bgY = (int) (75 * Game.SCALE);
 	}
 
-	public void draw(Graphics g) {
+	public void draw(Graphics g, int xDrawOffset) {
 		g.setColor(new Color(0, 0, 0, 200));
 		g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
 
 		g.drawImage(img, bgX, bgY, bgW, bgH, null);
-		next.draw(g);
-		menu.draw(g);
+		next.draw(g, xDrawOffset);
+		menu.draw(g, xDrawOffset);
 	}
 
 	public void update() {

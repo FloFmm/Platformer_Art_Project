@@ -324,6 +324,8 @@ public class HelpMethods {
 	private static int GetTileValue(float xPos, float yPos, int[][] lvlData) {
 		int xCord = (int) (xPos / Game.TILES_SIZE);
 		int yCord = (int) (yPos / Game.TILES_SIZE);
+		if (xCord < 0 || xCord >= lvlData.length || yCord < 0 || yCord >= lvlData[0].length)
+            return 1;
 		return lvlData[yCord][xCord];
 	}
 
@@ -389,7 +391,10 @@ public class HelpMethods {
 		if (xSpeed > 0) {
 			// Right
 			xIndex = (int) (hitbox.x+hitbox.width-1+xSpeed)/Game.TILES_SIZE;
-			tileValue = lvlData[yIndex][xIndex];
+			if (xIndex < 0 || xIndex >= lvlData.length || yIndex < 0 || yIndex >= lvlData[0].length)
+				tileValue = 1;
+			else
+				tileValue = lvlData[yIndex][xIndex];
 			// System.out.println(tileValue);
 			if (tileValue >= 111 && tileValue <= 989) {
 				int[] interpretation = InterpretTriangleTileValue(tileValue);

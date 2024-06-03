@@ -2,6 +2,9 @@ package ui;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+
+import org.lwjgl.glfw.GLFW;
 
 import utilz.LoadSave;
 import static utilz.Constants.UI.URMButtons.*;
@@ -10,10 +13,13 @@ public class UrmButton extends PauseButton {
 	private BufferedImage[] imgs;
 	private int rowIndex, index;
 	private boolean mouseOver, mousePressed;
-
-	public UrmButton(int x, int y, int width, int height, int rowIndex) {
+	private int buttonState = GLFW.GLFW_RELEASE, prevButtonState = GLFW.GLFW_RELEASE;
+	private int controllerButtonId;
+	
+	public UrmButton(int x, int y, int width, int height, int rowIndex, int controllerButtonId) {
 		super(x, y, width, height);
 		this.rowIndex = rowIndex;
+		this.controllerButtonId = controllerButtonId;
 		loadImgs();
 	}
 
@@ -26,16 +32,23 @@ public class UrmButton extends PauseButton {
 	}
 
 	public void update() {
+		prevButtonState = buttonState;
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1)) {
+			ByteBuffer buttons1 = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_1);
+			buttonState = buttons1.get(controllerButtonId);
+		}
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_2)) {
+			ByteBuffer buttons2 = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_2);
+			if (buttons2.get(controllerButtonId) == GLFW.GLFW_PRESS)
+				buttonState = GLFW.GLFW_PRESS;
+		}
 		index = 0;
-		if (mouseOver)
-			index = 1;
-		if (mousePressed)
+		if (buttonState == GLFW.GLFW_PRESS)
 			index = 2;
-
 	}
 
-	public void draw(Graphics g) {
-		g.drawImage(imgs[index], x, y, URM_SIZE, URM_SIZE, null);
+	public void draw(Graphics g, int xDrawOffset) {
+		g.drawImage(imgs[index], x + xDrawOffset, y, URM_SIZE, URM_SIZE, null);
 	}
 
 	public void resetBools() {
@@ -57,6 +70,21 @@ public class UrmButton extends PauseButton {
 
 	public void setMousePressed(boolean mousePressed) {
 		this.mousePressed = mousePressed;
+	}
+	public int getButtonState() {
+		return buttonState;
+	}
+
+	public void setButtonState(int buttonState) {
+		this.buttonState = buttonState;
+	}
+
+	public int getPrevButtonState() {
+		return prevButtonState;
+	}
+
+	public void setPrevButtonState(int prevButtonState) {
+		this.prevButtonState = prevButtonState;
 	}
 
 }

@@ -80,6 +80,8 @@ public class Player extends Entity {
 	private int controllerID; 
 	private int prevGrabOrThrowControllerState = GLFW.GLFW_RELEASE, grabOrThrowControllerState = GLFW.GLFW_RELEASE;
 	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
+	private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
+	
 	private final boolean isPlayer1;
 
 	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
@@ -190,9 +192,8 @@ public class Player extends Entity {
 		boolean controllerIsPresent = GLFW.glfwJoystickPresent(controllerID);
 		if (controllerIsPresent) {
 			ByteBuffer buttons = GLFW.glfwGetJoystickButtons(controllerID);
-
 			// jump
-	        int jumpControllerState = buttons.get(1);
+	        int jumpControllerState = buttons.get(CONTROLLER_A_BUTTON_ID);
 	        if (jumpControllerState == GLFW.GLFW_PRESS) {
 	        	jump = true;
 	        }
@@ -202,7 +203,7 @@ public class Player extends Entity {
 	        
 	        // grab or throw
 	        prevGrabOrThrowControllerState = grabOrThrowControllerState;
-	        grabOrThrowControllerState = buttons.get(2);
+	        grabOrThrowControllerState = buttons.get(CONTROLLER_X_BUTTON_ID);
 	        if (grabOrThrowControllerState == GLFW.GLFW_PRESS) {
 	        	
 	        	if (!grabOrThrow) {
@@ -217,7 +218,7 @@ public class Player extends Entity {
 	        
 	        // rotate tetris tile
 	        prevRotateControllerState = rotateControllerState;
-	        rotateControllerState = buttons.get(3);
+	        rotateControllerState = buttons.get(CONTROLLER_Y_BUTTON_ID);
 	        if (rotateControllerState == GLFW.GLFW_RELEASE && prevRotateControllerState == GLFW.GLFW_PRESS) {
 	        	if (isCarrying != null) {
 					int old_rotation_player1 = isCarrying.getRotation();
@@ -240,6 +241,13 @@ public class Player extends Entity {
 				setRight(false);
 				setLeft(false);
 			}
+			
+			// pause menu
+			prevPauseControllerState = pauseControllerState;
+			pauseControllerState = buttons.get(CONTROLLER_H_BUTTON_ID);
+	        if (pauseControllerState == GLFW.GLFW_RELEASE && prevPauseControllerState == GLFW.GLFW_PRESS) {
+	        	playing.setPaused(!playing.getPaused());
+	        }
 		}
 	}
 

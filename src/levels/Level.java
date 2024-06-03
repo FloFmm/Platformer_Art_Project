@@ -154,7 +154,7 @@ public class Level {
 		
 		// maxTilesOffset = lvlTilesWide - Game.TILES_IN_WIDTH;
 		// maxLvlOffsetX = Game.TILES_SIZE * maxTilesOffset;
-		maxLvlOffsetX = lvlTilesWide*Game.TILES_SIZE - Game.GAME_WIDTH + 1;
+		maxLvlOffsetX = lvlTilesWide*Game.TILES_SIZE - Game.GAME_WIDTH/2 + 1;
 		maxLvlOffsetY = lvlTilesHigh*Game.TILES_SIZE - Game.GAME_HEIGHT + 1;
 	}
 

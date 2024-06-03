@@ -2,8 +2,15 @@ package ui;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+
+import org.lwjgl.glfw.GLFW;
 
 import utilz.LoadSave;
+import main.Game;
+
+import static utilz.Constants.ControllerConstants.JOYSTICK_DEAD_ZONE;
 import static utilz.Constants.UI.VolumeButtons.*;
 
 public class VolumeButton extends PauseButton {
@@ -14,9 +21,11 @@ public class VolumeButton extends PauseButton {
 	private boolean mouseOver, mousePressed;
 	private int buttonX, minX, maxX;
 	private float floatValue = 0f;
+	private Game game;
 
-	public VolumeButton(int x, int y, int width, int height) {
+	public VolumeButton(int x, int y, int width, int height, Game game) {
 		super(x + width / 2, y, VOLUME_WIDTH, height);
+		this.game = game;
 		bounds.x -= VOLUME_WIDTH / 2;
 		buttonX = x + width / 2;
 		this.x = x;
@@ -38,18 +47,36 @@ public class VolumeButton extends PauseButton {
 
 	public void update() {
 		index = 0;
-		if (mouseOver)
-			index = 1;
-		if (mousePressed)
+		int change = 0;
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1)) {
+			FloatBuffer axes1 = GLFW.glfwGetJoystickAxes(GLFW.GLFW_JOYSTICK_1);
+			if (axes1.get(0) > JOYSTICK_DEAD_ZONE) {
+				change += 1;
+			}
+			else if (axes1.get(0) < -JOYSTICK_DEAD_ZONE) {
+				change -= 1;
+			}
+		}
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_2)) {
+			FloatBuffer axes2 = GLFW.glfwGetJoystickAxes(GLFW.GLFW_JOYSTICK_2);
+			if (axes2.get(0) > JOYSTICK_DEAD_ZONE) {
+				change += 1;
+			}
+			else if (axes2.get(0) < -JOYSTICK_DEAD_ZONE) {
+				change -= 1;
+			}
+		}
+		
+		if (change != 0) {
+			changeX(buttonX+change);
+			game.getAudioPlayer().setVolume(floatValue);
 			index = 2;
-
+		}
 	}
 
-	public void draw(Graphics g) {
-
-		g.drawImage(slider, x, y, width, height, null);
-		g.drawImage(imgs[index], buttonX - VOLUME_WIDTH / 2, y, VOLUME_WIDTH, height, null);
-
+	public void draw(Graphics g, int xDrawOffset) {
+		g.drawImage(slider, x + xDrawOffset, y, width, height, null);
+		g.drawImage(imgs[index], buttonX + xDrawOffset - VOLUME_WIDTH / 2, y, VOLUME_WIDTH, height, null);
 	}
 
 	public void changeX(int x) {
@@ -73,22 +100,6 @@ public class VolumeButton extends PauseButton {
 	public void resetBools() {
 		mouseOver = false;
 		mousePressed = false;
-	}
-
-	public boolean isMouseOver() {
-		return mouseOver;
-	}
-
-	public void setMouseOver(boolean mouseOver) {
-		this.mouseOver = mouseOver;
-	}
-
-	public boolean isMousePressed() {
-		return mousePressed;
-	}
-
-	public void setMousePressed(boolean mousePressed) {
-		this.mousePressed = mousePressed;
 	}
 
 	public float getFloatValue() {

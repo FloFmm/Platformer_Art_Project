@@ -3,6 +3,9 @@ package ui;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+
+import org.lwjgl.glfw.GLFW;
 
 import gamestates.Gamestate;
 import utilz.LoadSave;
@@ -13,14 +16,16 @@ public class MenuButton {
 	private int xOffsetCenter = B_WIDTH / 2;
 	private Gamestate state;
 	private BufferedImage[] imgs;
-	private boolean mouseOver, mousePressed;
+	private int buttonState = GLFW.GLFW_RELEASE, prevButtonState = GLFW.GLFW_RELEASE;
 	private Rectangle bounds;
+	private int controllerButtonId;
 
-	public MenuButton(int xPos, int yPos, int rowIndex, Gamestate state) {
+	public MenuButton(int xPos, int yPos, int rowIndex, Gamestate state, int controllerButtonId) {
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.rowIndex = rowIndex;
 		this.state = state;
+		this.controllerButtonId = controllerButtonId;
 		loadImgs();
 		initBounds();
 	}
@@ -41,27 +46,19 @@ public class MenuButton {
 	}
 
 	public void update() {
+		prevButtonState = buttonState;
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1)) {
+			ByteBuffer buttons1 = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_1);
+			buttonState = buttons1.get(controllerButtonId);
+		}
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_2)) {
+			ByteBuffer buttons2 = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_2);
+			if (buttons2.get(controllerButtonId) == GLFW.GLFW_PRESS)
+				buttonState = GLFW.GLFW_PRESS;
+		}
 		index = 0;
-		if (mouseOver)
-			index = 1;
-		if (mousePressed)
+		if (buttonState == GLFW.GLFW_PRESS)
 			index = 2;
-	}
-
-	public boolean isMouseOver() {
-		return mouseOver;
-	}
-
-	public void setMouseOver(boolean mouseOver) {
-		this.mouseOver = mouseOver;
-	}
-
-	public boolean isMousePressed() {
-		return mousePressed;
-	}
-
-	public void setMousePressed(boolean mousePressed) {
-		this.mousePressed = mousePressed;
 	}
 
 	public Rectangle getBounds() {
@@ -73,11 +70,28 @@ public class MenuButton {
 	}
 
 	public void resetBools() {
-		mouseOver = false;
-		mousePressed = false;
+		buttonState = GLFW.GLFW_RELEASE; 
+		prevButtonState = GLFW.GLFW_RELEASE;
 	}
+	
 	public Gamestate getState() {
 		return state;
 	}
 
+	public int getButtonState() {
+		return buttonState;
+	}
+
+	public void setButtonState(int buttonState) {
+		this.buttonState = buttonState;
+	}
+
+	public int getPrevButtonState() {
+		return prevButtonState;
+	}
+
+	public void setPrevButtonState(int prevButtonState) {
+		this.prevButtonState = prevButtonState;
+	}
+	
 }
