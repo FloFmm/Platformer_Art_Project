@@ -17,7 +17,7 @@ public class GameOverOverlay {
 	private Playing playing;
 	private BufferedImage img;
 	private int imgX, imgY, imgW, imgH;
-	private UrmButton menu, play;
+	//private UrmButton menu, play;
 
 	public GameOverOverlay(Playing playing) {
 		this.playing = playing;
@@ -29,8 +29,8 @@ public class GameOverOverlay {
 		int menuX = (int) (335 * Game.SCALE);
 		int playX = (int) (440 * Game.SCALE);
 		int y = (int) (195 * Game.SCALE);
-		play = new UrmButton(playX, y, URM_SIZE, URM_SIZE, 0, CONTROLLER_H_BUTTON_ID);
-		menu = new UrmButton(menuX, y, URM_SIZE, URM_SIZE, 2, CONTROLLER_B_BUTTON_ID);
+		//play = new UrmButton(playX, y, URM_SIZE, URM_SIZE, 0, CONTROLLER_H_BUTTON_ID);
+		//menu = new UrmButton(menuX, y, URM_SIZE, URM_SIZE, 2, CONTROLLER_B_BUTTON_ID);
 
 	}
 
@@ -49,50 +49,30 @@ public class GameOverOverlay {
 
 		g.drawImage(img, imgX, imgY, imgW, imgH, null);
 
-		menu.draw(g, xDrawOffset);
-		play.draw(g, xDrawOffset);
+		//menu.draw(g, xDrawOffset);
+		//play.draw(g, xDrawOffset);
 	}
 
 	public void update() {
-		menu.update();
-		play.update();
-	}
-
-	private boolean isIn(UrmButton b, MouseEvent e) {
-		return b.getBounds().contains(e.getX(), e.getY());
-	}
-
-	public void mouseMoved(MouseEvent e) {
-		play.setMouseOver(false);
-		menu.setMouseOver(false);
-
-		if (isIn(menu, e))
-			menu.setMouseOver(true);
-		else if (isIn(play, e))
-			play.setMouseOver(true);
+		//menu.update();
+		//play.update();
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		if (isIn(menu, e)) {
-			if (menu.isMousePressed()) {
-				playing.resetAll();
-				playing.setGamestate(Gamestate.MENU);
-			}
-		} else if (isIn(play, e))
-			if (play.isMousePressed()) {
-				playing.resetAll();
-				playing.getGame().getAudioPlayer().setLevelSong(playing.getLevelManager().getLevelIndex());
-			}
-
-		menu.resetBools();
-		play.resetBools();
+//		if (isIn(menu, e)) {
+//			if (menu.isMousePressed()) {
+//				playing.resetAll();
+//				playing.setGamestate(Gamestate.MENU);
+//			}
+//		} else if (isIn(play, e))
+//			if (play.isMousePressed()) {
+//				playing.resetAll();
+//				playing.getGame().getAudioPlayer().setLevelSong(playing.getLevelManager().getLevelIndex());
+//			}
+//
+//		menu.resetBools();
+//		play.resetBools();
 	}
 
-	public void mousePressed(MouseEvent e) {
-		if (isIn(menu, e))
-			menu.setMousePressed(true);
-		else if (isIn(play, e))
-			play.setMousePressed(true);
-	}
 
 }

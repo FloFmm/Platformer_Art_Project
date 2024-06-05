@@ -1,105 +1,71 @@
 package gamestates;
 
+import static utilz.Constants.ControllerConstants.CONTROLLER_A_BUTTON_ID;
+import static utilz.Constants.ControllerConstants.CONTROLLER_B_BUTTON_ID;
+import static utilz.Constants.ControllerConstants.CONTROLLER_X_BUTTON_ID;
+import static utilz.Constants.ControllerConstants.CONTROLLER_Y_BUTTON_ID;
+import static utilz.Constants.UI.URMButtons.URM_SIZE;
+import static utilz.Constants.UI.VolumeButtons.SLIDER_WIDTH;
+import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
+
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.GLFW;
+
 import main.Game;
+import ui.MenuButton;
+import ui.VolumeButton;
 import utilz.LoadSave;
 
 public class Credits extends State implements Statemethods {
+	private MenuButton[] buttons = new MenuButton[1];
 	private BufferedImage backgroundImg, creditsImg;
 	private int bgX, bgY, bgW, bgH;
-	private float bgYFloat;
-
-	private ArrayList<ShowEntity> entitiesList;
-
+	private int bgYFloat;
 	public Credits(Game game) {
 		super(game);
 		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
 		creditsImg = LoadSave.GetSpriteAtlas(LoadSave.CREDITS);
-		bgW = (int) (creditsImg.getWidth() * Game.SCALE);
-		bgH = (int) (creditsImg.getHeight() * Game.SCALE);
-		bgX = Game.GAME_WIDTH / 2 - bgW / 2;
-		bgY = Game.GAME_HEIGHT;
-		loadEntities();
-	}
+		
+		int menuX = (int) (Game.GAME_WIDTH/2 - 0.5*URM_SIZE);
+		int bY = (int) (Game.GAME_HEIGHT/2);
 
-	private void loadEntities() {
-		entitiesList = new ArrayList<>();
-		entitiesList.add(new ShowEntity(getIdleAni(LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS), 5, 64, 40), (int) (Game.GAME_WIDTH * 0.05), (int) (Game.GAME_HEIGHT * 0.8)));
-		entitiesList.add(new ShowEntity(getIdleAni(LoadSave.GetSpriteAtlas(LoadSave.CRABBY_SPRITE), 9, 72, 32), (int) (Game.GAME_WIDTH * 0.15), (int) (Game.GAME_HEIGHT * 0.75)));
-		entitiesList.add(new ShowEntity(getIdleAni(LoadSave.GetSpriteAtlas(LoadSave.PINKSTAR_ATLAS), 8, 34, 30), (int) (Game.GAME_WIDTH * 0.7), (int) (Game.GAME_HEIGHT * 0.75)));
-		entitiesList.add(new ShowEntity(getIdleAni(LoadSave.GetSpriteAtlas(LoadSave.SHARK_ATLAS), 8, 34, 30), (int) (Game.GAME_WIDTH * 0.8), (int) (Game.GAME_HEIGHT * 0.8)));
+		loadButtons();
 	}
-
-	private BufferedImage[] getIdleAni(BufferedImage atlas, int spritesAmount, int width, int height) {
-		BufferedImage[] arr = new BufferedImage[spritesAmount];
-		for (int i = 0; i < spritesAmount; i++)
-			arr[i] = atlas.getSubimage(width * i, 0, width, height);
-		return arr;
+	
+	private void loadButtons() {
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID);
 	}
 
 	@Override
 	public void update() {
-		bgYFloat -= 0.2f;
-		for (ShowEntity se : entitiesList)
-			se.update();
+		for (MenuButton mb : buttons) {
+			mb.update();
+			if (mb.getButtonState() == GLFW.GLFW_RELEASE && mb.getPrevButtonState() == GLFW.GLFW_PRESS) {
+				mb.applyGamestate();
+				resetButtons();
+			}
+		}
 	}
 
 	@Override
 	public void draw(Graphics g, boolean isPlayer1) {
-		g.drawImage(backgroundImg, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
-		g.drawImage(creditsImg, bgX, (int) (bgY + bgYFloat), bgW, bgH, null);
+		int xDrawOffset = 0;
+		if (!isPlayer1)
+			xDrawOffset = -Game.GAME_WIDTH/2;
+		g.drawImage(backgroundImg, xDrawOffset, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
+		g.drawImage(creditsImg, xDrawOffset, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
 
-		for (ShowEntity se : entitiesList)
-			se.draw(g);
+		for (MenuButton mb : buttons)
+			mb.draw(g, xDrawOffset);
 	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			bgYFloat = 0;
-			setGamestate(Gamestate.MENU);
-		}
+	
+	private void resetButtons() {
+		for (MenuButton mb : buttons)
+			mb.resetBools();
 	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-	}
-
-	private class ShowEntity {
-		private BufferedImage[] idleAnimation;
-		private int x, y, aniIndex, aniTick;
-
-		public ShowEntity(BufferedImage[] idleAnimation, int x, int y) {
-			this.idleAnimation = idleAnimation;
-			this.x = x;
-			this.y = y;
-		}
-
-		public void draw(Graphics g) {
-			g.drawImage(idleAnimation[aniIndex], x, y, (int) (idleAnimation[aniIndex].getWidth() * 4), (int) (idleAnimation[aniIndex].getHeight() * 4), null);
-		}
-
-		public void update() {
-			aniTick++;
-			if (aniTick >= 25) {
-				aniTick = 0;
-				aniIndex++;
-				if (aniIndex >= idleAnimation.length)
-					aniIndex = 0;
-			}
-
-		}
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

@@ -32,7 +32,7 @@ public class Player extends Entity {
 	private boolean left, right, jump, grabOrThrow = false;
 	protected Rectangle2D.Float grabBox;
 	private TetrisTile isCarrying;
-	private long throwPushDownStartTime;
+	private long throwPushDownStartTime, startTimeInAir;
 	private int[][] lvlData;
 	private float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
 	private float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
@@ -71,7 +71,7 @@ public class Player extends Entity {
 
 	private int tileY = 0;
 
-	private boolean powerAttackActive;
+	private boolean powerAttackActive=false, throwActive=false, selfHurt = false;
 	private int powerAttackTick;
 	private int powerGrowSpeed = 15;
 	private int powerGrowTick;
@@ -81,6 +81,7 @@ public class Player extends Entity {
 	private int prevGrabOrThrowControllerState = GLFW.GLFW_RELEASE, grabOrThrowControllerState = GLFW.GLFW_RELEASE;
 	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
 	private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
+	private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
 	
 	private final boolean isPlayer1;
 
@@ -119,8 +120,9 @@ public class Player extends Entity {
 	}
 
 	public void update() {
-		if (playing.useController)
-			updateControllerInputs();
+		boolean startInAir = inAir;
+		
+		updateControllerInputs();
 		updateHealthBar();
 		updatePowerBar();
 
@@ -186,6 +188,9 @@ public class Player extends Entity {
 
 		updateAnimationTick();
 		setAnimation();
+		
+		if (!startInAir && inAir)
+			startTimeInAir = System.nanoTime();
 	}
 	
 	private void updateControllerInputs() {
@@ -199,6 +204,13 @@ public class Player extends Entity {
 	        }
 	        if (jumpControllerState == GLFW.GLFW_RELEASE) {
 	        	jump = false;
+	        }
+	        
+	        // dash
+	        prevDashControllerState = dashControllerState;
+	        dashControllerState = buttons.get(CONTROLLER_L_BUTTON_ID);
+	        if (dashControllerState == GLFW.GLFW_RELEASE && prevDashControllerState == GLFW.GLFW_PRESS) {
+	        	powerAttack();
 	        }
 	        
 	        // grab or throw
@@ -273,6 +285,7 @@ public class Player extends Entity {
 		if (powerAttackActive)
 			attackChecked = false;
 
+		playing.checkEnemyPlayerHit(isPlayer1);
 		playing.checkEnemyHit(attackBox);
 		playing.checkObjectHit(attackBox);
 		playing.getGame().getAudioPlayer().playAttackSound();
@@ -297,7 +310,8 @@ public class Player extends Entity {
 		if (isCarrying != null) {
 			isCarrying.airSpeed = -calcThrowSpeed();
 			isCarrying.setIsCarriedBy(null);
-			isCarrying = null;			
+			isCarrying = null;	
+			throwActive = true;
 		}
 		else {
 			playing.checkTetrisTileGrabbed(grabBox, this);
@@ -350,7 +364,19 @@ public class Player extends Entity {
 	}
 
 	public void drawPlayer(Graphics g, int xLvlOffset, int yLvlOffset) {
-		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
+		
+		int aniStateOffset = 0;
+		if (isCarrying != null)
+			aniStateOffset = NUM_ANIMATIONS;
+//		if (state != 0) {
+//			System.out.println("=============================================");
+//			System.out.println(aniStateOffset);
+//			System.out.println(state);
+//			System.out.println(animations[state + aniStateOffset][aniIndex]);
+//			System.out.println(aniIndex);
+//			}
+		
+		g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
 				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
 		drawHitbox(g, xLvlOffset, yLvlOffset);
 		drawGrabBox(g, xLvlOffset, yLvlOffset);
@@ -382,10 +408,11 @@ public class Player extends Entity {
 			
 			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - radius/2 + xDistanceTraveled); 
 			
-			circle_y = (int) (hitbox.y - yLvlOffset - isCarrying.hitbox.height/2 - radius/2 - 
-					calculateYOfThrowArc(time, playing.getWindSpeed(), throwSpeed, GRAVITY));
-
-			g.fillOval(circle_x,circle_y,radius,radius);
+			if (isCarrying != null) {
+				circle_y = (int) (hitbox.y - yLvlOffset - isCarrying.hitbox.height/2 - radius/2 - 
+						calculateYOfThrowArc(time, playing.getWindSpeed(), throwSpeed, GRAVITY));
+				g.fillOval(circle_x,circle_y,radius,radius);
+			}
 		}
 		
 	}
@@ -409,7 +436,7 @@ public class Player extends Entity {
 			aniTick = 0;
 			aniIndex++;
 			if (aniIndex >= GetSpriteAmount(state)) {
-				if (state == JUMP || state == FALLING)
+				if (state == JUMP || state == FALLING || state == ATTACK)
 					aniIndex--;
 				else
 					aniIndex = 0;
@@ -421,6 +448,7 @@ public class Player extends Entity {
 				}
 				attacking = false;
 				attackChecked = false;
+				throwActive = false;
 			}
 		}
 	}
@@ -439,7 +467,7 @@ public class Player extends Entity {
 		if (inAir) {
 			if (airSpeed < 0)
 				state = JUMP;
-			else
+			else if ((System.nanoTime()-startTimeInAir)/1000000000.0f > 0.2f)
 				state = FALLING;
 		}
 
@@ -450,14 +478,10 @@ public class Player extends Entity {
 			return;
 		}
 
-		if (attacking) {
-			state = ATTACK;
-			if (startAni != ATTACK) {
-				aniIndex = 1;
-				aniTick = 0;
-				return;
-			}
+		if (throwActive) {
+			state = THROW;
 		}
+		
 		if (startAni != state)
 			resetAniTick();
 	}
@@ -568,7 +592,17 @@ public class Player extends Entity {
 			}
 		}
 	}
+	
 
+	public void selfHurtFromPowerAttack(int value) {
+		if (selfHurt)
+			return;
+		
+		currentHealth += value;
+		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
+		selfHurt = true;
+	}
+	
 	public void changeHealth(int value) {
 		if (value < 0) {
 			if (state == HIT)
@@ -581,7 +615,7 @@ public class Player extends Entity {
 		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
 	}
 
-	public void changeHealth(int value, Enemy e) {
+	public void changeHealth(int value, Entity e) {
 		if (state == HIT)
 			return;
 		changeHealth(value);
@@ -606,14 +640,14 @@ public class Player extends Entity {
 	private void loadAnimations() {
 		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
 		String fileName="", baseDir="";
-		animations = new BufferedImage[NUM_ANIMATIONS][MAX_ANIMATION_LENGTH];
+		animations = new BufferedImage[NUM_ANIMATIONS*2][MAX_ANIMATION_LENGTH];
 		
 		if (isPlayer1)
 			baseDir = "animation/player" + 1;
 		else
 			baseDir = "animation/player" + 2;
 		
-		for (int j = 0; j < animations.length; j++) {
+		for (int j = 0; j < NUM_ANIMATIONS; j++) {
 			switch(j) {
 				case IDLE:
 					fileName = "idle";
@@ -628,13 +662,16 @@ public class Player extends Entity {
 					fileName = "falling";
 					break;
 				case ATTACK:
-					fileName = "attack";
+					fileName = "jump";
 					break;
 				case HIT:
 					fileName = "hit";
 					break;
 				case DEAD:
 					fileName = "dead";
+					break;
+				case THROW:
+					fileName = "throw";
 					break;
 			}
 			for (int i = 0; i < animations[j].length; i++) {
@@ -647,9 +684,24 @@ public class Player extends Entity {
 						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
 						System.out.println("file does not exist: " + baseDir + "/" + fileName + i + ".png");
 					}
+					
+					if (j == IDLE || j == RUNNING || j == JUMP || j == FALLING) {
+						// carry animations
+						if (Files.exists(Paths.get("res/" + baseDir + "/carry" + fileName + i + ".png"))) {
+							animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/carry" + fileName + i + ".png");
+						}
+						else {
+							animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
+							System.out.println("file does not exist: " + baseDir + "/carry" + fileName + i + ".png");
+						}
+					}
+					else {
+						animations[j+NUM_ANIMATIONS][i] = null;
+					}
 				}
-				else 
+				else {
 					animations[j][i] = null;
+				}
 			}
 		}
 		statusBarImg = LoadSave.GetSpriteAtlas(LoadSave.STATUS_BAR);
@@ -717,6 +769,7 @@ public class Player extends Entity {
 		state = IDLE;
 		currentHealth = maxHealth;
 		powerAttackActive = false;
+		throwActive = false;
 		powerAttackTick = 0;
 		powerValue = powerMaxValue;
 
@@ -741,6 +794,7 @@ public class Player extends Entity {
 	
 
 	public void powerAttack() {
+		selfHurt = false;
 		if (powerAttackActive)
 			return;
 		if (powerValue >= 60) {

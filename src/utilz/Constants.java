@@ -159,7 +159,7 @@ public class Constants {
 			case RUNNING:
 				return 6;
 			case ATTACK:
-				return 7;
+				return 1;
 			case HIT:
 				return 4;
 			case DEAD:
@@ -203,10 +203,10 @@ public class Constants {
 
 	public static class UI {
 		public static class Buttons {
-			public static final int B_WIDTH_DEFAULT = 140;
-			public static final int B_HEIGHT_DEFAULT = 56;
-			public static final int B_WIDTH = (int) (B_WIDTH_DEFAULT * Game.SCALE);
-			public static final int B_HEIGHT = (int) (B_HEIGHT_DEFAULT * Game.SCALE);
+			public static final int B_WIDTH_DEFAULT = 768;
+			public static final int B_HEIGHT_DEFAULT = 256;
+			public static final int B_WIDTH = (int) (180 * Game.SCALE);
+			public static final int B_HEIGHT = (int) (60 * Game.SCALE);
 		}
 
 		public static class PauseButtons {
@@ -255,7 +255,9 @@ public class Constants {
 		public static final int ATTACK = 4;
 		public static final int HIT = 5;
 		public static final int DEAD = 6;
-		public static final int NUM_ANIMATIONS = 7;
+		public static final int THROW = 7;
+		
+		public static final int NUM_ANIMATIONS = 8;
 		public static final int MAX_ANIMATION_LENGTH = 12;
 		
 		public static int GetSpriteAmount(int player_action) {
@@ -263,16 +265,18 @@ public class Constants {
 			case DEAD:
 				return 1;//8;
 			case RUNNING:
-				return 12;//6;
+				return 12;
 			case IDLE:
-				return 1;//5;
+				return 1;
 			case HIT:
 				return 4;
 			case JUMP:
 				return 5;
 			case ATTACK:
-				return 1;//3;
+				return 5;
 			case FALLING:
+				return 4;
+			case THROW:
 				return 4;
 			default:
 				return 1;

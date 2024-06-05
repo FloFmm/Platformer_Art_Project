@@ -3,7 +3,6 @@ package main;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JPanel;
-import inputs.KeyboardInputs;
 import static main.Game.GAME_HEIGHT;
 import static main.Game.GAME_WIDTH;
 
@@ -15,7 +14,6 @@ public class GamePanel extends JPanel {
 		this.game = game;
 		this.isPlayer1 = isPlayer1;
 		setPanelSize();
-		addKeyListener(new KeyboardInputs(this));
 	}
 
 	private void setPanelSize() {

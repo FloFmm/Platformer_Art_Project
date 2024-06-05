@@ -3,6 +3,7 @@ package main;
 import java.awt.Graphics;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWJoystickCallback;
 
 import audio.AudioPlayer;
 import gamestates.Credits;
@@ -24,7 +25,6 @@ public class Game implements Runnable {
 	private Menu menu;
 	private Credits credits;
 	private AudioPlayer audioPlayer;
-
 	public final static int TILES_DEFAULT_SIZE = 32;
 	public final static float SCALE = 2f;
 	//public final static int TILES_IN_WIDTH = 15;//30;//26;
@@ -34,11 +34,13 @@ public class Game implements Runnable {
 	public final static int GAME_HEIGHT = 1080;//TILES_SIZE * TILES_IN_HEIGHT;
 
 	private final boolean SHOW_FPS_UPS = false;
-
+	private static GLFWJoystickCallback joystickCallback;
+	
 	public Game() {
 	
 		System.out.println("size: " + GAME_WIDTH + " : " + GAME_HEIGHT);
 		initClasses();
+		initControllerInput();
 		gamePanel1 = new GamePanel(this, true);
 		gamePanel2 = new GamePanel(this, false);
 		new GameWindow(gamePanel1, gamePanel2);
@@ -53,10 +55,27 @@ public class Game implements Runnable {
 		playing = new Playing(this);
 		credits = new Credits(this);
 		
+		
+	}
+	
+	private void initControllerInput() {
 		// joystick listener
 		if (!GLFW.glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
+		
+		// Set the joystick callback
+        joystickCallback = new GLFWJoystickCallback() {
+            @Override
+            public void invoke(int jid, int event) {
+                if (event == GLFW.GLFW_CONNECTED) {
+                    System.out.println("Controller connected: " + jid);
+                } else if (event == GLFW.GLFW_DISCONNECTED) {
+                    System.out.println("Controller disconnected: " + jid);
+                }
+            }
+        };
+        GLFW.glfwSetJoystickCallback(joystickCallback);
 	}
 
 	private void startGameLoop() {
@@ -65,6 +84,8 @@ public class Game implements Runnable {
 	}
 
 	public void update() {
+		// joystick listener
+		GLFW.glfwPollEvents();
 		switch (Gamestate.state) {
 		case MENU -> menu.update();
 		case PLAYING -> playing.update();
@@ -72,6 +93,7 @@ public class Game implements Runnable {
 		case QUIT -> System.exit(0);
 		}
 	}
+
 
 	@SuppressWarnings("incomplete-switch")
 	public void render(Graphics g, boolean isPlayer1) {
@@ -158,4 +180,5 @@ public class Game implements Runnable {
 	public AudioPlayer getAudioPlayer() {
 		return audioPlayer;
 	}
+
 }

@@ -14,7 +14,7 @@ public class LoadSave {
 	public static final String PLAYER_ATLAS = "player_sprites.png";
 	public static final String LEVEL_ATLAS = "outside_sprites.png";
 	public static final String MENU_BUTTONS = "button_atlas.png";
-	public static final String MENU_BACKGROUND = "menu_background.png";
+	public static final String MENU_BACKGROUND = "controller_labeled.png";
 	public static final String PAUSE_BACKGROUND = "pause_menu.png";
 	public static final String SOUND_BUTTONS = "sound_button.png";
 	public static final String URM_BUTTONS = "urm_buttons.png";
@@ -38,7 +38,7 @@ public class LoadSave {
 	public static final String QUESTION_ATLAS = "question_atlas.png";
 	public static final String EXCLAMATION_ATLAS = "exclamation_atlas.png";
 	public static final String SHARK_ATLAS = "shark_atlas.png";
-	public static final String CREDITS = "credits_list.png";
+	public static final String CREDITS = "credits.png";
 	public static final String GRASS_ATLAS = "grass_atlas.png";
 	public static final String TREE_ONE_ATLAS = "tree_one_atlas.png";
 	public static final String TREE_TWO_ATLAS = "tree_two_atlas.png";
@@ -46,7 +46,9 @@ public class LoadSave {
 	public static final String RAIN_PARTICLE = "rain_particle.png";
 	public static final String WATER_TOP = "water_atlas_animation.png";
 	public static final String WATER_BOTTOM = "water.png";
-	
+	public static final String CONTROLLER_ONLINE = "controller_online.png";
+	public static final String CONTROLLER_OFFLINE = "controller_offline.png";
+	public static final String PAUSED = "paused.png";
 	
 
 	public static BufferedImage GetSpriteAtlas(String fileName) {

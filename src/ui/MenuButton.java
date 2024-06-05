@@ -35,7 +35,7 @@ public class MenuButton {
 	}
 
 	private void loadImgs() {
-		imgs = new BufferedImage[3];
+		imgs = new BufferedImage[2];
 		BufferedImage temp = LoadSave.GetSpriteAtlas(LoadSave.MENU_BUTTONS);
 		for (int i = 0; i < imgs.length; i++)
 			imgs[i] = temp.getSubimage(i * B_WIDTH_DEFAULT, rowIndex * B_HEIGHT_DEFAULT, B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT);
@@ -58,7 +58,7 @@ public class MenuButton {
 		}
 		index = 0;
 		if (buttonState == GLFW.GLFW_PRESS)
-			index = 2;
+			index = 1;
 	}
 
 	public Rectangle getBounds() {

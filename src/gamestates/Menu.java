@@ -1,8 +1,6 @@
 package gamestates;
 
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import static utilz.Constants.ControllerConstants.*;
 import static utilz.Constants.UI.VolumeButtons.SLIDER_WIDTH;
@@ -18,33 +16,34 @@ import utilz.LoadSave;
 public class Menu extends State implements Statemethods {
 
 	private MenuButton[] buttons = new MenuButton[4];
-	private BufferedImage backgroundImg, backgroundImgPink;
+	private BufferedImage backgroundImg, backgroundImgPink, controllerOnlineImg, controllerOfflineImg;
 	private int menuX, menuY, menuWidth, menuHeight;
 	private VolumeButton volumeButton;
 	
 	public Menu(Game game) {
 		super(game);
 		loadButtons();
-		loadBackground();
-		backgroundImgPink = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
-
+		loadImages();
 	}
 
-	private void loadBackground() {
+	private void loadImages() {
+		backgroundImgPink = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
 		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND);
-		float heightFactor = 0.8f, widthFactor = 0.4f;
+		controllerOnlineImg = LoadSave.GetSpriteAtlas(LoadSave.CONTROLLER_ONLINE);
+		controllerOfflineImg = LoadSave.GetSpriteAtlas(LoadSave.CONTROLLER_OFFLINE);
+		float heightFactor = 1.0f, widthFactor = 1.0f;
 		menuWidth = (int) (Game.GAME_WIDTH*widthFactor);
 		menuHeight = (int) (Game.GAME_HEIGHT*heightFactor);
-		menuX = Game.GAME_WIDTH / 2 - menuWidth / 2;
-		menuY = Game.GAME_HEIGHT / 2 - menuHeight / 2 - (int) ((1-heightFactor)/3*Game.GAME_HEIGHT);
+		menuX = Game.GAME_WIDTH / 20;
+		menuY = 0; //Game.GAME_HEIGHT / 2 - menuHeight / 2 - (int) ((1-heightFactor)/3*Game.GAME_HEIGHT);
 	}
 
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 2, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID);
-		buttons[1] = new MenuButton(Game.GAME_WIDTH / 2, (int) (200 * Game.SCALE), 1, Gamestate.OPTIONS, CONTROLLER_X_BUTTON_ID);
-		buttons[2] = new MenuButton(Game.GAME_WIDTH / 2, (int) (270 * Game.SCALE), 3, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID);
-		buttons[3] = new MenuButton(Game.GAME_WIDTH / 2, (int) (340 * Game.SCALE), 2, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID);
-		volumeButton = new VolumeButton((Game.GAME_WIDTH/2 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID);
+		buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), 1, Gamestate.OPTIONS, CONTROLLER_X_BUTTON_ID);
+		buttons[2] = new MenuButton(Game.GAME_WIDTH / 6, (int) (270 * Game.SCALE), 2, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID);
+		buttons[3] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID);
+		volumeButton = new VolumeButton((Game.GAME_WIDTH/6 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
 	}
 
 	@Override
@@ -70,6 +69,20 @@ public class Menu extends State implements Statemethods {
 		g.drawImage(backgroundImgPink, xDrawOffset, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
 		g.drawImage(backgroundImg, menuX + xDrawOffset, menuY, menuWidth, menuHeight, null);
 
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1))
+			g.drawImage(controllerOnlineImg, (int) (Game.GAME_WIDTH*0.8 + xDrawOffset), 
+					(int) (Game.GAME_WIDTH*0.01), (int) (Game.GAME_WIDTH*0.1), (int) (Game.GAME_HEIGHT*0.1), null);
+		else
+			g.drawImage(controllerOfflineImg, (int) (Game.GAME_WIDTH*0.8 + xDrawOffset), 
+					(int) (Game.GAME_WIDTH*0.01), (int) (Game.GAME_WIDTH*0.1), (int) (Game.GAME_HEIGHT*0.1), null);
+		
+		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_2))
+			g.drawImage(controllerOnlineImg, (int) (Game.GAME_WIDTH*0.9 + xDrawOffset), 
+					(int) (Game.GAME_WIDTH*0.01), (int) (Game.GAME_WIDTH*0.1), (int) (Game.GAME_HEIGHT*0.1), null);
+		else
+			g.drawImage(controllerOfflineImg, (int) (Game.GAME_WIDTH*0.9 + xDrawOffset), 
+					(int) (Game.GAME_WIDTH*0.01), (int) (Game.GAME_WIDTH*0.1), (int) (Game.GAME_HEIGHT*0.1), null);
+	
 		for (MenuButton mb : buttons)
 			mb.draw(g, xDrawOffset);
 
@@ -81,17 +94,4 @@ public class Menu extends State implements Statemethods {
 			mb.resetBools();
 
 	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-	}
-	
-	@Override
-	public void keyTyped(KeyEvent e) {
-	}
-
 }

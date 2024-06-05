@@ -291,7 +291,7 @@ public class Playing extends State implements Statemethods {
 		if (paused) {
 			g.setColor(new Color(0, 0, 0, 150));
 			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
-			pauseOverlay.draw(g, xDrawOffset);
+			pauseOverlay.draw(g, isPlayer1);
 		} else if (gameOver)
 			gameOverOverlay.draw(g, xDrawOffset);
 		else if (lvlCompleted)
@@ -345,6 +345,24 @@ public class Playing extends State implements Statemethods {
 		enemyManager.checkEnemyHit(attackBox);
 	}
 	
+	public void checkEnemyPlayerHit(boolean isPlayer1Attacking) {
+		Player attacker = player2;
+		Player defender = player1;
+		if (isPlayer1Attacking) {
+			attacker = player1;
+			defender = player2;
+		}
+		if (attacker.getAttackBox().intersects(defender.getHitbox())) {
+			defender.changeHealth(-20, attacker);
+			attacker.selfHurtFromPowerAttack(-20);
+			if (defender.getIsCarrying() != null && attacker.getIsCarrying() == null) {
+				attacker.setIsCarrying(defender.getIsCarrying());
+				attacker.getIsCarrying().setIsCarriedBy(attacker);
+				defender.setIsCarrying(null);
+			}
+		}
+	}
+	
 	public void checkTetrisTileGrabbed(Rectangle2D.Float grabBox, Player player) {
 		tetrisTileManager.checkTetrisTileGrabbed(grabBox, player);
 	}
@@ -356,161 +374,6 @@ public class Playing extends State implements Statemethods {
 	public void checkSpikesTouched(Player p) {
 		objectManager.checkSpikesTouched(p);
 	}
-
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (useController)
-			return;
-		//System.out.println(e);
-		if (!gameOver && !gameCompleted && !lvlCompleted)
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_A:
-				player1.setLeft(true);
-				break;
-			case KeyEvent.VK_D:
-				player1.setRight(true);
-				break;
-			case KeyEvent.VK_W:
-				player1.setJump(true);
-				break;
-			case KeyEvent.VK_Q:
-				player1.setAttacking(true);
-				break;
-			case KeyEvent.VK_E:
-				player1.powerAttack();
-				break;
-			case KeyEvent.VK_R:
-				if (!player1.getGrabOrThrow()) {
-					player1.setGrabOrThrow(true);
-					player1.setThrowPushDownStartTime(System.nanoTime());	
-				}
-				break;
-				
-			case KeyEvent.VK_LEFT:
-				player2.setLeft(true);
-				break;
-			case KeyEvent.VK_RIGHT:
-				player2.setRight(true);
-				break;
-			case KeyEvent.VK_UP:
-				player2.setJump(true);
-				break;
-			case KeyEvent.VK_NUMPAD1:
-				player2.setAttacking(true);
-				break;
-			case KeyEvent.VK_NUMPAD0:
-				player2.powerAttack();
-				break;
-			case KeyEvent.VK_NUMPAD2:
-				if (!player2.getGrabOrThrow()) {
-					player2.setGrabOrThrow(true);
-					player2.setThrowPushDownStartTime(System.nanoTime());	
-				}
-				break;
-
-			case KeyEvent.VK_ESCAPE:
-				paused = !paused;
-			}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (useController)
-			return;
-		//System.out.println(e);
-		if (!gameOver && !gameCompleted && !lvlCompleted)
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_A:
-				player1.setLeft(false);
-				break;
-			case KeyEvent.VK_D:
-				player1.setRight(false);
-				break;
-			case KeyEvent.VK_W:
-				player1.setJump(false);
-				break;
-			case KeyEvent.VK_R:
-				player1.setGrabOrThrow(false);
-				player1.grabOrThrow();
-				break;	
-				
-			case KeyEvent.VK_LEFT:
-				player2.setLeft(false);
-				break;
-			case KeyEvent.VK_RIGHT:
-				player2.setRight(false);
-				break;
-			case KeyEvent.VK_UP:
-				player2.setJump(false);	
-				break;
-			case KeyEvent.VK_NUMPAD2:
-				player2.setGrabOrThrow(false);
-				player2.grabOrThrow();
-				break;
-			}
-	}
-	
-	@Override
-	public void keyTyped(KeyEvent e) {
-		if (useController)
-			return;
-		//System.out.println(e);
-		if (!gameOver && !gameCompleted && !lvlCompleted)
-			switch (e.getKeyChar()) {
-			case 'f':
-				if (player1.getIsCarrying() != null) {
-					int old_rotation_player1 = player1.getIsCarrying().getRotation();
-					player1.getIsCarrying().setRotation((old_rotation_player1 + 1) % 4);
-				}
-				break;	
-
-			case '3':
-				if (player2.getIsCarrying() != null) {
-					int old_rotation_player2 = player2.getIsCarrying().getRotation();
-					player2.getIsCarrying().setRotation((old_rotation_player2 + 1) % 4);
-				}
-				break;
-			}
-	}
-
-
-//	@Override TODO
-//	public void mousePressed(MouseEvent e) {
-//		if (gameOver)
-//			gameOverOverlay.mousePressed(e);
-//		else if (paused)
-//			pauseOverlay.mousePressed(e);
-//		else if (lvlCompleted)
-//			levelCompletedOverlay.mousePressed(e);
-//		else if (gameCompleted)
-//			gameCompletedOverlay.mousePressed(e);
-//
-//	}
-//
-//	@Override
-//	public void mouseReleased(MouseEvent e) {
-//		if (gameOver)
-//			gameOverOverlay.mouseReleased(e);
-//		else if (paused)
-//			pauseOverlay.mouseReleased(e);
-//		else if (lvlCompleted)
-//			levelCompletedOverlay.mouseReleased(e);
-//		else if (gameCompleted)
-//			gameCompletedOverlay.mouseReleased(e);
-//	}
-//
-//	@Override
-//	public void mouseMoved(MouseEvent e) {
-//		if (gameOver)
-//			gameOverOverlay.mouseMoved(e);
-//		else if (paused)
-//			pauseOverlay.mouseMoved(e);
-//		else if (lvlCompleted)
-//			levelCompletedOverlay.mouseMoved(e);
-//		else if (gameCompleted)
-//			gameCompletedOverlay.mouseMoved(e);
-//	}
 
 	public void setLevelCompleted(boolean levelCompleted) {
 		game.getAudioPlayer().lvlCompleted();
