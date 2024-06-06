@@ -239,6 +239,11 @@ public class Constants {
 	}
 
 	public static class PlayerConstants {
+		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
+		public static final float CLOSE_TO_BORDER_VERTICAL = 0.6f;
+		public static final float MAX_X_LVL_OFFSET_STEP_HORIZONTAL = 0.006f*Game.GAME_WIDTH;
+		public static final float MAX_X_LVL_OFFSET_STEP_VERTICAL = 0.02f*Game.GAME_HEIGHT;
+		
 		public static final int PLAYER_GREEN_VALUE = 100;
 		public static final int HITBOX_BASE_WIDTH = 16;
 		public static final int GRABBOX_BASE_WIDTH = (int) (HITBOX_BASE_WIDTH * 1.75f);
@@ -263,7 +268,7 @@ public class Constants {
 		public static int GetSpriteAmount(int player_action) {
 			switch (player_action) {
 			case DEAD:
-				return 1;//8;
+				return 4;
 			case RUNNING:
 				return 12;
 			case IDLE:

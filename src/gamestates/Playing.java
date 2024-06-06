@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import org.lwjgl.glfw.GLFW;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.ByteBuffer;
 import org.lwjgl.BufferUtils;
 
@@ -50,10 +52,10 @@ public class Playing extends State implements Statemethods {
 
 	private boolean paused = false;
 
-	private int leftBorder = (int) (0.25 * Game.GAME_WIDTH/2);
-	private int rightBorder = (int) (0.75 * Game.GAME_WIDTH/2);
-	private int upperBorder = (int) (0.25 * Game.GAME_HEIGHT/2);
-	private int lowerBorder = (int) (0.75 * Game.GAME_HEIGHT/2);
+	private int leftBorder = (int) ((1-CLOSE_TO_BORDER_HORIZONTAL) * Game.GAME_WIDTH/2);
+	private int rightBorder = (int) (CLOSE_TO_BORDER_HORIZONTAL * Game.GAME_WIDTH/2);
+	private int upperBorder = (int) ((1-CLOSE_TO_BORDER_VERTICAL) * Game.GAME_HEIGHT/2);
+	private int lowerBorder = (int) (CLOSE_TO_BORDER_VERTICAL * Game.GAME_HEIGHT/2);
 	private int maxLvlOffsetX, maxLvlOffsetY;
 
 	private BufferedImage backgroundImg, foregroundImg, bigCloud, smallCloud, shipImgs[];
@@ -76,8 +78,7 @@ public class Playing extends State implements Statemethods {
 		super(game);
 		initClasses();
 
-		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.PLAYING_BG_IMG);
-		foregroundImg =  LoadSave.GetSpriteAtlas(LoadSave.PLAYING_FG_IMG);
+		
 		bigCloud = LoadSave.GetSpriteAtlas(LoadSave.BIG_CLOUDS);
 		smallCloud = LoadSave.GetSpriteAtlas(LoadSave.SMALL_CLOUDS);
 		smallCloudsPos = new int[8];
@@ -88,6 +89,8 @@ public class Playing extends State implements Statemethods {
 		loadDialogue();
 		calcLvlOffset();
 		loadStartLevel();
+		player1.resetLvlOffsets();
+		player2.resetLvlOffsets();
 	}
 
 	private void loadDialogue() {
@@ -119,12 +122,27 @@ public class Playing extends State implements Statemethods {
 			exclamationImgs[i] = etemp.getSubimage(i * 14, 0, 14, 12);
 	}
 
+	public void loadLevel(int lvlIndex) {
+		resetAll();
+		levelManager.setLevelIndex(lvlIndex);
+		levelManager.loadNextLevel();
+//		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+//		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+//		
+		enemyManager.loadEnemies(levelManager.getCurrentLevel());
+		objectManager.loadObjects(levelManager.getCurrentLevel());
+		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
+		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
+		loadLvlImgs();
+	}
+	
 	public void loadNextLevel() {
 		levelManager.setLevelIndex(levelManager.getLevelIndex() + 1);
 		levelManager.loadNextLevel();
 		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		resetAll();
+		loadLvlImgs();
 	}
 
 	private void loadStartLevel() {
@@ -132,6 +150,25 @@ public class Playing extends State implements Statemethods {
 		objectManager.loadObjects(levelManager.getCurrentLevel());
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
+		loadLvlImgs();
+	}
+	
+	private void loadLvlImgs() {
+		if (Files.exists(Paths.get("res/backgrounds/" + (levelManager.getLevelIndex() + 1) + ".png"))) {
+			backgroundImg = LoadSave.GetSpriteAtlas("backgrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/backgrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
+			backgroundImg = LoadSave.GetSpriteAtlas("backgrounds/1.png");
+		}
+		
+		if (Files.exists(Paths.get("res/foregrounds/" + (levelManager.getLevelIndex() + 1) + ".png"))) {
+			foregroundImg = LoadSave.GetSpriteAtlas("foregrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/foregrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
+			foregroundImg = LoadSave.GetSpriteAtlas("foregrounds/1.png");
+		}
 	}
 
 	private void calcLvlOffset() {
@@ -164,6 +201,7 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void update() {
+
 		if (paused)
 			pauseOverlay.update();
 		else if (lvlCompleted)
@@ -172,10 +210,10 @@ public class Playing extends State implements Statemethods {
 			gameCompletedOverlay.update();
 		else if (gameOver)
 			gameOverOverlay.update();
-		else if (playerDying) {
-			player1.update();
-			player2.update();
-		}
+//		else if (playerDying) {
+//			player1.update();
+//			player2.update();
+//		}
 		else {
 			
 			updateDialogue();
@@ -211,19 +249,20 @@ public class Playing extends State implements Statemethods {
 		
 
 		if (xDiff > rightBorder)
-			xLvlOffset += xDiff - rightBorder;
+			xLvlOffset += Math.min(xDiff - rightBorder, MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
 		else if (xDiff < leftBorder)
-			xLvlOffset += xDiff - leftBorder;
+			xLvlOffset += Math.max(xDiff - leftBorder, -MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
 		
 		if (yDiff > lowerBorder)
-			yLvlOffset += yDiff - lowerBorder;
+			yLvlOffset += Math.min(yDiff - lowerBorder, MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
 		else if (yDiff < upperBorder)
-			yLvlOffset += yDiff - upperBorder;
+			yLvlOffset += Math.max(yDiff - upperBorder, -MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
 
 		xLvlOffset = Math.max(Math.min(xLvlOffset, maxLvlOffsetX), 0);
 		yLvlOffset = Math.max(Math.min(yLvlOffset, maxLvlOffsetY), 0);
 		player.setXLvlOffset(xLvlOffset);
 		player.setYLvlOffset(yLvlOffset);
+		
 	}
 
 	private void drawDialogue(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -396,6 +435,14 @@ public class Playing extends State implements Statemethods {
 		this.maxLvlOffsetY = lvlOffset;
 	}
 
+	public int getMaxLvlOffsetX() {
+		return maxLvlOffsetX;
+	}
+	
+	public int getMaxLvlOffsetY() {
+		return maxLvlOffsetY;
+	}
+	
 	public void unpauseGame() {
 		paused = false;
 	}

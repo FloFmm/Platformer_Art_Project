@@ -1,7 +1,5 @@
 package levels;
 
-import static utilz.Constants.ObjectConstants.BLUE_POTION;
-import static utilz.Constants.ObjectConstants.RED_POTION;
 import static utilz.HelpMethods.*;
 
 import java.awt.Graphics;

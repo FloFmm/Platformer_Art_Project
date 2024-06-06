@@ -40,7 +40,7 @@ public class Menu extends State implements Statemethods {
 
 	private void loadButtons() {
 		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID);
-		buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), 1, Gamestate.OPTIONS, CONTROLLER_X_BUTTON_ID);
+		buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), 1, Gamestate.PLAYING, CONTROLLER_X_BUTTON_ID);
 		buttons[2] = new MenuButton(Game.GAME_WIDTH / 6, (int) (270 * Game.SCALE), 2, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID);
 		buttons[3] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID);
 		volumeButton = new VolumeButton((Game.GAME_WIDTH/6 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
@@ -52,8 +52,11 @@ public class Menu extends State implements Statemethods {
 			mb.update();
 			if (mb.getButtonState() == GLFW.GLFW_RELEASE && mb.getPrevButtonState() == GLFW.GLFW_PRESS) {
 				mb.applyGamestate();
-				if (mb.getState() == Gamestate.PLAYING)
+				if (mb.getState() == Gamestate.PLAYING) {
+					int rowId = mb.getRowIndex();
+					game.getPlaying().loadLevel(rowId);
 					game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
+				}
 				resetButtons();
 			}
 		}

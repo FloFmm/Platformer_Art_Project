@@ -30,6 +30,7 @@ public class MenuButton {
 		initBounds();
 	}
 
+
 	private void initBounds() {
 		bounds = new Rectangle(xPos - xOffsetCenter, yPos, B_WIDTH, B_HEIGHT);
 	}
@@ -82,6 +83,10 @@ public class MenuButton {
 		return buttonState;
 	}
 
+	public int getRowIndex() {
+		return rowIndex;
+	}
+	
 	public void setButtonState(int buttonState) {
 		this.buttonState = buttonState;
 	}

@@ -28,7 +28,7 @@ import org.lwjgl.glfw.GLFW;
 public class Player extends Entity {
 	
 	private BufferedImage[][] animations;
-	private boolean moving = false, attacking = false;
+	private boolean moving = false, attacking = false, respawning = false;
 	private boolean left, right, jump, grabOrThrow = false;
 	protected Rectangle2D.Float grabBox;
 	private TetrisTile isCarrying;
@@ -42,9 +42,11 @@ public class Player extends Entity {
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
 	// StatusBarUI
-	private BufferedImage statusBarImg;
+	private BufferedImage statusBarImg, middleSeperatorImg;
+
 
 	private int statusBarWidth = (int) (192 * Game.SCALE);
+	private int middleSeperatorWidth = (int) (Game.GAME_WIDTH/5);
 	private int statusBarHeight = (int) (58 * Game.SCALE);
 	private int statusBarX = (int) (10 * Game.SCALE);
 	private int statusBarY = (int) (10 * Game.SCALE);
@@ -110,6 +112,7 @@ public class Player extends Entity {
 		hitbox.y = y;
 	}
 
+
 	private void initAttackBox() {
 		attackBox = new Rectangle2D.Float(x, y, (int) (35 * Game.SCALE), (int) (20 * Game.SCALE));
 		resetAttackBox();
@@ -140,8 +143,9 @@ public class Player extends Entity {
 					airSpeed = 0;
 				}
 			} else if (aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANI_SPEED - 1) {
-				playing.setGameOver(true);
-				playing.getGame().getAudioPlayer().stopSong();
+				//playing.setGameOver(true);
+				//playing.getGame().getAudioPlayer().stopSong();
+				resetAtDeath();
 				playing.getGame().getAudioPlayer().playEffect(AudioPlayer.GAMEOVER);
 			} else {
 				updateAnimationTick();
@@ -367,15 +371,7 @@ public class Player extends Entity {
 		
 		int aniStateOffset = 0;
 		if (isCarrying != null)
-			aniStateOffset = NUM_ANIMATIONS;
-//		if (state != 0) {
-//			System.out.println("=============================================");
-//			System.out.println(aniStateOffset);
-//			System.out.println(state);
-//			System.out.println(animations[state + aniStateOffset][aniIndex]);
-//			System.out.println(aniIndex);
-//			}
-		
+			aniStateOffset = NUM_ANIMATIONS;		
 		g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
 				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
 		drawHitbox(g, xLvlOffset, yLvlOffset);
@@ -420,7 +416,12 @@ public class Player extends Entity {
 	public void drawUI(Graphics g) {
 		// Background ui
 		g.drawImage(statusBarImg, statusBarX, statusBarY, statusBarWidth, statusBarHeight, null);
-
+		
+		int xDrawOffset = 0;
+		if (!isPlayer1)
+			xDrawOffset = -Game.GAME_WIDTH/2;
+		g.drawImage(middleSeperatorImg, Game.GAME_WIDTH/2-middleSeperatorWidth/2 + xDrawOffset, 0, middleSeperatorWidth, Game.GAME_HEIGHT, null);
+		
 		// Health bar
 		g.setColor(Color.red);
 		g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
@@ -705,6 +706,7 @@ public class Player extends Entity {
 			}
 		}
 		statusBarImg = LoadSave.GetSpriteAtlas(LoadSave.STATUS_BAR);
+		middleSeperatorImg = LoadSave.GetSpriteAtlas(LoadSave.MIDDLE_SEPERATOR);
 	}
 
 	public void loadLvlData(int[][] lvlData) {
@@ -761,6 +763,20 @@ public class Player extends Entity {
 	}
 
 	public void resetAll() {
+		resetAtDeath();
+		resetLvlOffsets();		
+	}
+	
+	public void resetLvlOffsets() {
+		if (!isPlayer1)
+			xLvlOffset = playing.getMaxLvlOffsetX();//(int)(hitbox.x - Game.GAME_WIDTH/4);
+		else
+			xLvlOffset = - Game.GAME_WIDTH/2 + 1;
+		//System.out.println(playing.getMaxLvlOffsetX());
+		yLvlOffset = (int)(hitbox.y - Game.GAME_HEIGHT/2); // playing.getMaxLvlOffsetY();
+	}
+
+	public void resetAtDeath() {
 		resetDirBooleans();
 		inAir = false;
 		attacking = false;
