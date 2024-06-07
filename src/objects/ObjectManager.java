@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import entities.Enemy;
+import entities.Entity;
 import entities.Player;
 import gamestates.Playing;
 import levels.Level;
@@ -35,7 +36,7 @@ public class ObjectManager {
 		loadImgs();
 	}
 
-	public void checkSpikesTouched(Player p) {
+	public void checkSpikesTouched(Entity p) {
 		for (Spike s : currentLevel.getSpikes())
 			if (s.getHitbox().intersects(p.getHitbox()))
 				p.kill();
@@ -99,8 +100,6 @@ public class ObjectManager {
 		for (int j = 0; j < containerImgs.length; j++)
 			for (int i = 0; i < containerImgs[j].length; i++)
 				containerImgs[j][i] = containerSprite.getSubimage(40 * i, 30 * j, 40, 30);
-
-		spikeImg = LoadSave.GetSpriteAtlas(LoadSave.TRAP_ATLAS);
 
 		cannonImgs = new BufferedImage[7];
 		BufferedImage temp = LoadSave.GetSpriteAtlas(LoadSave.CANNON_ATLAS);
@@ -199,7 +198,6 @@ public class ObjectManager {
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
 		drawPotions(g, xLvlOffset, yLvlOffset);
 		drawContainers(g, xLvlOffset, yLvlOffset);
-		drawTraps(g, xLvlOffset, yLvlOffset);
 		drawCannons(g, xLvlOffset, yLvlOffset);
 		drawProjectiles(g, xLvlOffset, yLvlOffset);
 		drawGrass(g, xLvlOffset, yLvlOffset);
@@ -238,12 +236,6 @@ public class ObjectManager {
 			}
 			g.drawImage(cannonImgs[c.getAniIndex()], x, (int) (c.getHitbox().y - yLvlOffset), width, CANNON_HEIGHT, null);
 		}
-	}
-
-	private void drawTraps(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Spike s : currentLevel.getSpikes())
-			g.drawImage(spikeImg, (int) (s.getHitbox().x - xLvlOffset), (int) (s.getHitbox().y - s.getyDrawOffset() - yLvlOffset), SPIKE_WIDTH, SPIKE_HEIGHT, null);
-
 	}
 
 	private void drawContainers(Graphics g, int xLvlOffset, int yLvlOffset) {

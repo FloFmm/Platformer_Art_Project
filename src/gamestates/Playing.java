@@ -2,22 +2,16 @@ package gamestates;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 import java.util.ArrayList;
 
-import org.lwjgl.glfw.GLFW;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.ByteBuffer;
-import org.lwjgl.BufferUtils;
 
 import entities.EnemyManager;
+import entities.Entity;
 import entities.Player;
 import entities.TetrisTileManager;
 import levels.LevelManager;
@@ -31,6 +25,7 @@ import utilz.LoadSave;
 import zones.BuildingZoneManager;
 import effects.DialogueEffect;
 import effects.Rain;
+import entities.Entity;
 
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.Dialogue.*;
@@ -126,14 +121,16 @@ public class Playing extends State implements Statemethods {
 		resetAll();
 		levelManager.setLevelIndex(lvlIndex);
 		levelManager.loadNextLevel();
-//		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-//		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-//		
 		enemyManager.loadEnemies(levelManager.getCurrentLevel());
 		objectManager.loadObjects(levelManager.getCurrentLevel());
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
 		loadLvlImgs();
+
+		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 	}
 	
 	public void loadNextLevel() {
@@ -143,6 +140,11 @@ public class Playing extends State implements Statemethods {
 		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		resetAll();
 		loadLvlImgs();
+		
+		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 	}
 
 	private void loadStartLevel() {
@@ -151,6 +153,11 @@ public class Playing extends State implements Statemethods {
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
 		loadLvlImgs();
+		
+		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
+		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 	}
 	
 	private void loadLvlImgs() {
@@ -182,9 +189,9 @@ public class Playing extends State implements Statemethods {
 		objectManager = new ObjectManager(this);
 		tetrisTileManager = new TetrisTileManager(this);
 		buildingZoneManager = new BuildingZoneManager(this);
-		player1 = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
+		player1 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, true);
-		player2 = new Player(200, 200, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
+		player2 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, false);
 		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
@@ -265,27 +272,6 @@ public class Playing extends State implements Statemethods {
 		
 	}
 
-	private void drawDialogue(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (DialogueEffect de : dialogEffects)
-			if (de.isActive()) {
-				if (de.getType() == QUESTION)
-					g.drawImage(questionImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY() - yLvlOffset, DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
-				else
-					g.drawImage(exclamationImgs[de.getAniIndex()], de.getX() - xLvlOffset, de.getY() - yLvlOffset, DIALOGUE_WIDTH, DIALOGUE_HEIGHT, null);
-			}
-	}
-
-	public void addDialogue(int x, int y, int type) {
-		// Not adding a new one, we are recycling. #ThinkGreen lol
-		dialogEffects.add(new DialogueEffect(x, y - (int) (Game.SCALE * 15), type));
-		for (DialogueEffect de : dialogEffects)
-			if (!de.isActive())
-				if (de.getType() == type) {
-					de.reset(x, -(int) (Game.SCALE * 15));
-					return;
-				}
-	}
-
 
 	@Override
 	public void draw(Graphics g, boolean isPlayer1) {
@@ -305,15 +291,17 @@ public class Playing extends State implements Statemethods {
 		drawClouds(g, xLvlOffset);
 		//if (drawRain)
 		//	rain.draw(g, xLvlOffset, yLvlOffset);
-
-		levelManager.draw(g, xLvlOffset, yLvlOffset);
-		g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, foregroundImg.getWidth(), foregroundImg.getHeight(), null);
+		
+		if (levelManager.getCurrentLevel().getDrawPolygons())
+			levelManager.draw(g, xLvlOffset, yLvlOffset);
+		if (levelManager.getCurrentLevel().getDrawForeground())
+			g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, foregroundImg.getWidth(), foregroundImg.getHeight(), null);
 
 		
 		objectManager.draw(g, xLvlOffset, yLvlOffset);
 		enemyManager.draw(g, xLvlOffset, yLvlOffset);
-		tetrisTileManager.draw(g, xLvlOffset, yLvlOffset);
 		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
+		tetrisTileManager.draw(g, xLvlOffset, yLvlOffset);
 		player1.drawPlayer(g, xLvlOffset, yLvlOffset);
 		player2.drawPlayer(g, xLvlOffset, yLvlOffset);
 		int xDrawOffset = 0;
@@ -323,9 +311,6 @@ public class Playing extends State implements Statemethods {
 			player2.drawUI(g);
 			xDrawOffset = -Game.GAME_WIDTH/2;
 		}
-
-		objectManager.drawBackgroundTrees(g, xLvlOffset, yLvlOffset);
-		drawDialogue(g, xLvlOffset, yLvlOffset);
 
 		if (paused) {
 			g.setColor(new Color(0, 0, 0, 150));
@@ -410,7 +395,7 @@ public class Playing extends State implements Statemethods {
 		objectManager.checkObjectTouched(player);
 	}
 
-	public void checkSpikesTouched(Player p) {
+	public void checkSpikesTouched(Entity p) {
 		objectManager.checkSpikesTouched(p);
 	}
 

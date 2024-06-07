@@ -1,6 +1,8 @@
 package levels;
 
 import static utilz.HelpMethods.*;
+import static utilz.Constants.Environment.*;
+import static utilz.Constants.PlayerConstants.*;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -48,8 +50,20 @@ public class LevelManager {
 
 	private void buildAllLevels() {
 		BufferedImage[] allLevels = LoadSave.GetAllLevels();
-		for (BufferedImage img : allLevels)
-			levels.add(new Level(img));
+		
+		for (int i=0; i<allLevels.length; i++) {
+			BufferedImage img = allLevels[i];
+			boolean drawForeground, drawPolygons;
+			if (i==1) {
+				drawForeground = false;
+				drawPolygons = true;
+			}
+			else {
+				drawForeground = true;
+				drawPolygons = false;
+			}
+			levels.add(new Level(img, drawForeground, drawPolygons, i+1));
+		}
 	}
 
 	private void importOutsideSprites() {
@@ -64,6 +78,7 @@ public class LevelManager {
 	}
 
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
+		g.setColor(FLOOR_TILE_COLOR);
 		int[][] lvlData = levels.get(lvlIndex).getLevelData();
 		for (int j = 0; j < lvlData.length; j++)
 			for (int i = 0; i < lvlData[0].length; i++) {
@@ -73,18 +88,36 @@ public class LevelManager {
 				if (111 <= index && index <= 989) { // triangle
 					if  (index%10 == 1) {
 						int[][] c = TriangleCoordinatesBaseLongShort(i, j, lvlData);
-						g.drawPolygon(new int[] {c[0][0]- xLvlOffset, c[1][0]- xLvlOffset, c[2][0]- xLvlOffset}, 
+						
+						int xOff = (int) (-HITBOX_BASE_WIDTH*Game.SCALE*0.75);
+						int ori = index/10%10;
+						int height = Math.max(Math.abs(c[0][1] - c[1][1]), Math.abs(c[0][1] - c[2][1]));
+						if (ori == 1 || ori == 2 || ori == 5 || ori == 6) {
+							xOff = -xOff;
+						}
+						g.drawPolygon(new int[] {c[0][0]- xLvlOffset - xOff, c[1][0]- xLvlOffset - xOff, c[2][0]- xLvlOffset - xOff}, 
 								new int[] {c[0][1] - yLvlOffset, c[1][1] - yLvlOffset, c[2][1] - yLvlOffset}, 3);
-						g.fillPolygon(new int[] {c[0][0]- xLvlOffset, c[1][0]- xLvlOffset, c[2][0]- xLvlOffset}, 
+						g.fillPolygon(new int[] {c[0][0]- xLvlOffset - xOff, c[1][0]- xLvlOffset - xOff, c[2][0]- xLvlOffset - xOff}, 
 								new int[] {c[0][1] - yLvlOffset, c[1][1] - yLvlOffset, c[2][1] - yLvlOffset}, 3);
+						int m = xOff;
+						if (xOff < 0)
+							m = 0;
+						g.drawRect(c[0][0] - m - xLvlOffset, c[0][1]- yLvlOffset - height, Math.abs(xOff), height);
+						g.fillRect(c[0][0] - m - xLvlOffset, c[0][1]- yLvlOffset - height, Math.abs(xOff), height);
 					}
 				}
 				else if (index == 48)
 					g.drawImage(waterSprite[aniIndex], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
 				else if (index == 49)
 					g.drawImage(waterSprite[4], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
-				else {
+				else if (index == 11)
+					continue;
+				else if (index == 3){
 					g.drawImage(levelSprite[index], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
+				}
+				else {
+					g.drawRect(x, y, Game.TILES_SIZE, Game.TILES_SIZE);
+					g.fillRect(x, y, Game.TILES_SIZE, Game.TILES_SIZE);
 				}
 					
 			}

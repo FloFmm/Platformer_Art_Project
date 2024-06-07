@@ -16,6 +16,7 @@ import java.io.IOException;
 import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
+import entities.Entity;
 import utilz.LoadSave;
 
 import java.nio.ByteBuffer;
@@ -270,7 +271,7 @@ public class Player extends Entity {
 	
 	private void checkInsideWater() {
 		if (IsEntityInWater(hitbox, playing.getLevelManager().getCurrentLevel().getLevelData()))
-			currentHealth = 0;
+			kill();
 	}
 
 	private void checkSpikesTouched() {
@@ -297,7 +298,7 @@ public class Player extends Entity {
 	
 	public float calcThrowSpeed() {
 		long now = System.nanoTime();
-		float pushDownDuration = (now-throwPushDownStartTime)/1000000000.0f;
+		float pushDownDuration = (now-throwPushDownStartTime)/1000_000_000.0f;
 		int increasingOrDecreasing = (int)((now-throwPushDownStartTime)/1000000000.0f/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED % 2);
 		if (increasingOrDecreasing == 0) {
 			pushDownDuration = pushDownDuration % TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED;
@@ -628,7 +629,7 @@ public class Player extends Entity {
 		else
 			pushBackDir = LEFT;
 	}
-
+	
 	public void kill() {
 		currentHealth = 0;
 	}
@@ -778,6 +779,10 @@ public class Player extends Entity {
 
 	public void resetAtDeath() {
 		resetDirBooleans();
+		if (isCarrying != null) {
+			isCarrying.setIsCarriedBy(null);
+			isCarrying = null;
+		}
 		inAir = false;
 		attacking = false;
 		moving = false;

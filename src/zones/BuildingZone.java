@@ -14,38 +14,52 @@ import main.Game;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class BuildingZone {
-	private int[][] lvlData;
 	private int gridWidth, gridHeight;
-	int[][] matrix, goalMatrix;
-	int buildingZoneIndex;
+	private int[][] matrix, goalMatrix, preMatrix;
+	private int buildingZoneIndex;
 	protected Rectangle2D.Float hitbox;
 	private List<TetrisTile> tetrisTiles = new ArrayList<>();
 	private String zoneType;
-	
-	public BuildingZone(int x, int y, int width, int height, int buildingZoneIndex, int[][] goalMatrix, String zoneType) {
+	private boolean finished = false;
+
+
+	public BuildingZone(int x, int y, int width, int height, int buildingZoneIndex, String zoneType) {
 		this.buildingZoneIndex = buildingZoneIndex;
 		hitbox = new Rectangle2D.Float(x, y, (int) (width), (int) (height));
 		gridWidth = (int) width/Game.TILES_SIZE*4;
 		gridHeight = (int) height/Game.TILES_SIZE*4;
-		matrix = initMatrix(gridHeight, gridWidth);
-		this.goalMatrix = matrixDeepCopy(goalMatrix);
 		this.zoneType = zoneType;
+		initMatrixes();
 	}
 
 
-	private int[][] initMatrix(int rows, int cols) {
-		int[][] m = new int[rows][cols];
-
-        // Fill matrix with zeros
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                m[i][j] = 0;
-            }
-        }
-        return m;
+	private void initMatrixes() {
+		switch (zoneType) {
+        case "windmill":
+        	goalMatrix = matrixDeepCopy(WINDMILL_GOAL_MATRIX);
+        	preMatrix = matrixDeepCopy(WINDMILL_PRE_MATRIX);
+        	matrix = matrixDeepCopy(WINDMILL_PRE_MATRIX);
+            break;
+        case "windmill_tutorial":
+        	goalMatrix = matrixDeepCopy(WINDMILL_GOAL_MATRIX);
+        	preMatrix = matrixDeepCopy(WINDMILL_TUTORIAL_PRE_MATRIX);
+        	matrix = matrixDeepCopy(WINDMILL_TUTORIAL_PRE_MATRIX);
+            break;
+        case "rocket":
+        	goalMatrix = matrixDeepCopy(ROCKET_GOAL_MATRIX);
+        	preMatrix = matrixDeepCopy(ROCKET_PRE_MATRIX);
+        	matrix = matrixDeepCopy(ROCKET_PRE_MATRIX);
+            break;
+        case "rocket_tutorial":
+        	goalMatrix = matrixDeepCopy(ROCKET_GOAL_MATRIX);
+        	preMatrix = matrixDeepCopy(ROCKET_TUTORIAL_PRE_MATRIX);
+        	matrix = matrixDeepCopy(ROCKET_TUTORIAL_PRE_MATRIX);
+            break;
+		}
 	}
-	
+
 	public boolean addTetrisTile(TetrisTile tetrisTile) {
 		int[][] oldMatrix = matrixDeepCopy(matrix);
 		matrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
@@ -59,7 +73,7 @@ public class BuildingZone {
 		}
 		
 		
-		if (!matrixIsCompletable()) {
+		if (!isCompletable(matrix)) {
 			//TetrisTile lastAddedTile = tetrisTiles.remove(tetrisTiles.size() - 1);
 			TetrisTile lastAddedTile = tetrisTile;
 			matrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
@@ -68,21 +82,40 @@ public class BuildingZone {
 					tetrisTile.getXDrawOffset(), 
 					tetrisTile.getYDrawOffset());
 			
-			lastAddedTile.explosion();
+			lastAddedTile.startExplosionTimer();
 			return false;
 		}
 		else {
+			// successful
+			System.out.println("successfully added");
+			if (isFinished()) {
+				System.out.println("finished a building zone");
+				finished = true;
+			}
+				
 			tetrisTiles.add(tetrisTile);
 		}
 		return true;
 	}
 	
-	private boolean matrixIsCompletable() {
+	public boolean isCompletable(int[][] m) {
+		int rows = m.length;
+        int cols = m[0].length;
+		for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (m[i][j] == 1 && goalMatrix[i][j] == 0 && preMatrix[i][j] == 0)
+                	return false;
+            }
+        }
+		return true;
+	}
+	
+	public boolean isFinished() {
 		int rows = matrix.length;
         int cols = matrix[0].length;
 		for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (matrix[i][j] == 1 && goalMatrix[i][j] != 1)
+                if (matrix[i][j] == 0 && goalMatrix[i][j] == 1)
                 	return false;
             }
         }
@@ -103,8 +136,8 @@ public class BuildingZone {
 	public void update(Playing playing) {
 	}
 	
-	public void loadLvlData(int[][] lvlData) {
-		this.lvlData = lvlData;
+	public boolean getFinished() {
+		return finished;
 	}
 	
 	public int getBuildingZoneIndex() {
@@ -124,4 +157,9 @@ public class BuildingZone {
 	public String getZoneType() {
 		return zoneType;
 	}
+	
+	
+	public int[][] getMatrix() {
+		return matrix;
 	}
+}

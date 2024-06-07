@@ -644,6 +644,19 @@ public class HelpMethods {
 		return result;
 	}
 	
+	public static int[][] matrixAdd(int[][] matrixA, int[][] matrixB) {
+		int rowsA = matrixA.length;
+        int colsA = matrixA[0].length;
+        int[][] result = new int[rowsA][colsA];
+        
+		for (int i = 0; i < rowsA; i++) {
+            for (int j = 0; j < colsA; j++) {
+                result[i][j] += matrixA[i][j] + matrixB[i][j];
+            }
+        }
+		return result;
+	}
+	
 	public static boolean matrixEquiv(int[][] matrixA, int[][] matrixB) {
 		int rowsA = matrixA.length;
         int colsA = matrixA[0].length;
@@ -700,7 +713,7 @@ public class HelpMethods {
 		return false;
 	}
 	
-	public static void printArray(int[][] arr) {
+	public static void printMatrix(int[][] arr) {
         for (int i = 0; i < arr.length; i++) {
             for (int j = 0; j < arr[i].length; j++) {
                 System.out.print(arr[i][j] + "\t");

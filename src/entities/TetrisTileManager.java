@@ -52,7 +52,8 @@ public class TetrisTileManager {
 		for (TetrisTile c : currentLevel.getTetrisTiles())
 			if (c.getLockedInBuildingZone() == null)
 				if (grabBox.intersects(c.getHitbox())) {
-					c.setIsCarriedBy(player);
+					c.grabbed(player);
+					
 					player.setIsCarrying(c);
 					return;
 				}

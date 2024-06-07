@@ -45,16 +45,21 @@ public class Level {
 	private int maxLvlOffsetY;
 	private Point playerSpawn;
 	private int buildingZoneIndex = 0;
-
-	public Level(BufferedImage img) {
+	private boolean drawForeground = true, drawPolygons = true;
+	private int lvlId;
+	
+	public Level(BufferedImage img, boolean drawForeground, boolean drawPolygons, int lvlId) {
 		this.img = img;
 		lvlData = new int[img.getHeight()][img.getWidth()];
+		this.drawForeground = drawForeground;
+		this.drawPolygons = drawPolygons;
+		this.lvlId = lvlId;
 		loadLevel();
 		calcLvlOffsets();
 	}
 
-	private void loadLevel() {
 
+	private void loadLevel() {
 		// Looping through the image colors just once. Instead of one per
 		// object/enemy/etc..
 		// Removed many methods in HelpMethods class.
@@ -91,6 +96,7 @@ public class Level {
 	}
 
 	private void loadLevelData(int redValue, int x, int y) {
+		
 		if (redValue >= 50 && !(redValue >= 111 && redValue <= 989))
 			lvlData[y][x] = 0;
 		else
@@ -105,18 +111,17 @@ public class Level {
 				int upperBound = leftRightUpperLower[2];
 				int lowerBound = leftRightUpperLower[3];
 				if (x == leftBound && y == lowerBound) {
-					int[][] goalMatrix = WINDMILL_MATRIX;
 					String type = "windmill";
 					if (buildingZoneIndex == 0) {
-						goalMatrix = ROCKET_MATRIX;
 						type = "rocket";
 					}
-	
+					if (lvlId == 2)
+						type += "_tutorial";
+					
 					buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE), 
 							(rightBound-leftBound+1) * Game.TILES_SIZE, 
 							(upperBound-lowerBound+1) * Game.TILES_SIZE, 
 							buildingZoneIndex,
-							goalMatrix,
 							type));
 					buildingZoneIndex += 1;
 				}
@@ -133,7 +138,7 @@ public class Level {
 		switch (greenValue) {
 		case CRABBY -> crabs.add(new Crabby(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
 		case TETRIS_TILE_GREEN_VALUE -> tetrisTiles.add(new TetrisTile(x * Game.TILES_SIZE, y * Game.TILES_SIZE, 
-				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES-1), lvlData));
+				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES), lvlData));
 		case PLAYER_GREEN_VALUE -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
 		}
 	}
@@ -213,6 +218,15 @@ public class Level {
 
 	public ArrayList<Grass> getGrass() {
 		return grass;
+	}
+	
+
+	public boolean getDrawForeground() {
+		return drawForeground;
+	}
+
+	public boolean getDrawPolygons() {
+		return drawPolygons;
 	}
 
 }

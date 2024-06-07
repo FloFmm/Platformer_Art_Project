@@ -100,4 +100,7 @@ public abstract class Entity {
 	public Rectangle2D.Float getAttackBox() {
 		return attackBox;
 	}
+	
+	public void kill() {
+	}
 }
