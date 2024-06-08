@@ -334,7 +334,8 @@ public class TetrisTile extends Entity {
 		Random random = new Random();
 		tileIndex = random.nextInt(0, NUM_TETRIS_TILES);
 		if (tileIndex == oldTileIndex)
-			tileIndex += 1 %(NUM_TETRIS_TILES);
+			tileIndex = (tileIndex + 1) %(NUM_TETRIS_TILES);
+
 	}
 	
 	public void grabbed(Player player) {

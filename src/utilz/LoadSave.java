@@ -50,6 +50,8 @@ public class LoadSave {
 	public static final String CONTROLLER_ONLINE = "controller_online.png";
 	public static final String CONTROLLER_OFFLINE = "controller_offline.png";
 	public static final String PAUSED = "paused.png";
+	public static final String VICTORY_IMG = "victory.png";
+	public static final String DEFEAT_IMG = "defeat.png";
 	
 
 	public static BufferedImage GetSpriteAtlas(String fileName) {

@@ -3,6 +3,7 @@ package zones;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import entities.Player;
 import gamestates.Playing;
@@ -17,7 +18,7 @@ public class BuildingZoneManager {
 	private Playing playing;
 	private Level currentLevel;
 	private BufferedImage rocketImg, windmillImg, rocketTutorialImg, windmillTutorialImg;
-	//private boolean player1Finished = false, player2Finished = false;
+	private boolean player1Finished = false, player2Finished = false;
 	public BuildingZoneManager(Playing playing) {
 		this.playing = playing;
 		loadBuildingZoneImgs();
@@ -35,9 +36,23 @@ public class BuildingZoneManager {
 	}
 
 	public void update() {
-		for (BuildingZone c : currentLevel.getBuildingZones()) {
+		BuildingZone c;
+		ArrayList<BuildingZone> bz = currentLevel.getBuildingZones();
+		player2Finished = true;
+		for (int i=0; i<bz.size(); i++) {
+			c = bz.get(i);
 			c.update(playing);
-			
+			if (i==0)
+				player1Finished = c.getFinished();
+			else
+				player2Finished = player2Finished && c.getFinished();
+		}
+		if (player1Finished) {
+			playing.setGameOver(true);
+			playing.setPlayer1Won(true);
+		}
+		if (player2Finished) {
+			playing.setPlayer2Won(true);
 		}
 	}
 

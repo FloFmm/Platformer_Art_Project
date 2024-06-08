@@ -1,25 +1,16 @@
 package gamestates;
 
-import static utilz.Constants.ControllerConstants.CONTROLLER_A_BUTTON_ID;
-import static utilz.Constants.ControllerConstants.CONTROLLER_B_BUTTON_ID;
-import static utilz.Constants.ControllerConstants.CONTROLLER_X_BUTTON_ID;
-import static utilz.Constants.ControllerConstants.CONTROLLER_Y_BUTTON_ID;
 import static utilz.Constants.UI.URMButtons.URM_SIZE;
-import static utilz.Constants.UI.VolumeButtons.SLIDER_WIDTH;
-import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
 
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
 import main.Game;
 import ui.MenuButton;
-import ui.VolumeButton;
 import utilz.LoadSave;
+import static utilz.Constants.ControllerConstants.*;
 
 public class Credits extends State implements Statemethods {
 	private MenuButton[] buttons = new MenuButton[1];
@@ -38,7 +29,7 @@ public class Credits extends State implements Statemethods {
 	}
 	
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID);
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID);
 	}
 
 	@Override

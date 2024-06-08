@@ -1,78 +1,79 @@
 package ui;
 
-import static utilz.Constants.UI.URMButtons.URM_SIZE;
-import static utilz.Constants.ControllerConstants.*;
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+
+import org.lwjgl.glfw.GLFW;
 
 import gamestates.Gamestate;
 import gamestates.Playing;
+import gamestates.Statemethods;
 import main.Game;
 import utilz.LoadSave;
+import static utilz.Constants.ControllerConstants.*;
+import static utilz.Constants.UI.Buttons.*;
 
-public class GameOverOverlay {
-
+public class GameOverOverlay implements Statemethods{
 	private Playing playing;
-	private BufferedImage img;
-	private int imgX, imgY, imgW, imgH;
-	//private UrmButton menu, play;
-
+	private MenuButton[] buttons = new MenuButton[1];
+	private BufferedImage victoryImg, defeatImg;
+	
 	public GameOverOverlay(Playing playing) {
 		this.playing = playing;
-		createImg();
-		createButtons();
+		loadButtons();
+		loadImages();
 	}
 
-	private void createButtons() {
-		int menuX = (int) (335 * Game.SCALE);
-		int playX = (int) (440 * Game.SCALE);
-		int y = (int) (195 * Game.SCALE);
-		//play = new UrmButton(playX, y, URM_SIZE, URM_SIZE, 0, CONTROLLER_H_BUTTON_ID);
-		//menu = new UrmButton(menuX, y, URM_SIZE, URM_SIZE, 2, CONTROLLER_B_BUTTON_ID);
-
+	private void loadImages() {
+		victoryImg = LoadSave.GetSpriteAtlas(LoadSave.VICTORY_IMG);
+		defeatImg = LoadSave.GetSpriteAtlas(LoadSave.DEFEAT_IMG);
+		float heightFactor = 1.0f, widthFactor = 1.0f;
 	}
-
-	private void createImg() {
-		img = LoadSave.GetSpriteAtlas(LoadSave.DEATH_SCREEN);
-		imgW = (int) (img.getWidth() * Game.SCALE);
-		imgH = (int) (img.getHeight() * Game.SCALE);
-		imgX = Game.GAME_WIDTH / 2 - imgW / 2;
-		imgY = (int) (100 * Game.SCALE);
-
+	
+	private void loadButtons() {
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID);
 	}
-
-	public void draw(Graphics g, int xDrawOffset) {
-		g.setColor(new Color(0, 0, 0, 200));
-		g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
-
-		g.drawImage(img, imgX, imgY, imgW, imgH, null);
-
-		//menu.draw(g, xDrawOffset);
-		//play.draw(g, xDrawOffset);
-	}
-
+	
+	@Override
 	public void update() {
-		//menu.update();
-		//play.update();
+		for (MenuButton mb : buttons) {
+			mb.update();
+			if (mb.getButtonState() == GLFW.GLFW_RELEASE && mb.getPrevButtonState() == GLFW.GLFW_PRESS) {
+				mb.applyGamestate();
+				if (mb.getState() == Gamestate.MENU) {
+					playing.resetAll();
+					playing.unpauseGame();
+				}
+				resetButtons();
+			}
+		}
 	}
-
-	public void mouseReleased(MouseEvent e) {
-//		if (isIn(menu, e)) {
-//			if (menu.isMousePressed()) {
-//				playing.resetAll();
-//				playing.setGamestate(Gamestate.MENU);
-//			}
-//		} else if (isIn(play, e))
-//			if (play.isMousePressed()) {
-//				playing.resetAll();
-//				playing.getGame().getAudioPlayer().setLevelSong(playing.getLevelManager().getLevelIndex());
-//			}
-//
-//		menu.resetBools();
-//		play.resetBools();
+	
+	@Override
+	public void draw(Graphics g, boolean isPlayer1) {
+		int xDrawOffset = 0;
+		if (!isPlayer1)
+			xDrawOffset = -Game.GAME_WIDTH/2;
+		
+		if (isPlayer1) {
+			if (playing.getPlayer1Won())
+				g.drawImage(victoryImg, 0, 0, Game.GAME_WIDTH/2, Game.GAME_HEIGHT, null);
+			else
+				g.drawImage(defeatImg, 0, 0, Game.GAME_WIDTH/2, Game.GAME_HEIGHT, null);
+		}
+		else {
+			if (playing.getPlayer2Won())
+				g.drawImage(victoryImg, 0, 0, Game.GAME_WIDTH/2, Game.GAME_HEIGHT, null);
+			else
+				g.drawImage(defeatImg, 0, 0, Game.GAME_WIDTH/2, Game.GAME_HEIGHT, null);
+		}
+		
+		for (MenuButton mb : buttons)
+			mb.draw(g, xDrawOffset);
 	}
-
-
+	
+	private void resetButtons() {
+		for (MenuButton mb : buttons)
+			mb.resetBools();
+	}
 }

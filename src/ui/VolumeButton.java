@@ -18,7 +18,6 @@ public class VolumeButton extends PauseButton {
 	private BufferedImage[] imgs;
 	private BufferedImage slider;
 	private int index = 0;
-	private boolean mouseOver, mousePressed;
 	private int buttonX, minX, maxX;
 	private float floatValue = 0f;
 	private Game game;
@@ -97,10 +96,6 @@ public class VolumeButton extends PauseButton {
 		floatValue = value / range;
 	}
 
-	public void resetBools() {
-		mouseOver = false;
-		mousePressed = false;
-	}
 
 	public float getFloatValue() {
 		return floatValue;

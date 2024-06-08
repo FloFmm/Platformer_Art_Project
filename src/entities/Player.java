@@ -2,7 +2,9 @@ package entities;
 
 import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.*;
-import static utilz.Constants.*;
+import static utilz.Constants.UPS_SET;
+import static utilz.Constants.GRAVITY;
+import static utilz.Constants.ANI_SPEED;
 import static utilz.Constants.Directions.*;
 import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.ControllerConstants.*;
@@ -135,7 +137,6 @@ public class Player extends Entity {
 				state = DEAD;
 				aniTick = 0;
 				aniIndex = 0;
-				playing.setPlayerDying(true);
 				playing.getGame().getAudioPlayer().playEffect(AudioPlayer.DIE);
 
 				// Check if player died in air

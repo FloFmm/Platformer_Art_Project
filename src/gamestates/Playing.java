@@ -30,6 +30,7 @@ import entities.Entity;
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.Dialogue.*;
 import static utilz.Constants.PlayerConstants.*;
+import static utilz.Constants.UPS_SET;
 
 public class Playing extends State implements Statemethods {
 
@@ -44,6 +45,8 @@ public class Playing extends State implements Statemethods {
 	private GameCompletedOverlay gameCompletedOverlay;
 	private LevelCompletedOverlay levelCompletedOverlay;
 	private Rain rain;
+	private int gameUpdates = 0;
+	private float gameTimeInSeconds = 0;
 
 	private boolean paused = false;
 
@@ -60,10 +63,9 @@ public class Playing extends State implements Statemethods {
 	private int[] smallCloudsPos;
 	private Random rnd = new Random();
 
-	private boolean gameOver;
+	private boolean gameOver=false, player1Won=false, player2Won=false;
 	private boolean lvlCompleted;
 	private boolean gameCompleted;
-	private boolean playerDying;
 
 	private float windSpeed = 2.0f;//5.0f;
 	public boolean useController = true;
@@ -222,7 +224,7 @@ public class Playing extends State implements Statemethods {
 //			player2.update();
 //		}
 		else {
-			
+			updateTimedEvents();
 			updateDialogue();
 			//if (drawRain)
 			//	rain.update(xLvlOffset);
@@ -239,6 +241,16 @@ public class Playing extends State implements Statemethods {
 	}
 
 
+
+	private void updateTimedEvents() {
+		gameUpdates += 1;
+		gameTimeInSeconds = (float) gameUpdates / UPS_SET;
+//		System.out.println(gameTimeInSeconds);
+//		if (gameTimeInSeconds >= 5) {
+//			gameOver = true;
+//		}
+		
+	}
 
 	private void updateDialogue() {
 		for (DialogueEffect de : dialogEffects)
@@ -317,7 +329,7 @@ public class Playing extends State implements Statemethods {
 			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
 			pauseOverlay.draw(g, isPlayer1);
 		} else if (gameOver)
-			gameOverOverlay.draw(g, xDrawOffset);
+			gameOverOverlay.draw(g, isPlayer1);
 		else if (lvlCompleted)
 			levelCompletedOverlay.draw(g, xDrawOffset);
 		else if (gameCompleted)
@@ -346,8 +358,8 @@ public class Playing extends State implements Statemethods {
 		gameOver = false;
 		paused = false;
 		lvlCompleted = false;
-		playerDying = false;
-
+		gameTimeInSeconds = 0;
+		gameUpdates = 0;
 
 		player1.resetAll();
 		player2.resetAll();
@@ -470,15 +482,27 @@ public class Playing extends State implements Statemethods {
 		return windSpeed;
 	}
 
-	public void setPlayerDying(boolean playerDying) {
-		this.playerDying = playerDying;
-	}
-
 	public boolean getPaused() {
 		return paused;
 	}
 
 	public void setPaused(boolean paused) {
 		this.paused = paused;
+	}
+
+	public boolean getPlayer1Won() {
+		return player1Won;
+	}
+
+	public void setPlayer1Won(boolean player1Won) {
+		this.player1Won = player1Won;
+	}
+
+	public boolean getPlayer2Won() {
+		return player2Won;
+	}
+
+	public void setPlayer2Won(boolean player2Won) {
+		this.player2Won = player2Won;
 	}
 }
