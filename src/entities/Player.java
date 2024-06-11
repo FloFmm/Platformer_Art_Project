@@ -13,12 +13,10 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
-import entities.Entity;
 import utilz.LoadSave;
 
 import java.nio.ByteBuffer;
@@ -40,13 +38,13 @@ public class Player extends Entity {
 	private float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
 	private float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
 	private int xLvlOffset, yLvlOffset;
+	
 	// Jumping / Gravity
 	private float jumpSpeed = -2.25f * Game.SCALE;
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
 	// StatusBarUI
 	private BufferedImage statusBarImg, middleSeperatorImg;
-
 
 	private int statusBarWidth = (int) (192 * Game.SCALE);
 	private int middleSeperatorWidth = (int) (Game.GAME_WIDTH/5);
@@ -70,16 +68,18 @@ public class Player extends Entity {
 
 	private int flipX = 0;
 	private int flipW = 1;
-
 	private boolean attackChecked;
 	private Playing playing;
-
 	private int tileY = 0;
 
-	private boolean powerAttackActive=false, throwActive=false, selfHurt = false;
+	private boolean powerAttackActive=false, selfHurt = false;
 	private int powerAttackTick;
 	private int powerGrowSpeed = 15;
 	private int powerGrowTick;
+	
+	// grab and throw
+	private float throwAngle = 0;
+	private boolean throwActive=false;
 	
 	//controller
 	private int controllerID; 
@@ -87,6 +87,8 @@ public class Player extends Entity {
 	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
 	private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
 	private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
+	private int prevControllerLeftButtonState = GLFW.GLFW_RELEASE, controllerLeftButtonState = GLFW.GLFW_RELEASE;
+	private int prevControllerRightButtonState = GLFW.GLFW_RELEASE, controllerRightButtonState = GLFW.GLFW_RELEASE;
 	
 	private final boolean isPlayer1;
 
@@ -234,6 +236,24 @@ public class Player extends Entity {
 				grabOrThrow();
 	        }
 	        
+	        // throw direction
+	        prevControllerLeftButtonState = controllerLeftButtonState;
+	        controllerLeftButtonState = buttons.get(CONTROLLER_LEFT_BUTTON_ID);
+	        if (controllerLeftButtonState == GLFW.GLFW_RELEASE && prevControllerLeftButtonState == GLFW.GLFW_PRESS) {
+				if (throwAngle - THROW_ANGLE_STEP >= -MAX_THROW_ANGLE)
+					throwAngle -= THROW_ANGLE_STEP;
+				else
+					throwAngle = -MAX_THROW_ANGLE;
+	        }
+	        prevControllerRightButtonState = controllerRightButtonState;
+	        controllerRightButtonState = buttons.get(CONTROLLER_RIGHT_BUTTON_ID);
+	        if (controllerRightButtonState == GLFW.GLFW_RELEASE && prevControllerRightButtonState == GLFW.GLFW_PRESS) {
+				if (throwAngle + THROW_ANGLE_STEP <= MAX_THROW_ANGLE)
+					throwAngle += THROW_ANGLE_STEP;
+				else
+					throwAngle = MAX_THROW_ANGLE;
+	        }
+	        
 	        // rotate tetris tile
 	        prevRotateControllerState = rotateControllerState;
 	        rotateControllerState = buttons.get(CONTROLLER_Y_BUTTON_ID);
@@ -244,14 +264,36 @@ public class Player extends Entity {
 				}
 	        } 
 	        
+	        // joysticks
+	        FloatBuffer axes = GLFW.glfwGetJoystickAxes(controllerID);
+	        float left_js_x = axes.get(0);
+	        float right_js_x = axes.get(2);
+	        float right_js_y = axes.get(3);
+	        
+	        // right joystick for throw direction
+	        if (Math.sqrt(right_js_x*right_js_x + right_js_y*right_js_y) > JOYSTICK_DEAD_ZONE) {
+				if (right_js_y < 0) {
+					throwAngle = (float) Math.toDegrees(Math.atan(right_js_x/Math.abs(right_js_y)));
+					if (throwAngle > MAX_THROW_ANGLE)
+						throwAngle = MAX_THROW_ANGLE;
+					if (throwAngle < -MAX_THROW_ANGLE)
+						throwAngle = -MAX_THROW_ANGLE;
+				}
+				else {
+					if (right_js_x > 0)
+						throwAngle = MAX_THROW_ANGLE;
+					else
+						throwAngle = -MAX_THROW_ANGLE;
+				}
+			}
 	        
 	        // left joystick for running
-			FloatBuffer axes = GLFW.glfwGetJoystickAxes(controllerID);
-			if (axes.get(0) > JOYSTICK_DEAD_ZONE) {
+			
+			if (left_js_x > JOYSTICK_DEAD_ZONE) {
 				setRight(true);
 				setLeft(false);
 			}
-			else if (axes.get(0) < -JOYSTICK_DEAD_ZONE) {
+			else if (left_js_x < -JOYSTICK_DEAD_ZONE) {
 				setRight(false);
 				setLeft(true);
 			}
@@ -297,7 +339,7 @@ public class Player extends Entity {
 		playing.getGame().getAudioPlayer().playAttackSound();
 	}
 	
-	public float calcThrowSpeed() {
+	public float[] calcThrowSpeed() {
 		long now = System.nanoTime();
 		float pushDownDuration = (now-throwPushDownStartTime)/1000_000_000.0f;
 		int increasingOrDecreasing = (int)((now-throwPushDownStartTime)/1000000000.0f/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED % 2);
@@ -309,12 +351,18 @@ public class Player extends Entity {
 		}
 		float throwSpeed = (float) Math.min(TETRIS_TILE_MAX_THROW_SPEED, 
 				TETRIS_TILE_MAX_THROW_SPEED*Math.sqrt(pushDownDuration/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED));
-		return throwSpeed;
+		
+		float tileXSpeed = (float) Math.sin(Math.toRadians(throwAngle)) * throwSpeed;
+		float tileAirSpeed = (float) Math.cos(Math.toRadians(throwAngle)) * throwSpeed;
+		
+		return new float[] {tileXSpeed, tileAirSpeed};
 	}
 	
 	public void grabOrThrow() {
 		if (isCarrying != null) {
-			isCarrying.airSpeed = -calcThrowSpeed();
+			float[] throwSpeed = calcThrowSpeed();
+			isCarrying.xSpeed = throwSpeed[0];
+			isCarrying.airSpeed = -throwSpeed[1];
 			isCarrying.setIsCarriedBy(null);
 			isCarrying = null;	
 			throwActive = true;
@@ -389,26 +437,31 @@ public class Player extends Entity {
 	}
 
 	protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset, int numArcPoints) {
-		g.setColor(Color.RED);
+		float[] throwSpeed = calcThrowSpeed();
+		float tileXSpeed = throwSpeed[0];
+		float tileAirSpeed = throwSpeed[1];
+		
+		g.setColor(THROW_ARC_COLOR);
 		int circle_x , circle_y;
 		int radius, maxRadius = 11, minRadius = 7;
-		float throwSpeed = calcThrowSpeed();
-		float maxThrowTime = throwSpeed / GRAVITY * 2;
-		float xDistanceTraveled, time;
+		float maxThrowTime = tileAirSpeed / GRAVITY * 2;
+		float xDistanceTraveled, xDistanceDueStartSpeed, xDistanceDueWind, time;
 		for (int i=0; i < numArcPoints; i++) {
 			time = i/(numArcPoints-1.0f)*maxThrowTime;
-			radius = (int)(minRadius + (numArcPoints/2.0f - Math.abs(numArcPoints/2.0f - i))/(numArcPoints/2.0f) * (maxRadius-minRadius));
+			xDistanceDueStartSpeed = time * tileXSpeed;
 			if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET)
-				xDistanceTraveled = playing.getWindSpeed()/(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f * time * time;
+				xDistanceDueWind = playing.getWindSpeed()/(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f * time * time;
 			else
-				xDistanceTraveled = playing.getWindSpeed()*(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f + 
+				xDistanceDueWind = playing.getWindSpeed()*(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f + 
 						playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET);
+			xDistanceTraveled = xDistanceDueStartSpeed + xDistanceDueWind;
 			
+			radius = (int)(minRadius + (numArcPoints/2.0f - Math.abs(numArcPoints/2.0f - i))/(numArcPoints/2.0f) * (maxRadius-minRadius));
 			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - radius/2 + xDistanceTraveled); 
 			
 			if (isCarrying != null) {
 				circle_y = (int) (hitbox.y - yLvlOffset - isCarrying.hitbox.height/2 - radius/2 - 
-						calculateYOfThrowArc(time, playing.getWindSpeed(), throwSpeed, GRAVITY));
+						calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
 				g.fillOval(circle_x,circle_y,radius,radius);
 			}
 		}
@@ -770,10 +823,12 @@ public class Player extends Entity {
 	}
 	
 	public void resetLvlOffsets() {
-		if (!isPlayer1)
+		if (!isPlayer1) {
 			xLvlOffset = playing.getMaxLvlOffsetX();//(int)(hitbox.x - Game.GAME_WIDTH/4);
-		else
-			xLvlOffset = - Game.GAME_WIDTH/2 + 1;
+		}
+		else {
+			xLvlOffset = 0;//- Game.GAME_WIDTH/2 + 1;
+		}
 		//System.out.println(playing.getMaxLvlOffsetX());
 		yLvlOffset = (int)(hitbox.y - Game.GAME_HEIGHT/2); // playing.getMaxLvlOffsetY();
 	}

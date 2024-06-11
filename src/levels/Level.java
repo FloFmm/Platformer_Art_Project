@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
-import entities.Crabby;
+import entities.Tumbleweed;
 import entities.TetrisTile;
 import main.Game;
 import objects.BackgroundTree;
@@ -28,7 +28,7 @@ public class Level {
 	private BufferedImage img;
 	private int[][] lvlData;
 
-	private ArrayList<Crabby> crabs = new ArrayList<>();
+	private ArrayList<Tumbleweed> crabs = new ArrayList<>();
 	private ArrayList<TetrisTile> tetrisTiles = new ArrayList<>();
 	private ArrayList<BuildingZone> buildingZones = new ArrayList<>();
 	private ArrayList<Potion> potions = new ArrayList<>();
@@ -136,7 +136,7 @@ public class Level {
 	private void loadEntities(int greenValue, int x, int y) {
 		Random random = new Random();
 		switch (greenValue) {
-		case CRABBY -> crabs.add(new Crabby(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
+		case TUMBLE_WEED -> crabs.add(new Tumbleweed(x * Game.TILES_SIZE, y * Game.TILES_SIZE, lvlData));
 		case TETRIS_TILE_GREEN_VALUE -> tetrisTiles.add(new TetrisTile(x * Game.TILES_SIZE, y * Game.TILES_SIZE, 
 				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES), lvlData));
 		case PLAYER_GREEN_VALUE -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
@@ -183,7 +183,7 @@ public class Level {
 		return playerSpawn;
 	}
 
-	public ArrayList<Crabby> getCrabs() {
+	public ArrayList<Tumbleweed> getCrabs() {
 		return crabs;
 	}
 	

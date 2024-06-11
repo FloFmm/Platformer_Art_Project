@@ -2,7 +2,8 @@ package entities;
 
 import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.UPS_SET;
-import static utilz.Constants.EnemyConstants.CRABBY;
+import static utilz.Constants.EnemyConstants.TUMBLE_WEED;
+import static utilz.Constants.EnemyConstants.TUMBLE_WEED_MAX_SPEED;
 import static utilz.Constants.PlayerConstants.IDLE;
 import static utilz.HelpMethods.*;
 import static utilz.Constants.*;
@@ -24,7 +25,6 @@ public class TetrisTile extends Entity {
 	private int tileIndex;
 	private BuildingZone lockedInBuildingZone = null;
 	private TetrisTileManager tetrisTileManager;
-	private float xSpeed = 0;
 	private float xDrawOffset=0;
 	private float yDrawOffset=0;
 	private Player isCarriedBy;
@@ -181,7 +181,7 @@ public class TetrisTile extends Entity {
 		}
 		else {
 			inAir = true;
-			if (Math.abs(xSpeed) < Math.abs(windSpeed))
+			if ((Math.signum(xSpeed) == Math.signum(windSpeed) && Math.abs(xSpeed) < Math.abs(TUMBLE_WEED_MAX_SPEED)) || Math.signum(xSpeed) != Math.signum(windSpeed))
 				xSpeed += windSpeed/(UPS_SET*TETRIS_TILE_TIME_TO_REACH_WINDSPEED);
 		}
 			

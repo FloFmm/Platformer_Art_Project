@@ -128,11 +128,14 @@ public class Playing extends State implements Statemethods {
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
 		loadLvlImgs();
+		calcLvlOffset();
 
 		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player1.resetAll();
+		player2.resetAll();
 	}
 	
 	public void loadNextLevel() {
@@ -142,11 +145,14 @@ public class Playing extends State implements Statemethods {
 		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		resetAll();
 		loadLvlImgs();
+		calcLvlOffset();
 		
 		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player1.resetAll();
+		player2.resetAll();
 	}
 
 	private void loadStartLevel() {
@@ -155,11 +161,14 @@ public class Playing extends State implements Statemethods {
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
 		loadLvlImgs();
+		calcLvlOffset();
 		
 		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
+		player1.resetAll();
+		player2.resetAll();
 	}
 	
 	private void loadLvlImgs() {
@@ -360,7 +369,7 @@ public class Playing extends State implements Statemethods {
 		lvlCompleted = false;
 		gameTimeInSeconds = 0;
 		gameUpdates = 0;
-
+		
 		player1.resetAll();
 		player2.resetAll();
 		enemyManager.resetAllEnemies();

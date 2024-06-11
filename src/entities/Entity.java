@@ -19,6 +19,7 @@ public abstract class Entity {
 	protected int aniTick, aniIndex;
 	protected int state;
 	protected float airSpeed;
+	protected float xSpeed;
 	protected boolean inAir = false;
 	protected int maxHealth;
 	protected int currentHealth;
@@ -90,7 +91,7 @@ public abstract class Entity {
 	public int getAniIndex() {
 		return aniIndex;
 	}
-
+	
 	protected void newState(int state) {
 		this.state = state;
 		aniTick = 0;

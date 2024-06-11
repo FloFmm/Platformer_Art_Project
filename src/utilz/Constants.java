@@ -135,37 +135,41 @@ public class Constants {
 	}
 
 	public static class EnemyConstants {
-		public static final int CRABBY = 0;
+		public static final int TUMBLE_WEED = 0;
 		
 		public static final int IDLE = 0;
 		public static final int RUNNING = 1;
 		public static final int ATTACK = 2;
 		public static final int HIT = 3;
 		public static final int DEAD = 4;
+		public static final int NUM_ENEMY_STATES = 5;
 
-		public static final int CRABBY_WIDTH_DEFAULT = 72;
-		public static final int CRABBY_HEIGHT_DEFAULT = 32;
-		public static final int CRABBY_WIDTH = (int) (CRABBY_WIDTH_DEFAULT * Game.SCALE);
-		public static final int CRABBY_HEIGHT = (int) (CRABBY_HEIGHT_DEFAULT * Game.SCALE);
-		public static final int CRABBY_DRAWOFFSET_X = (int) (26 * Game.SCALE);
-		public static final int CRABBY_DRAWOFFSET_Y = (int) (9 * Game.SCALE);
-
+		public static final int TUMBLE_WEED_WIDTH_DEFAULT = 32;
+		public static final int TUMBLE_WEED_HEIGHT_DEFAULT = 32;
+		public static final int TUMBLE_WEED_WIDTH = (int) (TUMBLE_WEED_WIDTH_DEFAULT * Game.SCALE);
+		public static final int TUMBLE_WEED_HEIGHT = (int) (TUMBLE_WEED_HEIGHT_DEFAULT * Game.SCALE);
+		public static final int TUMBLE_WEED_DRAWOFFSET_X = (int) (26 * Game.SCALE);
+		public static final int TUMBLE_WEED_DRAWOFFSET_Y = (int) (9 * Game.SCALE);
+		public static final int TUMBLE_WEED_NUM_ANIMATIONS = 5;
+		public static final int TUMBLE_WEED_MAX_ANIMATION_LENGTH = 10;
+		public static final float TUMBLE_WEED_MAX_SPEED = 1.0f*Game.SCALE;
+		public static final float TUMBLE_WEED_TIME_TO_REACH_WIND_SPEED = 5.0f;
 
 		public static int GetSpriteAmount(int enemy_type, int enemy_state) {
 			switch (enemy_state) {
 
 			case IDLE: {
-				if (enemy_type == CRABBY)
-					return 9;
+				if (enemy_type == TUMBLE_WEED)
+					return 1;
 			}
 			case RUNNING:
-				return 6;
+				return 10;
 			case ATTACK:
 				return 1;
 			case HIT:
 				return 4;
 			case DEAD:
-				return 5;
+				return 2;
 			}
 
 			return 0;
@@ -174,8 +178,8 @@ public class Constants {
 
 		public static int GetMaxHealth(int enemy_type) {
 			switch (enemy_type) {
-			case CRABBY:
-				return 50;
+			case TUMBLE_WEED:
+				return 10;
 			default:
 				return 1;
 			}
@@ -183,7 +187,7 @@ public class Constants {
 
 		public static int GetEnemyDmg(int enemy_type) {
 			switch (enemy_type) {
-			case CRABBY:
+			case TUMBLE_WEED:
 				return 15;
 			default:
 				return 0;
@@ -245,7 +249,7 @@ public class Constants {
 	public static class PlayerConstants {
 		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
 		public static final float CLOSE_TO_BORDER_VERTICAL = 0.6f;
-		public static final float MAX_X_LVL_OFFSET_STEP_HORIZONTAL = 0.006f*Game.GAME_WIDTH;
+		public static final float MAX_X_LVL_OFFSET_STEP_HORIZONTAL = 0.002f*Game.GAME_WIDTH;
 		public static final float MAX_X_LVL_OFFSET_STEP_VERTICAL = 0.02f*Game.GAME_HEIGHT;
 		
 		public static final int PLAYER_GREEN_VALUE = 100;
@@ -316,10 +320,13 @@ public class Constants {
 		public static final int I_TILE = 11;
 		public static final int LONG_I_TILE = 12;
 		
+		public static final Color THROW_ARC_COLOR = new Color(100,100,100);
 		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*5.0f;
 		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
-		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 2.0f;
-		
+		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 3.0f;
+		public static final float THROW_ANGLE_STEP = 5.0f;
+		public static final float MAX_THROW_ANGLE = 60.0f;
+				
 		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = -TETRIS_TILE_MAX_THROW_SPEED*1.0f;
 		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*1.0f;
 		public static final float TETRIS_TILE_MIN_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.75f;

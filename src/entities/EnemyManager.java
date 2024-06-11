@@ -8,11 +8,12 @@ import gamestates.Playing;
 import levels.Level;
 import utilz.LoadSave;
 import static utilz.Constants.EnemyConstants.*;
+import static utilz.HelpMethods.rotateImage;
 
 public class EnemyManager {
 
 	private Playing playing;
-	private BufferedImage[][] crabbyArr, pinkstarArr, sharkArr;
+	private BufferedImage[][] tumbleWeedArr;
 	private Level currentLevel;
 
 	public EnemyManager(Playing playing) {
@@ -26,7 +27,7 @@ public class EnemyManager {
 
 	public void update(int[][] lvlData) {
 		boolean isAnyActive = false;
-		for (Crabby c : currentLevel.getCrabs())
+		for (Tumbleweed c : currentLevel.getCrabs())
 			if (c.isActive()) {
 				c.update(lvlData, playing);
 				isAnyActive = true;
@@ -43,11 +44,11 @@ public class EnemyManager {
 
 
 	private void drawCrabs(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Crabby c : currentLevel.getCrabs())
+		for (Tumbleweed c : currentLevel.getCrabs())
 			if (c.isActive()) {
 
-				g.drawImage(crabbyArr[c.getState()][c.getAniIndex()], (int) c.getHitbox().x - xLvlOffset - CRABBY_DRAWOFFSET_X + c.flipX(),
-						(int) c.getHitbox().y - yLvlOffset - CRABBY_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), CRABBY_WIDTH * c.flipW(), CRABBY_HEIGHT, null);
+				g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()], (int) c.getHitbox().x - xLvlOffset - TUMBLE_WEED_DRAWOFFSET_X + c.flipX(),
+						(int) c.getHitbox().y - yLvlOffset - TUMBLE_WEED_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), TUMBLE_WEED_WIDTH * c.flipW(), TUMBLE_WEED_HEIGHT, null);
 
 //				c.drawHitbox(g, xLvlOffset);
 //				c.drawAttackBox(g, xLvlOffset);
@@ -56,7 +57,7 @@ public class EnemyManager {
 	}
 
 	public void checkEnemyHit(Rectangle2D.Float attackBox) {
-		for (Crabby c : currentLevel.getCrabs())
+		for (Tumbleweed c : currentLevel.getCrabs())
 			if (c.isActive())
 				if (c.getState() != DEAD && c.getState() != HIT)
 					if (attackBox.intersects(c.getHitbox())) {
@@ -66,19 +67,17 @@ public class EnemyManager {
 	}
 
 	private void loadEnemyImgs() {
-		crabbyArr = getImgArr(LoadSave.GetSpriteAtlas(LoadSave.CRABBY_SPRITE), 9, 5, CRABBY_WIDTH_DEFAULT, CRABBY_HEIGHT_DEFAULT);
-	}
-
-	private BufferedImage[][] getImgArr(BufferedImage atlas, int xSize, int ySize, int spriteW, int spriteH) {
-		BufferedImage[][] tempArr = new BufferedImage[ySize][xSize];
-		for (int j = 0; j < tempArr.length; j++)
-			for (int i = 0; i < tempArr[j].length; i++)
-				tempArr[j][i] = atlas.getSubimage(i * spriteW, j * spriteH, spriteW, spriteH);
-		return tempArr;
+		tumbleWeedArr = new BufferedImage[TUMBLE_WEED_NUM_ANIMATIONS][TUMBLE_WEED_MAX_ANIMATION_LENGTH];
+		tumbleWeedArr[IDLE][0] = LoadSave.GetSpriteAtlas(LoadSave.TUMBLE_WEED_SPRITE);
+		tumbleWeedArr[RUNNING][0] = tumbleWeedArr[IDLE][0];
+		
+		for (int i = 1; i<GetSpriteAmount(TUMBLE_WEED, RUNNING);i++) {
+			tumbleWeedArr[RUNNING][i] = rotateImage(tumbleWeedArr[RUNNING][i-1], 360/GetSpriteAmount(TUMBLE_WEED, RUNNING));
+		}
 	}
 
 	public void resetAllEnemies() {
-		for (Crabby c : currentLevel.getCrabs())
+		for (Tumbleweed c : currentLevel.getCrabs())
 			c.resetEnemy();
 	}
 
