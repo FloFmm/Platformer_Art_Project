@@ -10,7 +10,6 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class LoadSave {
-
 	public static final String PLAYER_ATLAS = "player_sprites.png";
 	public static final String LEVEL_ATLAS = "outside_sprites.png";
 	public static final String MENU_BUTTONS = "button_atlas.png";
@@ -22,8 +21,7 @@ public class LoadSave {
 	public static final String MENU_BACKGROUND_IMG = "background_menu.png";
 	public static final String PLAYING_BG_IMG = "playing_bg_img.png";
 	public static final String PLAYING_FG_IMG = "playing_fg_img.png";
-	public static final String BIG_CLOUDS = "big_clouds.png";
-	public static final String SMALL_CLOUDS = "small_clouds.png";
+	
 	public static final String TUMBLE_WEED_SPRITE = "tumble_weed_sprite.png";
 	public static final String STATUS_BAR = "health_power_bar.png";
 	public static final String MIDDLE_SEPERATOR = "middle_seperator.png";

@@ -38,20 +38,20 @@ public class EnemyManager {
 	}
 
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
-		drawCrabs(g, xLvlOffset, yLvlOffset);
+		drawTumbleWeeds(g, xLvlOffset, yLvlOffset);
 	}
 
 
 
-	private void drawCrabs(Graphics g, int xLvlOffset, int yLvlOffset) {
+	private void drawTumbleWeeds(Graphics g, int xLvlOffset, int yLvlOffset) {
 		for (Tumbleweed c : currentLevel.getCrabs())
 			if (c.isActive()) {
 
 				g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()], (int) c.getHitbox().x - xLvlOffset - TUMBLE_WEED_DRAWOFFSET_X + c.flipX(),
 						(int) c.getHitbox().y - yLvlOffset - TUMBLE_WEED_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), TUMBLE_WEED_WIDTH * c.flipW(), TUMBLE_WEED_HEIGHT, null);
 
-//				c.drawHitbox(g, xLvlOffset);
-//				c.drawAttackBox(g, xLvlOffset);
+				c.drawHitbox(g, xLvlOffset, yLvlOffset);
+				c.drawAttackBox(g, xLvlOffset, yLvlOffset);
 			}
 
 	}

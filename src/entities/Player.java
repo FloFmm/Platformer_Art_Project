@@ -901,4 +901,8 @@ public class Player extends Entity {
 		this.yLvlOffset = yLvlOffset;
 	}
 
+	public boolean getPowerAttackActive() {
+		return powerAttackActive;
+	}
+
 }

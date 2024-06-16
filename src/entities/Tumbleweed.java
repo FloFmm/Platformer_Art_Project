@@ -1,22 +1,18 @@
 package entities;
 
 import static utilz.Constants.EnemyConstants.*;
-import static utilz.Constants.TetrisTileConstants.GetTetrisTileShape;
-import static utilz.Constants.TetrisTileConstants.TETRIS_GRID_SIZE;
-import static utilz.Constants.TetrisTileConstants.TETRIS_TILE_TIME_TO_EXPLODE;
-import static utilz.Constants.TetrisTileConstants.TETRIS_TILE_TIME_TO_REACH_WINDSPEED;
-import static utilz.Constants.TetrisTileConstants.TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR;
 import static utilz.HelpMethods.CanMoveHere;
 import static utilz.HelpMethods.GetEntityXPosNextToWall;
 import static utilz.HelpMethods.IsEntityOnFloor;
-import static utilz.HelpMethods.IsFloor;
+
+import audio.AudioPlayer;
+
+import static utilz.Constants.ANI_SPEED;
 import static utilz.Constants.GRAVITY;
 import static utilz.Constants.UPS_SET;
-import static utilz.Constants.Dialogue.*;
 
 import gamestates.Playing;
 import main.Game;
-import zones.BuildingZone;
 
 public class Tumbleweed extends Enemy {
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
@@ -26,8 +22,8 @@ public class Tumbleweed extends Enemy {
 	public Tumbleweed(float x, float y, int[][] lvlData) {
 		super(x, y, TUMBLE_WEED_WIDTH, TUMBLE_WEED_HEIGHT, TUMBLE_WEED);
 		this.lvlData = lvlData;
-		initHitbox(TUMBLE_WEED_WIDTH, TUMBLE_WEED_HEIGHT);
-		initAttackBox(TUMBLE_WEED_WIDTH, TUMBLE_WEED_HEIGHT, 0);
+		initHitbox(TUMBLE_WEED_HITBOX_WIDTH_DEFAULT, TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT);
+		initAttackBox(TUMBLE_WEED_HITBOX_WIDTH_DEFAULT, TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT, 0);
 		
 	}
 
@@ -36,6 +32,23 @@ public class Tumbleweed extends Enemy {
 		updateAnimationTick();
 		updatePos(playing.getWindSpeed());
 		updateAttackBox();
+		
+		if (currentHealth <= 0) {
+			if (state != DEAD) {
+				state = DEAD;
+				aniTick = 0;
+				aniIndex = 0;
+				playing.getGame().getAudioPlayer().playEffect(AudioPlayer.DIE);
+
+				// Check if player died in air
+				if (!IsEntityOnFloor(hitbox, lvlData)) {
+					inAir = true;
+					airSpeed = 0;
+				}
+			} else if (aniIndex == GetSpriteAmount(TUMBLE_WEED, DEAD) - 1 && aniTick >= ANI_SPEED - 1) {
+				kill();
+			}
+		}
 	}
 
 	private void updateBehavior(int[][] lvlData, Playing playing) {
@@ -51,6 +64,12 @@ public class Tumbleweed extends Enemy {
 					newState(RUNNING);
 				break;
 			case RUNNING:
+				if (!playing.getPlayer1().getPowerAttackActive()) {
+					checkPlayerHit(attackBox, playing.getPlayer1());
+				}
+				if (!playing.getPlayer1().getPowerAttackActive()) {
+					checkPlayerHit(attackBox, playing.getPlayer2());
+				}
 				break;
 			case HIT:
 				if (aniIndex <= GetSpriteAmount(enemyType, state) - 2)
@@ -105,5 +124,27 @@ public class Tumbleweed extends Enemy {
 		inAir = false;
 		airSpeed = 0;
 	}
+	
+	private void resetTumbleWeed() {
+		state = IDLE;
+		currentHealth = maxHealth;
 
+		if (!IsEntityOnFloor(hitbox, lvlData))
+			inAir = true;
+		
+		xSpeed = 0;
+		airSpeed = 0;
+		moving = false;
+		
+		hitbox.x = x;
+		hitbox.y = y;
+		attackBox.x = x;
+		attackBox.y = y;
+		if (!IsEntityOnFloor(hitbox, lvlData))
+			inAir = true;
+	}
+	
+	public void kill() {
+		resetTumbleWeed();
+	}	
 }

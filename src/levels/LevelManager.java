@@ -53,16 +53,8 @@ public class LevelManager {
 		
 		for (int i=0; i<allLevels.length; i++) {
 			BufferedImage img = allLevels[i];
-			boolean drawForeground, drawPolygons;
-			if (i==1) {
-				drawForeground = false;
-				drawPolygons = true;
-			}
-			else {
-				drawForeground = true;
-				drawPolygons = false;
-			}
-			levels.add(new Level(img, drawForeground, drawPolygons, i+1));
+			boolean tutorial = i==1;
+			levels.add(new Level(img, tutorial, i+1));
 		}
 	}
 

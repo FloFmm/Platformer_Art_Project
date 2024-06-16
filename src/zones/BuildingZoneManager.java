@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import entities.Player;
 import gamestates.Playing;
 import levels.Level;
+import main.Game;
 import objects.Spike;
 import utilz.LoadSave;
 import static utilz.HelpMethods.*;
@@ -80,9 +81,9 @@ public class BuildingZoneManager {
 			}
 			
 			g.drawImage(zoneImg, 
-					(int) (c.getHitbox().x - xLvlOffset),
+					(int) (c.getHitbox().x - xLvlOffset - c.getHitbox().width),
 					(int) (c.getHitbox().y - yLvlOffset), 
-					(int) c.getHitbox().width, (int) c.getHitbox().height, null);
+					(int) (3 * c.getHitbox().width), (int) c.getHitbox().height + Game.TILES_SIZE, null);
 			//c.drawHitbox(g, xLvlOffset, yLvlOffset);
 				
 		}

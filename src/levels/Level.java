@@ -40,24 +40,41 @@ public class Level {
 
 	private int lvlTilesWide;
 	private int lvlTilesHigh;
+	private int lvlWidth;
+	private int lvlHeight;
+
+
 	//private int maxTilesOffset;
 	private int maxLvlOffsetX;
 	private int maxLvlOffsetY;
 	private Point playerSpawn;
 	private int buildingZoneIndex = 0;
-	private boolean drawForeground = true, drawPolygons = true;
+	private boolean drawForeground = true, drawPolygons = false, drawClouds = true, drawBackground = true, drawSky = true, drawWater = true;
 	private int lvlId;
 	
-	public Level(BufferedImage img, boolean drawForeground, boolean drawPolygons, int lvlId) {
+	public Level(BufferedImage img, boolean tutorial, int lvlId) {
 		this.img = img;
 		lvlData = new int[img.getHeight()][img.getWidth()];
-		this.drawForeground = drawForeground;
-		this.drawPolygons = drawPolygons;
+		if (tutorial) {
+			this.drawForeground = false;
+			this.drawPolygons = true;
+			this.drawSky = true;
+			this.drawBackground = false;
+			this.drawClouds = false;
+			this.drawWater = true;
+		}
+		else {
+			this.drawForeground = true;
+			this.drawPolygons = false;
+			this.drawSky = true;
+			this.drawBackground = true;
+			this.drawClouds = true;
+			this.drawWater = true;
+		}
 		this.lvlId = lvlId;
 		loadLevel();
 		calcLvlOffsets();
 	}
-
 
 	private void loadLevel() {
 		// Looping through the image colors just once. Instead of one per
@@ -156,11 +173,14 @@ public class Level {
 	private void calcLvlOffsets() {
 		lvlTilesWide = img.getWidth();
 		lvlTilesHigh = img.getHeight();
+		lvlWidth = lvlTilesWide*Game.TILES_SIZE;
+		lvlHeight = lvlTilesHigh*Game.TILES_SIZE;
+
 		
 		// maxTilesOffset = lvlTilesWide - Game.TILES_IN_WIDTH;
 		// maxLvlOffsetX = Game.TILES_SIZE * maxTilesOffset;
-		maxLvlOffsetX = lvlTilesWide*Game.TILES_SIZE - Game.GAME_WIDTH/2 + 1;
-		maxLvlOffsetY = lvlTilesHigh*Game.TILES_SIZE - Game.GAME_HEIGHT + 1;
+		maxLvlOffsetX = lvlWidth - Game.GAME_WIDTH/2 + 1;
+		maxLvlOffsetY = lvlHeight - Game.GAME_HEIGHT + 1;
 	}
 
 	public int getSpriteIndex(int x, int y) {
@@ -227,6 +247,34 @@ public class Level {
 
 	public boolean getDrawPolygons() {
 		return drawPolygons;
+	}
+	
+
+	public boolean getDrawClouds() {
+		return drawClouds;
+	}
+
+
+	public boolean getDrawBackground() {
+		return drawBackground;
+	}
+
+
+	public boolean getDrawSky() {
+		return drawSky;
+	}
+	
+	public boolean getDrawWater() {
+		return drawWater;
+	}
+	
+	public int getLvlWidth() {
+		return lvlWidth;
+	}
+
+
+	public int getLvlHeight() {
+		return lvlHeight;
 	}
 
 }

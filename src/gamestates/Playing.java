@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.Random;
 import java.util.ArrayList;
 
 import java.nio.file.Files;
@@ -25,9 +24,7 @@ import utilz.LoadSave;
 import zones.BuildingZoneManager;
 import effects.DialogueEffect;
 import effects.Rain;
-import entities.Entity;
 
-import static utilz.Constants.Environment.*;
 import static utilz.Constants.Dialogue.*;
 import static utilz.Constants.PlayerConstants.*;
 import static utilz.Constants.UPS_SET;
@@ -56,12 +53,9 @@ public class Playing extends State implements Statemethods {
 	private int lowerBorder = (int) (CLOSE_TO_BORDER_VERTICAL * Game.GAME_HEIGHT/2);
 	private int maxLvlOffsetX, maxLvlOffsetY;
 
-	private BufferedImage backgroundImg, foregroundImg, bigCloud, smallCloud, shipImgs[];
+	private BufferedImage backgroundImg, foregroundImg, skyImg, fastCloudImg, slowCloudImg, waterImg;
 	private BufferedImage[] questionImgs, exclamationImgs;
 	private ArrayList<DialogueEffect> dialogEffects = new ArrayList<>();
-
-	private int[] smallCloudsPos;
-	private Random rnd = new Random();
 
 	private boolean gameOver=false, player1Won=false, player2Won=false;
 	private boolean lvlCompleted;
@@ -74,15 +68,6 @@ public class Playing extends State implements Statemethods {
 	public Playing(Game game) {
 		super(game);
 		initClasses();
-
-		
-		bigCloud = LoadSave.GetSpriteAtlas(LoadSave.BIG_CLOUDS);
-		smallCloud = LoadSave.GetSpriteAtlas(LoadSave.SMALL_CLOUDS);
-		smallCloudsPos = new int[8];
-		for (int i = 0; i < smallCloudsPos.length; i++)
-			smallCloudsPos[i] = (int) (90 * Game.SCALE) + rnd.nextInt((int) (100 * Game.SCALE));
-
-
 		loadDialogue();
 		calcLvlOffset();
 		loadStartLevel();
@@ -140,7 +125,6 @@ public class Playing extends State implements Statemethods {
 	
 	public void loadNextLevel() {
 		levelManager.setLevelIndex(levelManager.getLevelIndex() + 1);
-		levelManager.loadNextLevel();
 		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
 		resetAll();
@@ -172,20 +156,52 @@ public class Playing extends State implements Statemethods {
 	}
 	
 	private void loadLvlImgs() {
-		if (Files.exists(Paths.get("res/backgrounds/" + (levelManager.getLevelIndex() + 1) + ".png"))) {
-			backgroundImg = LoadSave.GetSpriteAtlas("backgrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_water.png"))) {
+			waterImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_water.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/backgrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
-			backgroundImg = LoadSave.GetSpriteAtlas("backgrounds/1.png");
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_water.png");
+			waterImg = LoadSave.GetSpriteAtlas("layers/1_water.png");
 		}
 		
-		if (Files.exists(Paths.get("res/foregrounds/" + (levelManager.getLevelIndex() + 1) + ".png"))) {
-			foregroundImg = LoadSave.GetSpriteAtlas("foregrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_sky.png"))) {
+			skyImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_sky.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/foregrounds/" + (levelManager.getLevelIndex() + 1) + ".png");
-			foregroundImg = LoadSave.GetSpriteAtlas("foregrounds/1.png");
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_sky.png");
+			skyImg = LoadSave.GetSpriteAtlas("layers/1_sky.png");
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_slow.png"))) {
+			slowCloudImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_slow.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_slow.png");
+			slowCloudImg = LoadSave.GetSpriteAtlas("layers/1_cloud_slow.png");
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_fast.png"))) {
+			fastCloudImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_fast.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_fast.png");
+			fastCloudImg = LoadSave.GetSpriteAtlas("layers/1_cloud_fast.png");
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_background.png"))) {
+			backgroundImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_background.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_background.png");
+			backgroundImg = LoadSave.GetSpriteAtlas("layers/1_background.png");
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_foreground.png"))) {
+			foregroundImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_foreground.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_foreground.png");
+			foregroundImg = LoadSave.GetSpriteAtlas("layers/1_foreground.png");
 		}
 	}
 
@@ -296,8 +312,8 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void draw(Graphics g, boolean isPlayer1) {
-		
-		g.drawImage(backgroundImg, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
+		int curLvlWidth = levelManager.getCurrentLevel().getLvlWidth();
+		int curLvlHeight = levelManager.getCurrentLevel().getLvlHeight();
 		int xLvlOffset, yLvlOffset;
 		if (isPlayer1) {
 			xLvlOffset = player1.getXLvlOffset();
@@ -308,23 +324,50 @@ public class Playing extends State implements Statemethods {
 			yLvlOffset = player2.getYLvlOffset();
 		}
 		
-			
-		drawClouds(g, xLvlOffset);
+		// sky
+		if (levelManager.getCurrentLevel().getDrawSky())
+			g.drawImage(skyImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
+
+		// slow clouds
+		if (levelManager.getCurrentLevel().getDrawClouds()) {
+			g.drawImage(slowCloudImg, - (int) (xLvlOffset * 0.3), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		}
+		
+		// fast clouds
+		if (levelManager.getCurrentLevel().getDrawClouds()) {
+			g.drawImage(fastCloudImg, - (int) (xLvlOffset * 0.7), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		}
+		
+		// background
+		if (levelManager.getCurrentLevel().getDrawBackground())
+			g.drawImage(backgroundImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		
+		// polygons
+		if (levelManager.getCurrentLevel().getDrawPolygons())
+			levelManager.draw(g, xLvlOffset, yLvlOffset);
+		
+		// foreground 
+		if (levelManager.getCurrentLevel().getDrawForeground())
+			g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		
+		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
+		
 		//if (drawRain)
 		//	rain.draw(g, xLvlOffset, yLvlOffset);
 		
-		if (levelManager.getCurrentLevel().getDrawPolygons())
-			levelManager.draw(g, xLvlOffset, yLvlOffset);
-		if (levelManager.getCurrentLevel().getDrawForeground())
-			g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, foregroundImg.getWidth(), foregroundImg.getHeight(), null);
-
-		
+		// objects
 		objectManager.draw(g, xLvlOffset, yLvlOffset);
-		enemyManager.draw(g, xLvlOffset, yLvlOffset);
-		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
+		
+		//entities
 		tetrisTileManager.draw(g, xLvlOffset, yLvlOffset);
+		enemyManager.draw(g, xLvlOffset, yLvlOffset);
 		player1.drawPlayer(g, xLvlOffset, yLvlOffset);
 		player2.drawPlayer(g, xLvlOffset, yLvlOffset);
+		// water 
+		if (levelManager.getCurrentLevel().getDrawWater())
+			g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+2240-gameTimeInSeconds/100*2240), curLvlWidth, curLvlHeight, null);
+		
+		// ui
 		int xDrawOffset = 0;
 		if (isPlayer1)
 			player1.drawUI(g);
@@ -333,6 +376,7 @@ public class Playing extends State implements Statemethods {
 			xDrawOffset = -Game.GAME_WIDTH/2;
 		}
 
+		// overlay
 		if (paused) {
 			g.setColor(new Color(0, 0, 0, 150));
 			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
@@ -344,16 +388,9 @@ public class Playing extends State implements Statemethods {
 		else if (gameCompleted)
 			gameCompletedOverlay.draw(g);
 		
-		
+
 	}
 
-	private void drawClouds(Graphics g, int xLvlOffset) {
-		for (int i = 0; i < 4; i++)
-			g.drawImage(bigCloud, i * BIG_CLOUD_WIDTH - (int) (xLvlOffset * 0.3), (int) (204 * Game.SCALE), BIG_CLOUD_WIDTH, BIG_CLOUD_HEIGHT, null);
-
-		for (int i = 0; i < smallCloudsPos.length; i++)
-			g.drawImage(smallCloud, SMALL_CLOUD_WIDTH * 4 * i - (int) (xLvlOffset * 0.7), smallCloudsPos[i], SMALL_CLOUD_WIDTH, SMALL_CLOUD_HEIGHT, null);
-	}
 
 	public void setGameCompleted() {
 		gameCompleted = true;

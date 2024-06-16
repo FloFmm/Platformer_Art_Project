@@ -144,12 +144,17 @@ public class Constants {
 		public static final int DEAD = 4;
 		public static final int NUM_ENEMY_STATES = 5;
 
-		public static final int TUMBLE_WEED_WIDTH_DEFAULT = 32;
-		public static final int TUMBLE_WEED_HEIGHT_DEFAULT = 32;
+		public static final int TUMBLE_WEED_WIDTH_DEFAULT = 30;
+		public static final int TUMBLE_WEED_HEIGHT_DEFAULT = 30;
 		public static final int TUMBLE_WEED_WIDTH = (int) (TUMBLE_WEED_WIDTH_DEFAULT * Game.SCALE);
 		public static final int TUMBLE_WEED_HEIGHT = (int) (TUMBLE_WEED_HEIGHT_DEFAULT * Game.SCALE);
-		public static final int TUMBLE_WEED_DRAWOFFSET_X = (int) (26 * Game.SCALE);
-		public static final int TUMBLE_WEED_DRAWOFFSET_Y = (int) (9 * Game.SCALE);
+		public static final int TUMBLE_WEED_HITBOX_WIDTH_DEFAULT = 24;
+		public static final int TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT = 24;
+		public static final int TUMBLE_WEED_HITBOX_WIDTH = (int) (TUMBLE_WEED_HITBOX_WIDTH_DEFAULT * Game.SCALE);
+		public static final int TUMBLE_WEED_HITBOX_HEIGHT = (int) (TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT * Game.SCALE);
+		
+		public static final int TUMBLE_WEED_DRAWOFFSET_X = (int) ((TUMBLE_WEED_WIDTH-TUMBLE_WEED_HITBOX_WIDTH)/2);
+		public static final int TUMBLE_WEED_DRAWOFFSET_Y = (int) ((TUMBLE_WEED_HEIGHT-TUMBLE_WEED_HITBOX_HEIGHT)/2);
 		public static final int TUMBLE_WEED_NUM_ANIMATIONS = 5;
 		public static final int TUMBLE_WEED_MAX_ANIMATION_LENGTH = 10;
 		public static final float TUMBLE_WEED_MAX_SPEED = 1.0f*Game.SCALE;
@@ -167,9 +172,9 @@ public class Constants {
 			case ATTACK:
 				return 1;
 			case HIT:
-				return 4;
+				return 10;
 			case DEAD:
-				return 2;
+				return 4;
 			}
 
 			return 0;
@@ -179,7 +184,7 @@ public class Constants {
 		public static int GetMaxHealth(int enemy_type) {
 			switch (enemy_type) {
 			case TUMBLE_WEED:
-				return 10;
+				return 20;
 			default:
 				return 1;
 			}
@@ -188,7 +193,7 @@ public class Constants {
 		public static int GetEnemyDmg(int enemy_type) {
 			switch (enemy_type) {
 			case TUMBLE_WEED:
-				return 15;
+				return 10;
 			default:
 				return 0;
 			}
@@ -198,15 +203,13 @@ public class Constants {
 	public static class Environment {
 		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45);
 		
-		public static final int BIG_CLOUD_WIDTH_DEFAULT = 448;
-		public static final int BIG_CLOUD_HEIGHT_DEFAULT = 101;
-		public static final int SMALL_CLOUD_WIDTH_DEFAULT = 74;
-		public static final int SMALL_CLOUD_HEIGHT_DEFAULT = 24;
-
-		public static final int BIG_CLOUD_WIDTH = (int) (BIG_CLOUD_WIDTH_DEFAULT * Game.SCALE);
-		public static final int BIG_CLOUD_HEIGHT = (int) (BIG_CLOUD_HEIGHT_DEFAULT * Game.SCALE);
-		public static final int SMALL_CLOUD_WIDTH = (int) (SMALL_CLOUD_WIDTH_DEFAULT * Game.SCALE);
-		public static final int SMALL_CLOUD_HEIGHT = (int) (SMALL_CLOUD_HEIGHT_DEFAULT * Game.SCALE);
+		// clouds
+		public static final int CLOUD_START_OFFSET = (int) (-Game.GAME_HEIGHT * 0.3);
+		public static final int CLOUD_END_OFFSET = (int) (-Game.GAME_HEIGHT * 0.3);
+		
+		// water
+		public static final int WATER_START_OFFSET = (int) (Game.GAME_HEIGHT * 0.9);
+		public static final int WATER_END_OFFSET = (int) (Game.TILES_SIZE * 27);
 	}
 
 	public static class UI {
@@ -282,7 +285,7 @@ public class Constants {
 			case IDLE:
 				return 1;
 			case HIT:
-				return 4;
+				return 6;
 			case JUMP:
 				return 5;
 			case ATTACK:
