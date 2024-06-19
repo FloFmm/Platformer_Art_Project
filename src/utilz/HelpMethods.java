@@ -6,7 +6,13 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import javax.imageio.ImageIO;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.util.Map;
+import java.util.Set;
 import main.Game;
 import objects.Projectile;
 
@@ -721,5 +727,103 @@ public class HelpMethods {
             System.out.println(); // Move to the next line for the next row
         }
     }
-    
+	
+
+	
+	public static BufferedImage replaceColors(BufferedImage image, Map<Color, Color> colorMap, int tolerance, Color defaultC) {
+		int width = image.getWidth();
+        int height = image.getHeight();
+		int numMappingFailures = 0;
+		// Create a copy of the original image
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                newImage.setRGB(x, y, image.getRGB(x, y));
+            }
+        }
+        
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgba = image.getRGB(x, y);
+                Color originalColor = new Color(rgba, true); // true to consider alpha
+
+                if (originalColor.getAlpha() != 0) {
+                	Color mappedColor = getNewColor(originalColor, colorMap, tolerance);
+	                if (mappedColor == null) {
+	                	mappedColor = defaultC;
+	                	numMappingFailures += 1;
+	                }
+	
+	                // Preserve the original alpha value
+	                int alpha = originalColor.getAlpha();
+	                Color newColor = new Color(mappedColor.getRed(), mappedColor.getGreen(), mappedColor.getBlue(), alpha);
+	
+	                int newRgba = (newColor.getAlpha() << 24) | (newColor.getRed() << 16) | (newColor.getGreen() << 8) | newColor.getBlue();
+	                newImage.setRGB(x, y, newRgba);
+                }
+                
+            }
+        }
+        if (numMappingFailures > 0)
+        	System.out.println("failed to map color " + numMappingFailures + " times. replaced those with default color");
+        return newImage;
+    }
+	
+	private static Color getNewColor(Color color, Map<Color, Color> colorMap, int tolerance) {
+		Set<Color> colorSet = colorMap.keySet();
+		
+		// try direct conversion
+		int smallestError = 255+255+255;
+		Color bestC = null;
+		for (Color c : colorSet) {
+			int error = Math.abs(c.getRed() - color.getRed()) + 
+					Math.abs(c.getGreen() - color.getGreen()) + 
+					Math.abs(c.getBlue() - color.getBlue());
+	        if (error <= 3*tolerance && error < smallestError) {
+	        	bestC = c;
+	        	smallestError = error;
+	        }
+	    }
+		if (bestC != null)
+			return colorMap.get(bestC); 
+		
+		// try mixing colors
+		smallestError = 255+255+255;
+		Color bestC1 = null;
+		Color bestC2 = null;
+		float bestRatio = 1.0f;
+	    for (Color c1 : colorSet) {
+	    	for (Color c2 : colorSet) {
+	    		for (int i = 1; i < 10f; i+=1) {
+	    			float ratio = i*0.1f;
+	    			Color closestColor = mixColors(c1, c2, ratio); 
+	    			int error = Math.abs(closestColor.getRed() - color.getRed()) + 
+	    					Math.abs(closestColor.getGreen() - color.getGreen()) + 
+	    					Math.abs(closestColor.getBlue() - color.getBlue());
+	    			if (error < smallestError) {
+	    				bestC1 = c1;
+	    				bestC2 = c2;
+	    				smallestError = error; 
+	    				bestRatio = ratio;
+	    			}
+//	    			        if (Math.abs(closestColor.getRed() - color.getRed()) <= tolerance &&
+//				            Math.abs(closestColor.getGreen() - color.getGreen()) <= tolerance &&
+//				            Math.abs(closestColor.getBlue() - color.getBlue()) <= tolerance) {
+//				            return mixColors(colorMap.get(c1), colorMap.get(c2), ratio);
+//				        }
+	    		}
+	    	}
+	    }
+	    if (bestC1 != null)
+	    	return  mixColors(colorMap.get(bestC1), colorMap.get(bestC2), bestRatio);
+	    return null;
+	}
+	
+	private static Color mixColors(Color c1, Color c2, float ratio) {
+		return new Color((int) (c1.getRed()*ratio + c2.getRed()*(1.0f-ratio)), 
+				(int) (c1.getGreen()*ratio + c2.getGreen()*(1.0f-ratio)), 
+				(int) (c1.getBlue()*ratio + c2.getBlue()*(1.0f-ratio)));
+	}
+	
 }

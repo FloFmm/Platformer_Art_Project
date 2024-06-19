@@ -13,7 +13,10 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-
+import java.util.HashMap;
+import java.util.Map;
+import javax.imageio.ImageIO;
+import java.io.File;
 import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
@@ -731,24 +734,39 @@ public class Player extends Entity {
 					break;
 			}
 			for (int i = 0; i < animations[j].length; i++) {
-				//animations[j][i] = img.getSubimage(i * spriteImgWidth, j * spriteImgHeight, spriteImgWidth, spriteImgHeight);
 				if (i<GetSpriteAmount(j)) {
 					if (Files.exists(Paths.get("res/" + baseDir + "/" + fileName + i + ".png"))) {
+						
 						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/" + fileName + i + ".png");
 					}
 					else {
-						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
-						System.out.println("file does not exist: " + baseDir + "/" + fileName + i + ".png");
+						if (!isPlayer1) {
+				            animations[j][i] = replaceColors(playing.getPlayer1().getAnimations()[j][i], COLOR_MAP, PLAYER_COLOR_TOLERANCE, PLAYER_DEFAULT_COLOR);
+				            LoadSave.SaveImage(animations[j][i], "png", "res/" + baseDir + "/" + fileName + i + ".png");
+				            System.out.println("file: " + "res/" + baseDir + "/" + fileName + i + ".png" + " was created by repalcing colors");
+						}
+						else {
+							animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
+							System.out.println("file does not exist: " + baseDir + "/" + fileName + i + ".png");
+						}
+						
 					}
 					
-					if (j == IDLE || j == RUNNING || j == JUMP || j == FALLING) {
+					if (j == IDLE || j == RUNNING || j == JUMP || j == FALLING || j==ATTACK) {
 						// carry animations
 						if (Files.exists(Paths.get("res/" + baseDir + "/carry" + fileName + i + ".png"))) {
 							animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/carry" + fileName + i + ".png");
 						}
 						else {
-							animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
-							System.out.println("file does not exist: " + baseDir + "/carry" + fileName + i + ".png");
+							if (!isPlayer1) {
+					            animations[j+NUM_ANIMATIONS][i] = replaceColors(playing.getPlayer1().getAnimations()[j+NUM_ANIMATIONS][i], COLOR_MAP, PLAYER_COLOR_TOLERANCE, PLAYER_DEFAULT_COLOR);
+					            LoadSave.SaveImage(animations[j+NUM_ANIMATIONS][i], "png", "res/" + baseDir + "/carry" + fileName + i + ".png");
+					            System.out.println("file: " + "res/" + baseDir + "/carry" + fileName + i + ".png" + " was created by repalcing colors");
+							}
+							else {
+								animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
+								System.out.println("file does not exist: " + baseDir + "/carry" + fileName + i + ".png");
+							}
 						}
 					}
 					else {
@@ -903,6 +921,10 @@ public class Player extends Entity {
 
 	public boolean getPowerAttackActive() {
 		return powerAttackActive;
+	}
+	
+	public BufferedImage[][] getAnimations() {
+		return animations;
 	}
 
 }

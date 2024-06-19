@@ -4,6 +4,9 @@ import main.Game;
 import static utilz.HelpMethods.*;
 
 import java.awt.Color;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 public class Constants {
 	public static final int FPS_SET = 120;
 	public static final int UPS_SET = 200;
@@ -298,6 +301,22 @@ public class Constants {
 				return 1;
 			}
 		}
+		
+		public static final Color PLAYER_DEFAULT_COLOR = new Color(21, 19, 26); // BLACK
+		public static final int PLAYER_COLOR_TOLERANCE = 8; // BLACK
+		
+		public static final Map<Color, Color> COLOR_MAP;
+	    static {
+	        Map<Color, Color> map = new HashMap<>();
+	        map.put(new Color(233, 38, 28), new Color(252, 191, 43)); // A
+	        map.put(new Color(171, 40, 28), new Color(215, 150, 33)); // B
+	        map.put(new Color(97, 39, 24), new Color(153, 104, 20)); // C
+	        map.put(new Color(225, 85, 39), new Color(248, 214, 126)); // D
+	        map.put(new Color(22, 22, 28), new Color(22, 22, 28)); // BLACK
+	        map.put(new Color(14, 0, 12), new Color(14, 0, 12)); // BLACK
+
+	        COLOR_MAP = Collections.unmodifiableMap(map);
+	    }
 	}
 	
 	public static class TetrisTileConstants {

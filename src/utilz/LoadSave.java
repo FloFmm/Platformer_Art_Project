@@ -69,6 +69,17 @@ public class LoadSave {
 		}
 		return img;
 	}
+	
+    public static boolean SaveImage(BufferedImage img, String formatName, String path) {
+        File outputFile = new File(path);
+        boolean result = false;
+        try {
+            result = ImageIO.write(img, formatName, outputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 	public static BufferedImage[] GetAllLevels() {
 		URL url = LoadSave.class.getResource("/lvls");
