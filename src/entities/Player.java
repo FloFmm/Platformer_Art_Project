@@ -8,6 +8,7 @@ import static utilz.Constants.ANI_SPEED;
 import static utilz.Constants.Directions.*;
 import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.ControllerConstants.*;
+import static utilz.Constants.Environment.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -33,7 +34,7 @@ public class Player extends Entity {
 	private boolean left, right, jump, grabOrThrow = false;
 	protected Rectangle2D.Float grabBox;
 	private TetrisTile isCarrying;
-	private long throwPushDownStartTime, startTimeInAir;
+	private float throwPushDownStartTime, startTimeInAir;
 	private int[][] lvlData;
 	private float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
 	private float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
@@ -44,10 +45,15 @@ public class Player extends Entity {
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
 	// StatusBarUI
-	private BufferedImage statusBarImg, middleSeperatorImg;
+	private BufferedImage statusBarImg, middleSeperatorImg, windsockImg1, windsockImg2, windsockImg3;
 
-	private int tempScaleWidth = (int) (Game.GAME_WIDTH/20);
+	private int tempScaleWidth = (int) (Game.GAME_WIDTH/80);
+	private int tempScaleMaxHeight = (int) (Game.GAME_HEIGHT/3);
 	private int tempScaleY = (int) (Game.GAME_HEIGHT/2);
+	
+	private int windsockWidth = (int) (Game.GAME_WIDTH/20);
+	private int windsockHeight = (int) (Game.GAME_WIDTH/20);
+	private int windsockY = (int) (Game.GAME_HEIGHT/20);
 	
 	private int statusBarWidth = (int) (192 * Game.SCALE);
 	private int middleSeperatorWidth = (int) (Game.GAME_WIDTH/5);
@@ -106,7 +112,7 @@ public class Player extends Entity {
 		this.state = IDLE;
 		this.maxHealth = 100;
 		this.currentHealth = maxHealth;
-		this.walkSpeed = Game.SCALE * 1.0f;
+		this.walkSpeed = PLAYER_WALKSPEED;
 		loadAnimations();
 		initHitbox(HITBOX_BASE_WIDTH, HITBOX_BASE_HEIGHT);
 		initGrabBox(GRABBOX_BASE_WIDTH, GRABBOX_BASE_HEIGHT);
@@ -180,10 +186,10 @@ public class Player extends Entity {
 		} else
 			updatePos();
 
+		
+		checkSpikesTouched();
+		checkInsideWater();
 		if (moving) {
-			checkPotionTouched();
-			checkSpikesTouched();
-			checkInsideWater();
 			tileY = (int) (hitbox.y / Game.TILES_SIZE);
 			if (powerAttackActive) {
 				powerAttackTick++;
@@ -201,7 +207,7 @@ public class Player extends Entity {
 		setAnimation();
 		
 		if (!startInAir && inAir)
-			startTimeInAir = System.nanoTime();
+			startTimeInAir = playing.getGameTimeInSeconds();
 	}
 	
 	private void updateControllerInputs() {
@@ -231,7 +237,7 @@ public class Player extends Entity {
 	        	
 	        	if (!grabOrThrow) {
 					grabOrThrow = true;
-					throwPushDownStartTime = System.nanoTime();	
+					throwPushDownStartTime = playing.getGameTimeInSeconds();	
 				}
 	        }
 	        if (grabOrThrowControllerState == GLFW.GLFW_RELEASE && prevGrabOrThrowControllerState == GLFW.GLFW_PRESS) {
@@ -343,9 +349,9 @@ public class Player extends Entity {
 	}
 	
 	public float[] calcThrowSpeed() {
-		long now = System.nanoTime();
-		float pushDownDuration = (now-throwPushDownStartTime)/1000_000_000.0f;
-		int increasingOrDecreasing = (int)((now-throwPushDownStartTime)/1000000000.0f/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED % 2);
+		float now = playing.getGameTimeInSeconds();
+		float pushDownDuration = (now-throwPushDownStartTime);
+		int increasingOrDecreasing = (int)((now-throwPushDownStartTime)/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED % 2);
 		if (increasingOrDecreasing == 0) {
 			pushDownDuration = pushDownDuration % TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED;
 		}
@@ -489,9 +495,30 @@ public class Player extends Entity {
 		g.fillRect(powerBarXStart + statusBarX, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
 		
 		// temperature
-		//Color tempColor = new Color()
-		g.setColor(Color.red);
-		g.fillRect(Game.GAME_WIDTH/2-tempScaleWidth + xDrawOffset, tempScaleY, tempScaleWidth, (int) playing.getTemperature());
+		Color tempColor = new Color((int) (playing.getTemperature()*255/MAX_TEMP),0,(int) (255-playing.getTemperature()*255/MAX_TEMP));
+		g.setColor(tempColor);
+		int tempScaleHeight = (int) (tempScaleMaxHeight * playing.getTemperature() / MAX_TEMP);
+		g.fillRect(Game.GAME_WIDTH/2-tempScaleWidth/2 + xDrawOffset, 
+				tempScaleY - tempScaleHeight, 
+				tempScaleWidth, 
+				tempScaleHeight);
+		
+		// windsock
+		BufferedImage wsImg;
+		int flip = 1;
+		float windSpeed = playing.getWindSpeed();
+		if (windSpeed < 0)
+			flip = -1;
+		
+		if (Math.abs(windSpeed) <= WEAK_WIND_TH) 
+			wsImg = windsockImg1;
+		else if(WEAK_WIND_TH <= Math.abs(windSpeed) && Math.abs(windSpeed) <= STRONG_WIND_TH)
+			wsImg = windsockImg2;
+		else
+			wsImg = windsockImg3;
+			
+		g.drawImage(wsImg, Game.GAME_WIDTH/2-flip*windsockWidth/2 + xDrawOffset, windsockY, flip*windsockWidth, windsockHeight, null);
+		
 		
 	}
 
@@ -507,7 +534,7 @@ public class Player extends Entity {
 					aniIndex = 0;
 				if (state == HIT) {
 					newState(IDLE);
-					airSpeed = 0f;
+					//airSpeed = 0f;
 					if (!IsFloor(hitbox, 0, lvlData))
 						inAir = true;
 				}
@@ -532,7 +559,7 @@ public class Player extends Entity {
 		if (inAir) {
 			if (airSpeed < 0)
 				state = JUMP;
-			else if ((System.nanoTime()-startTimeInAir)/1000000000.0f > 0.2f)
+			else if ((playing.getGameTimeInSeconds()-startTimeInAir) > 0.2f)
 				state = FALLING;
 		}
 
@@ -681,7 +708,7 @@ public class Player extends Entity {
 	}
 
 	public void changeHealth(int value, Entity e) {
-		if (state == HIT)
+		if (state == HIT || state == DEAD)
 			return;
 		changeHealth(value);
 		pushBackOffsetDir = UP;
@@ -786,6 +813,9 @@ public class Player extends Entity {
 		}
 		statusBarImg = LoadSave.GetSpriteAtlas(LoadSave.STATUS_BAR);
 		middleSeperatorImg = LoadSave.GetSpriteAtlas(LoadSave.MIDDLE_SEPERATOR);
+		windsockImg1 = LoadSave.GetSpriteAtlas(LoadSave.WINDSOCK1);
+		windsockImg2 = LoadSave.GetSpriteAtlas(LoadSave.WINDSOCK2);
+		windsockImg3 = LoadSave.GetSpriteAtlas(LoadSave.WINDSOCK3);
 	}
 
 	public void loadLvlData(int[][] lvlData) {

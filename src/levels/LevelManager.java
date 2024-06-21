@@ -21,7 +21,6 @@ public class LevelManager {
 
 	public LevelManager(Game game) {
 		this.game = game;
-		importOutsideSprites();
 		levels = new ArrayList<>();
 		buildAllLevels();
 	}
@@ -44,19 +43,8 @@ public class LevelManager {
 		for (int i=0; i<allLevels.length; i++) {
 			BufferedImage img = allLevels[i];
 			boolean tutorial = i==1;
-			levels.add(new Level(img, tutorial, i+1));
+			levels.add(new Level(img, tutorial, i+1, this));
 		}
-	}
-
-	private void importOutsideSprites() {
-		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.LEVEL_ATLAS);
-		levelSprite = new BufferedImage[48];
-		for (int j = 0; j < 4; j++)
-			for (int i = 0; i < 12; i++) {
-				int index = j * 12 + i;
-				// TODO
-				levelSprite[index] = img.getSubimage(i * 32, j * 32, 32, 32);
-			}
 	}
 
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -90,9 +78,6 @@ public class LevelManager {
 				}
 				else if (index == 11)
 					continue;
-				else if (index == 3){
-					g.drawImage(levelSprite[index], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
-				}
 				else {
 					g.drawRect(x, y, Game.TILES_SIZE, Game.TILES_SIZE);
 					g.fillRect(x, y, Game.TILES_SIZE, Game.TILES_SIZE);
@@ -126,6 +111,10 @@ public class LevelManager {
 
 	public int getLevelIndex() {
 		return lvlIndex;
+	}
+	
+	public Level getLevelByIndex(int lvlId) {
+		return levels.get(lvlId-1);
 	}
 
 	public void setLevelIndex(int lvlIndex) {

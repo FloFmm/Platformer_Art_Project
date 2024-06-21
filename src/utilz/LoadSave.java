@@ -25,6 +25,11 @@ public class LoadSave {
 	public static final String TUMBLE_WEED_SPRITE = "tumble_weed_sprite.png";
 	public static final String STATUS_BAR = "health_power_bar.png";
 	public static final String MIDDLE_SEPERATOR = "middle_seperator.png";
+	public static final String WINDSOCK1 = "windsock1.png";
+	public static final String WINDSOCK2 = "windsock2.png";
+	public static final String WINDSOCK3 = "windsock3.png";
+	
+	
 	public static final String COMPLETED_IMG = "completed_sprite.png";
 	public static final String POTION_ATLAS = "potions_sprites.png";
 	public static final String CONTAINER_ATLAS = "objects_sprites.png";

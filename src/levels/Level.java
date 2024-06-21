@@ -3,6 +3,8 @@ package levels;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,6 +17,7 @@ import objects.GameContainer;
 import objects.Grass;
 import objects.Potion;
 import objects.Spike;
+import utilz.LoadSave;
 import zones.BuildingZone;
 
 import static utilz.Constants.EnemyConstants.*;
@@ -50,10 +53,13 @@ public class Level {
 	private Point playerSpawn;
 	private int buildingZoneIndex = 0;
 	private boolean drawForeground = true, drawPolygons = false, drawClouds = true, drawBackground = true, drawSky = true, drawWater = true;
+	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
 	private int lvlId;
+	private LevelManager levelManager;
 	
-	public Level(BufferedImage img, boolean tutorial, int lvlId) {
+	public Level(BufferedImage img, boolean tutorial, int lvlId, LevelManager levelManager) {
 		this.img = img;
+		this.levelManager = levelManager;
 		lvlData = new int[img.getHeight()][img.getWidth()];
 		if (tutorial) {
 			this.drawForeground = false;
@@ -74,6 +80,7 @@ public class Level {
 		this.lvlId = lvlId;
 		loadLevel();
 		calcLvlOffsets();
+		loadLvlImgs();
 	}
 
 	private void loadLevel() {
@@ -94,6 +101,64 @@ public class Level {
 				loadEntities(green, x, y);
 				loadObjects(blue, x, y);
 			}
+	}
+	
+	private void loadLvlImgs() {
+		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_water.png"))) {
+			waterImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_water.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_water.png");
+			waterImg = levelManager.getLevelByIndex(lvlId-1).getWaterImg();
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_sky.png"))) {
+			skyImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_sky.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_sky.png");
+			skyImg = levelManager.getLevelByIndex(lvlId-1).getSkyImg();
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_cloud1.png"))) {
+			cloudImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud1.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_cloud1.png");
+			cloudImg1 = levelManager.getLevelByIndex(lvlId-1).getCloudImg1();
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_cloud2.png"))) {
+			cloudImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud2.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_cloud2.png");
+			cloudImg2 = levelManager.getLevelByIndex(lvlId-1).getCloudImg2();
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_background1.png"))) {
+			backgroundImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background1.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_background1.png");
+			backgroundImg1 = levelManager.getLevelByIndex(lvlId-1).getBackgroundImg1();
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_background2.png"))) {
+			backgroundImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background2.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_background2.png");
+			backgroundImg2 = levelManager.getLevelByIndex(lvlId-1).getBackgroundImg2();
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_foreground.png"))) {
+			foregroundImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_foreground.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_foreground.png");
+			foregroundImg = levelManager.getLevelByIndex(lvlId-1).getForegroundImg();
+		}
 	}
 
 	private int calculateTriangleLengthOrientationPosition(int red, int x, int y, BufferedImage img) {
@@ -275,6 +340,35 @@ public class Level {
 
 	public int getLvlHeight() {
 		return lvlHeight;
+	}
+	
+
+	public BufferedImage getBackgroundImg1() {
+		return backgroundImg1;
+	}
+
+	public BufferedImage getBackgroundImg2() {
+		return backgroundImg2;
+	}
+
+	public BufferedImage getForegroundImg() {
+		return foregroundImg;
+	}
+
+	public BufferedImage getSkyImg() {
+		return skyImg;
+	}
+
+	public BufferedImage getCloudImg1() {
+		return cloudImg1;
+	}
+
+	public BufferedImage getCloudImg2() {
+		return cloudImg2;
+	}
+
+	public BufferedImage getWaterImg() {
+		return waterImg;
 	}
 
 }

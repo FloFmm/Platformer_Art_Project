@@ -142,10 +142,9 @@ public class Constants {
 		
 		public static final int IDLE = 0;
 		public static final int RUNNING = 1;
-		public static final int ATTACK = 2;
-		public static final int HIT = 3;
-		public static final int DEAD = 4;
-		public static final int NUM_ENEMY_STATES = 5;
+		public static final int HIT = 2;
+		public static final int DEAD = 3;
+		public static final int NUM_ENEMY_STATES = 4;
 
 		public static final int TUMBLE_WEED_WIDTH_DEFAULT = 30;
 		public static final int TUMBLE_WEED_HEIGHT_DEFAULT = 30;
@@ -172,8 +171,6 @@ public class Constants {
 			}
 			case RUNNING:
 				return 10;
-			case ATTACK:
-				return 1;
 			case HIT:
 				return 10;
 			case DEAD:
@@ -206,7 +203,15 @@ public class Constants {
 	public static class Environment {
 		// temperature
 		public static float MAX_TEMP = 100;
-		public static float TIME_TO_REACH_MAX_TEMP = 10 * 60;
+		public static float TIME_TO_REACH_MAX_TEMP = 1 * 60;
+		
+		// wind
+		public static float WEAK_WIND_TH = 0.25f*Game.SCALE;
+		public static float STRONG_WIND_TH = 0.75f*Game.SCALE;
+		public static float MAX_WIND_SPEED_START = 0.5f*Game.SCALE;
+		public static float MAX_WIND_SPEED_END = 1.5f*Game.SCALE;
+		public static float TIME_BETWEEN_WIND_CHANGE_START = 5;
+		public static float TIME_BETWEEN_WIND_CHANGE_END = 10;
 		
 		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45, 150);
 		
@@ -264,6 +269,8 @@ public class Constants {
 	}
 
 	public static class PlayerConstants {
+		public static final float PLAYER_WALKSPEED = Game.SCALE * 1.0f;
+		
 		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
 		public static final float CLOSE_TO_BORDER_VERTICAL = 0.6f;
 		public static final float MAX_X_LVL_OFFSET_STEP_HORIZONTAL = 0.002f*Game.GAME_WIDTH;
