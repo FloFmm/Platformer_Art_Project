@@ -204,7 +204,11 @@ public class Constants {
 	}
 
 	public static class Environment {
-		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45);
+		// temperature
+		public static float MAX_TEMP = 100;
+		public static float TIME_TO_REACH_MAX_TEMP = 10 * 60;
+		
+		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45, 150);
 		
 		// clouds
 		public static final int CLOUD_START_OFFSET = (int) (-Game.GAME_HEIGHT * 0.3);
@@ -213,6 +217,13 @@ public class Constants {
 		// water
 		public static final int WATER_START_OFFSET = (int) (Game.GAME_HEIGHT * 0.9);
 		public static final int WATER_END_OFFSET = (int) (Game.TILES_SIZE * 27);
+		
+		// layer speed 
+		public static final float SKY_SPEED = 0.5f;
+		public static final float BG1_SPEED = 0.6f;
+		public static final float C1_SPEED = 0.7f;
+		public static final float C2_SPEED = 0.8f;
+		public static final float BG2_SPEED = 0.9f;
 	}
 
 	public static class UI {

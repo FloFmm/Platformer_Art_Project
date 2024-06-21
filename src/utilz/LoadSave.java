@@ -64,6 +64,7 @@ public class LoadSave {
 			try {
 				is.close();
 			} catch (Exception e) {
+				System.out.println("failed to load " + fileName);
 				e.printStackTrace();
 			}
 		}

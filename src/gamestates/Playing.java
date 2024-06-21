@@ -27,6 +27,7 @@ import effects.Rain;
 
 import static utilz.Constants.Dialogue.*;
 import static utilz.Constants.PlayerConstants.*;
+import static utilz.Constants.Environment.*;
 import static utilz.Constants.UPS_SET;
 
 public class Playing extends State implements Statemethods {
@@ -42,9 +43,11 @@ public class Playing extends State implements Statemethods {
 	private GameCompletedOverlay gameCompletedOverlay;
 	private LevelCompletedOverlay levelCompletedOverlay;
 	private Rain rain;
+	
+	// timed events
 	private int gameUpdates = 0;
 	private float gameTimeInSeconds = 0;
-
+	private float temperature = 0, tempFromTime = 0, tempFromExplosion = 0, tempFromWindmills = 0;
 	private boolean paused = false;
 
 	private int leftBorder = (int) ((1-CLOSE_TO_BORDER_HORIZONTAL) * Game.GAME_WIDTH/2);
@@ -53,7 +56,7 @@ public class Playing extends State implements Statemethods {
 	private int lowerBorder = (int) (CLOSE_TO_BORDER_VERTICAL * Game.GAME_HEIGHT/2);
 	private int maxLvlOffsetX, maxLvlOffsetY;
 
-	private BufferedImage backgroundImg, foregroundImg, skyImg, fastCloudImg, slowCloudImg, waterImg;
+	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
 	private BufferedImage[] questionImgs, exclamationImgs;
 	private ArrayList<DialogueEffect> dialogEffects = new ArrayList<>();
 
@@ -172,28 +175,36 @@ public class Playing extends State implements Statemethods {
 			skyImg = LoadSave.GetSpriteAtlas("layers/1_sky.png");
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_slow.png"))) {
-			slowCloudImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_slow.png");
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud1.png"))) {
+			cloudImg1 = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_cloud1.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_slow.png");
-			slowCloudImg = LoadSave.GetSpriteAtlas("layers/1_cloud_slow.png");
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud1.png");
+			cloudImg1 = LoadSave.GetSpriteAtlas("layers/1_cloud1.png");
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_fast.png"))) {
-			fastCloudImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_fast.png");
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud2.png"))) {
+			cloudImg2 = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_cloud2.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud_fast.png");
-			fastCloudImg = LoadSave.GetSpriteAtlas("layers/1_cloud_fast.png");
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_cloud2.png");
+			cloudImg2 = LoadSave.GetSpriteAtlas("layers/1_cloud2.png");
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_background.png"))) {
-			backgroundImg = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_background.png");
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_background1.png"))) {
+			backgroundImg1 = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_background1.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_background.png");
-			backgroundImg = LoadSave.GetSpriteAtlas("layers/1_background.png");
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_background1.png");
+			backgroundImg1 = LoadSave.GetSpriteAtlas("layers/1_background1.png");
+		}
+		
+		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_background2.png"))) {
+			backgroundImg2 = LoadSave.GetSpriteAtlas("layers/" + (levelManager.getLevelIndex() + 1) + "_background2.png");
+		}
+		else {
+			System.out.println("file does not exist: " + "res/layers/" + (levelManager.getLevelIndex() + 1) + "_background2.png");
+			backgroundImg2 = LoadSave.GetSpriteAtlas("layers/1_background2.png");
 		}
 		
 		if (Files.exists(Paths.get("res/layers/" + (levelManager.getLevelIndex() + 1) + "_foreground.png"))) {
@@ -270,6 +281,8 @@ public class Playing extends State implements Statemethods {
 	private void updateTimedEvents() {
 		gameUpdates += 1;
 		gameTimeInSeconds = (float) gameUpdates / UPS_SET;
+		tempFromTime = gameTimeInSeconds * MAX_TEMP / TIME_TO_REACH_MAX_TEMP;
+		temperature = tempFromTime + tempFromExplosion + tempFromWindmills;
 //		System.out.println(gameTimeInSeconds);
 //		if (gameTimeInSeconds >= 5) {
 //			gameOver = true;
@@ -326,31 +339,38 @@ public class Playing extends State implements Statemethods {
 		
 		// sky
 		if (levelManager.getCurrentLevel().getDrawSky())
-			g.drawImage(skyImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
-
-		// slow clouds
-		if (levelManager.getCurrentLevel().getDrawClouds()) {
-			g.drawImage(slowCloudImg, - (int) (xLvlOffset * 0.3), -yLvlOffset, curLvlWidth, curLvlHeight, null);
-		}
+			g.drawImage(skyImg, - (int) (xLvlOffset * SKY_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
 		
-		// fast clouds
-		if (levelManager.getCurrentLevel().getDrawClouds()) {
-			g.drawImage(fastCloudImg, - (int) (xLvlOffset * 0.7), -yLvlOffset, curLvlWidth, curLvlHeight, null);
-		}
-		
-		// background
+		// background 1
 		if (levelManager.getCurrentLevel().getDrawBackground())
-			g.drawImage(backgroundImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
+			g.drawImage(backgroundImg1, - (int) (xLvlOffset * BG1_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		
+		
+		// cloud 1 
+		if (levelManager.getCurrentLevel().getDrawClouds()) {
+			g.drawImage(cloudImg1, - (int) (xLvlOffset * C1_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		}
+		
+		// cloud 2
+		if (levelManager.getCurrentLevel().getDrawClouds()) {
+			g.drawImage(cloudImg2, - (int) (xLvlOffset * C2_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		}
+		
+		// background 2
+		if (levelManager.getCurrentLevel().getDrawBackground())
+			g.drawImage(backgroundImg2, - (int) (xLvlOffset * BG2_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		
+		// building zones
+		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
+				
+		// foreground 
+		if (levelManager.getCurrentLevel().getDrawForeground())
+			g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
 		
 		// polygons
 		if (levelManager.getCurrentLevel().getDrawPolygons())
 			levelManager.draw(g, xLvlOffset, yLvlOffset);
 		
-		// foreground 
-		if (levelManager.getCurrentLevel().getDrawForeground())
-			g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
-		
-		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
 		
 		//if (drawRain)
 		//	rain.draw(g, xLvlOffset, yLvlOffset);
@@ -363,9 +383,10 @@ public class Playing extends State implements Statemethods {
 		enemyManager.draw(g, xLvlOffset, yLvlOffset);
 		player1.drawPlayer(g, xLvlOffset, yLvlOffset);
 		player2.drawPlayer(g, xLvlOffset, yLvlOffset);
+		
 		// water 
-		if (levelManager.getCurrentLevel().getDrawWater())
-			g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+2240-gameTimeInSeconds/100*2240), curLvlWidth, curLvlHeight, null);
+		//if (levelManager.getCurrentLevel().getDrawWater())
+		//	g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+2240-gameTimeInSeconds/100*2240), curLvlWidth, curLvlHeight, null);
 		
 		// ui
 		int xDrawOffset = 0;
@@ -551,4 +572,38 @@ public class Playing extends State implements Statemethods {
 	public void setPlayer2Won(boolean player2Won) {
 		this.player2Won = player2Won;
 	}
+	
+
+	public float getTemperature() {
+		return temperature;
+	}
+
+	public void setTemperature(float temperature) {
+		this.temperature = temperature;
+	}
+
+	public float getTempFromTime() {
+		return tempFromTime;
+	}
+
+	public void setTempFromTime(float tempFromTime) {
+		this.tempFromTime = tempFromTime;
+	}
+
+	public float getTempFromExplosion() {
+		return tempFromExplosion;
+	}
+
+	public void setTempFromExplosion(float tempFromExplosion) {
+		this.tempFromExplosion = tempFromExplosion;
+	}
+	
+	public float getTempFromWindmills() {
+		return tempFromWindmills;
+	}
+
+	public void setTempFromWindmills(float tempFromWindmills) {
+		this.tempFromWindmills= tempFromWindmills;
+	}
+
 }

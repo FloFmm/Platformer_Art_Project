@@ -13,10 +13,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
-import javax.imageio.ImageIO;
-import java.io.File;
 import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
@@ -28,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.lwjgl.glfw.GLFW;
+
 
 public class Player extends Entity {
 	
@@ -49,6 +46,9 @@ public class Player extends Entity {
 	// StatusBarUI
 	private BufferedImage statusBarImg, middleSeperatorImg;
 
+	private int tempScaleWidth = (int) (Game.GAME_WIDTH/20);
+	private int tempScaleY = (int) (Game.GAME_HEIGHT/2);
+	
 	private int statusBarWidth = (int) (192 * Game.SCALE);
 	private int middleSeperatorWidth = (int) (Game.GAME_WIDTH/5);
 	private int statusBarHeight = (int) (58 * Game.SCALE);
@@ -487,6 +487,12 @@ public class Player extends Entity {
 		// Power Bar
 		g.setColor(Color.yellow);
 		g.fillRect(powerBarXStart + statusBarX, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
+		
+		// temperature
+		//Color tempColor = new Color()
+		g.setColor(Color.red);
+		g.fillRect(Game.GAME_WIDTH/2-tempScaleWidth + xDrawOffset, tempScaleY, tempScaleWidth, (int) playing.getTemperature());
+		
 	}
 
 	private void updateAnimationTick() {

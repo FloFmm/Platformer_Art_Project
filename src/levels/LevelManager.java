@@ -16,26 +16,16 @@ public class LevelManager {
 
 	private Game game;
 	private BufferedImage[] levelSprite;
-	private BufferedImage[] waterSprite;
 	private ArrayList<Level> levels;
 	private int lvlIndex = 0, aniTick, aniIndex;
 
 	public LevelManager(Game game) {
 		this.game = game;
 		importOutsideSprites();
-		createWater();
 		levels = new ArrayList<>();
 		buildAllLevels();
 	}
-
-	private void createWater() {
-		waterSprite = new BufferedImage[5];
-		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.WATER_TOP);
-		for (int i = 0; i < 4; i++)
-			waterSprite[i] = img.getSubimage(i * 32, 0, 32, 32);
-		waterSprite[4] = LoadSave.GetSpriteAtlas(LoadSave.WATER_BOTTOM);
-	}
-
+	
 	public void loadNextLevel() {
 		Level newLevel = levels.get(lvlIndex);
 		game.getPlaying().getEnemyManager().loadEnemies(newLevel);
@@ -81,7 +71,7 @@ public class LevelManager {
 					if  (index%10 == 1) {
 						int[][] c = TriangleCoordinatesBaseLongShort(i, j, lvlData);
 						
-						int xOff = (int) (-HITBOX_BASE_WIDTH*Game.SCALE*0.75);
+						int xOff = 0;//(int) (-HITBOX_BASE_WIDTH*Game.SCALE*0.75);
 						int ori = index/10%10;
 						int height = Math.max(Math.abs(c[0][1] - c[1][1]), Math.abs(c[0][1] - c[2][1]));
 						if (ori == 1 || ori == 2 || ori == 5 || ori == 6) {
@@ -98,10 +88,6 @@ public class LevelManager {
 						g.fillRect(c[0][0] - m - xLvlOffset, c[0][1]- yLvlOffset - height, Math.abs(xOff), height);
 					}
 				}
-				else if (index == 48)
-					g.drawImage(waterSprite[aniIndex], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
-				else if (index == 49)
-					g.drawImage(waterSprite[4], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
 				else if (index == 11)
 					continue;
 				else if (index == 3){
