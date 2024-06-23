@@ -52,7 +52,7 @@ public class Level {
 	private int maxLvlOffsetY;
 	private Point playerSpawn;
 	private int buildingZoneIndex = 0;
-	private boolean drawForeground = true, drawPolygons = false, drawClouds = true, drawBackground = true, drawSky = true, drawWater = true;
+	private boolean drawForeground = true, drawPolygons = false, drawClouds = true, drawBackground = true, drawSky = true, drawWater = true, drawDarkness=true;
 	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
 	private int lvlId;
 	private LevelManager levelManager;
@@ -68,6 +68,7 @@ public class Level {
 			this.drawBackground = false;
 			this.drawClouds = false;
 			this.drawWater = true;
+			this.drawDarkness=false;
 		}
 		else {
 			this.drawForeground = true;
@@ -76,6 +77,7 @@ public class Level {
 			this.drawBackground = true;
 			this.drawClouds = true;
 			this.drawWater = true;
+			this.drawDarkness=true;
 		}
 		this.lvlId = lvlId;
 		loadLevel();
@@ -322,6 +324,10 @@ public class Level {
 
 	public boolean getDrawBackground() {
 		return drawBackground;
+	}
+	
+	public boolean getDrawDarkness() {
+		return drawDarkness;
 	}
 
 

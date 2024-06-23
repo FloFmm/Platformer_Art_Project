@@ -22,6 +22,7 @@ public abstract class Enemy extends Entity {
 	protected boolean active = true;
 	protected boolean attackChecked;
 	protected int attackBoxOffsetX;
+	public int aniSpeed;
 
 	public Enemy(float x, float y, int width, int height, int enemyType) {
 		super(x, y, width, height);
@@ -29,6 +30,7 @@ public abstract class Enemy extends Entity {
 
 		maxHealth = GetMaxHealth(enemyType);
 		currentHealth = maxHealth;
+		aniSpeed = ANI_SPEED;
 	}
 
 	protected void updateAttackBox() {
@@ -65,7 +67,7 @@ public abstract class Enemy extends Entity {
 
 	protected void updateAnimationTick() {
 		aniTick++;
-		if (aniTick >= ANI_SPEED) {
+		if (aniTick >= aniSpeed) {
 			aniTick = 0;
 			aniIndex++;
 			if (aniIndex >= GetSpriteAmount(enemyType, state)) {

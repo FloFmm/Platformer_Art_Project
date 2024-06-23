@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import gamestates.Playing;
 import levels.Level;
+import main.Game;
 import utilz.LoadSave;
 import static utilz.HelpMethods.*;
 import static utilz.Constants.TetrisTileConstants.*;
@@ -41,10 +42,10 @@ public class TetrisTileManager {
 	private void drawTetrisTiles(Graphics g, int xLvlOffset, int yLvlOffset) {
 		for (TetrisTile c : currentLevel.getTetrisTiles()) {
 			g.drawImage(tetrisTileArr[c.getTileIndex()][c.getRotation()], 
-					(int) (c.getHitbox().x - xLvlOffset - c.getXDrawOffset()),
-					(int) (c.getHitbox().y - yLvlOffset - c.getYDrawOffset()), 
-					TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, null);
-			c.drawHitbox(g, xLvlOffset, yLvlOffset);
+					(int) (c.getHitbox().x - xLvlOffset - c.getXDrawOffset() - Game.TILES_SIZE/2),
+					(int) (c.getHitbox().y - yLvlOffset - c.getYDrawOffset() - Game.TILES_SIZE/2), 
+					TETRIS_TILE_WIDTH*2, TETRIS_TILE_HEIGHT*2, null);
+			//c.drawHitbox(g, xLvlOffset, yLvlOffset);
 		}
 	}
 	

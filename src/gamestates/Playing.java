@@ -29,6 +29,7 @@ import static utilz.Constants.Dialogue.*;
 import static utilz.Constants.PlayerConstants.*;
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.UPS_SET;
+import static utilz.HelpMethods.*;
 
 public class Playing extends State implements Statemethods {
 
@@ -51,6 +52,7 @@ public class Playing extends State implements Statemethods {
 	private float timeOfLastWindChange = 0;
 	private float temperature = 0, tempFromTime = 0, tempFromExplosion = 0, tempFromWindmills = 0;
 	private boolean paused = false;
+	private float currentCloudYPos, currentWaterYPos, currentDarknessAlpha;
 
 	private int leftBorder = (int) ((1-CLOSE_TO_BORDER_HORIZONTAL) * Game.GAME_WIDTH/2);
 	private int rightBorder = (int) (CLOSE_TO_BORDER_HORIZONTAL * Game.GAME_WIDTH/2);
@@ -79,6 +81,9 @@ public class Playing extends State implements Statemethods {
 		loadStartLevel();
 		player1.resetLvlOffsets();
 		player2.resetLvlOffsets();
+		currentWaterYPos = WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
+		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
+		currentDarknessAlpha = 0;
 	}
 
 	private void loadDialogue() {
@@ -306,25 +311,44 @@ public class Playing extends State implements Statemethods {
 		// sky
 		if (levelManager.getCurrentLevel().getDrawSky())
 			g.drawImage(skyImg, - (int) (xLvlOffset * SKY_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
-		
+				
 		// background 1
 		if (levelManager.getCurrentLevel().getDrawBackground())
 			g.drawImage(backgroundImg1, - (int) (xLvlOffset * BG1_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
 		
-		
-		// cloud 1 
+		// cloud 1 and 2
 		if (levelManager.getCurrentLevel().getDrawClouds()) {
-			g.drawImage(cloudImg1, - (int) (xLvlOffset * C1_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
-		}
-		
-		// cloud 2
-		if (levelManager.getCurrentLevel().getDrawClouds()) {
-			g.drawImage(cloudImg2, - (int) (xLvlOffset * C2_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+			int cloudYPos = (int) linear(temperature, 0, MAX_TEMP, 
+					CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight(), 
+					CLOUD_END_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight());
+			
+			if (((int) currentCloudYPos) != cloudYPos) {
+				if (currentCloudYPos > cloudYPos)
+					currentCloudYPos -= CLOUD_MOVE_SPEED;
+				else
+					currentCloudYPos += CLOUD_MOVE_SPEED;
+			}
+			g.drawImage(cloudImg1, - (int) (xLvlOffset * C1_SPEED), (int) (-yLvlOffset + currentCloudYPos), curLvlWidth, curLvlHeight, null);
+			g.drawImage(cloudImg2, - (int) (xLvlOffset * C2_SPEED), -yLvlOffset + cloudYPos, curLvlWidth, curLvlHeight, null);
 		}
 		
 		// background 2
 		if (levelManager.getCurrentLevel().getDrawBackground())
 			g.drawImage(backgroundImg2, - (int) (xLvlOffset * BG2_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
+		
+		// darkness 1 
+		if (levelManager.getCurrentLevel().getDrawDarkness()) {
+			int darknessAlpha = (int) linear(temperature, 0, MAX_TEMP, DARKNESS_START_ALPHA, DARKNESS_END_ALPHA)/2;
+			if (((int) currentDarknessAlpha) != darknessAlpha) {
+				if (currentDarknessAlpha > darknessAlpha)
+					currentDarknessAlpha -= DARKNESS_CHANGE_SPEED;
+				else
+					currentDarknessAlpha += DARKNESS_CHANGE_SPEED;
+			}
+			Color black = new Color(40,0,0, (int) currentDarknessAlpha);
+			g.setColor(black);
+			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
+		}
 		
 		// building zones
 		buildingZoneManager.draw(g, xLvlOffset, yLvlOffset);
@@ -351,8 +375,25 @@ public class Playing extends State implements Statemethods {
 		player2.drawPlayer(g, xLvlOffset, yLvlOffset);
 		
 		// water 
-		//if (levelManager.getCurrentLevel().getDrawWater())
-		//	g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+2240-gameTimeInSeconds/100*2240), curLvlWidth, curLvlHeight, null);
+		if (levelManager.getCurrentLevel().getDrawWater()) {
+			int waterYPos = (int) linear(temperature, 0, MAX_TEMP, 
+					WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight(), 
+					WATER_END_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight());
+			if (((int) currentWaterYPos) != waterYPos) {
+				if (currentWaterYPos > waterYPos)
+					currentWaterYPos -= WATER_MOVE_SPEED;
+				else
+					currentWaterYPos += WATER_MOVE_SPEED;
+			}
+			g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+currentWaterYPos), curLvlWidth, curLvlHeight, null);
+		}
+		
+		// darkness 2
+		if (levelManager.getCurrentLevel().getDrawDarkness()) {
+			Color black2 = new Color(40,0,0, (int) (currentDarknessAlpha));
+			g.setColor(black2);
+			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
+		}
 		
 		// ui
 		int xDrawOffset = 0;
@@ -400,6 +441,10 @@ public class Playing extends State implements Statemethods {
 		objectManager.resetAllObjects();
 		tetrisTileManager.resetAllTetrisTiles();
 		dialogEffects.clear();
+		currentWaterYPos = WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
+		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
+		currentDarknessAlpha = 0;
+		
 	}
 
 	public void setGameOver(boolean gameOver) {
@@ -577,5 +622,9 @@ public class Playing extends State implements Statemethods {
 		return gameTimeInSeconds;
 	}
 
+
+	public float getCurrentWaterYPos() {
+		return currentWaterYPos;
+	}
 
 }

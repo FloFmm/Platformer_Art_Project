@@ -41,7 +41,7 @@ public class Player extends Entity {
 	private int xLvlOffset, yLvlOffset;
 	
 	// Jumping / Gravity
-	private float jumpSpeed = -2.25f * Game.SCALE;
+	private float jumpSpeed = PLAYER_JUMP_SPEED;
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
 	// StatusBarUI
@@ -322,8 +322,16 @@ public class Player extends Entity {
 
 	
 	private void checkInsideWater() {
-		if (IsEntityInWater(hitbox, playing.getLevelManager().getCurrentLevel().getLevelData()))
-			kill();
+		if (hitbox.y + hitbox.height*0.75 > playing.getCurrentWaterYPos()) {
+			currentHealth -= WATER_DMG_PER_SECOND / UPS_SET;
+			currentHealth = Math.max(currentHealth, 0);
+			walkSpeed = PLAYER_WALKSPEED*WATER_PLAYER_SLOW_FACTOR;
+			jumpSpeed = PLAYER_JUMP_SPEED*WATER_PLAYER_JUMP_SLOW_FACTOR;
+		}
+		else {
+			walkSpeed = PLAYER_WALKSPEED;
+			jumpSpeed = PLAYER_JUMP_SPEED;
+		}
 	}
 
 	private void checkSpikesTouched() {

@@ -161,6 +161,8 @@ public class Constants {
 		public static final int TUMBLE_WEED_MAX_ANIMATION_LENGTH = 10;
 		public static final float TUMBLE_WEED_MAX_SPEED = 1.0f*Game.SCALE;
 		public static final float TUMBLE_WEED_TIME_TO_REACH_WIND_SPEED = 5.0f;
+		public static final int TUMBLE_WEED_MAX_ANI_SPEED = (int) (0.5*ANI_SPEED);
+		public static final int TUMBLE_WEED_MIN_ANI_SPEED = (int) (3*ANI_SPEED);
 
 		public static int GetSpriteAmount(int enemy_type, int enemy_state) {
 			switch (enemy_state) {
@@ -215,13 +217,23 @@ public class Constants {
 		
 		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45, 150);
 		
+		// darkness
+		public static final float DARKNESS_START_ALPHA = 0f;//-0.15f;
+		public static final float DARKNESS_END_ALPHA = 150f;//0.10f;
+		public static final float DARKNESS_CHANGE_SPEED = 0.05f*Game.SCALE;
+		
 		// clouds
-		public static final int CLOUD_START_OFFSET = (int) (-Game.GAME_HEIGHT * 0.3);
-		public static final int CLOUD_END_OFFSET = (int) (-Game.GAME_HEIGHT * 0.3);
+		public static final float CLOUD_START_OFFSET_FACTOR = 0.05f;//-0.15f;
+		public static final float CLOUD_END_OFFSET_FACTOR = 0.05f;//0.10f;
+		public static final float CLOUD_MOVE_SPEED = 0.05f*Game.SCALE;
 		
 		// water
-		public static final int WATER_START_OFFSET = (int) (Game.GAME_HEIGHT * 0.9);
-		public static final int WATER_END_OFFSET = (int) (Game.TILES_SIZE * 27);
+		public static final float WATER_START_OFFSET_FACTOR = 1.0f;
+		public static final float WATER_END_OFFSET_FACTOR = 0.8f;
+		public static final float WATER_MOVE_SPEED = 0.05f*Game.SCALE;
+		public static final float WATER_DMG_PER_SECOND = 10.0f;
+		public static final float WATER_PLAYER_SLOW_FACTOR = 0.5f;
+		public static final float WATER_PLAYER_JUMP_SLOW_FACTOR = 0.75f;
 		
 		// layer speed 
 		public static final float SKY_SPEED = 0.5f;
@@ -270,6 +282,7 @@ public class Constants {
 
 	public static class PlayerConstants {
 		public static final float PLAYER_WALKSPEED = Game.SCALE * 1.0f;
+		public static final float PLAYER_JUMP_SPEED = -2.25f * Game.SCALE;
 		
 		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
 		public static final float CLOSE_TO_BORDER_VERTICAL = 0.6f;
@@ -344,7 +357,7 @@ public class Constants {
 		public static final int TETRIS_TILE_HEIGHT_DEFAULT = 32;
 		public static final int TETRIS_TILE_WIDTH = (int) (TETRIS_TILE_WIDTH_DEFAULT * Game.SCALE);
 		public static final int TETRIS_TILE_HEIGHT = (int) (TETRIS_TILE_HEIGHT_DEFAULT * Game.SCALE);
-		public static final int NUM_TETRIS_TILES = 13;
+		public static final int NUM_TETRIS_TILES = 15;
 		
 		public static final int T_TILE = 0;
 		public static final int L_TILE = 1;
@@ -359,6 +372,8 @@ public class Constants {
 		public static final int LONG_S_TILE = 10;
 		public static final int I_TILE = 11;
 		public static final int LONG_I_TILE = 12;
+		public static final int SINGLE_TILE = 13;
+		public static final int DOUBLE_TILE = 14;
 		
 		public static final Color THROW_ARC_COLOR = new Color(100,100,100);
 		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*5.0f;
@@ -650,6 +665,18 @@ public class Constants {
 									{0,1,0,0},
 									{0,1,0,0},
 									{0,1,0,0}};
+				break;
+			case SINGLE_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,0,0,0},
+									{0,1,0,0},
+									{0,0,0,0}};
+				break;
+			case DOUBLE_TILE:
+				matrix = new int[][] {{0,0,0,0}, 
+									{0,0,0,0},
+									{0,1,1,0},
+									{0,0,0,0}};
 				break;
 			default:
 				matrix = new int[][] {{1,1,1,1}, 

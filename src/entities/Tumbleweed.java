@@ -1,22 +1,14 @@
 package entities;
 
 import static utilz.Constants.EnemyConstants.*;
-import static utilz.Constants.PlayerConstants.ATTACK;
-import static utilz.Constants.PlayerConstants.FALLING;
-import static utilz.Constants.PlayerConstants.HIT;
-import static utilz.Constants.PlayerConstants.IDLE;
-import static utilz.Constants.PlayerConstants.JUMP;
-import static utilz.Constants.PlayerConstants.RUNNING;
-import static utilz.Constants.PlayerConstants.THROW;
+import static utilz.Constants.Environment.WATER_DMG_PER_SECOND;
 import static utilz.Constants.Directions.*;
 import static utilz.HelpMethods.CanMoveHere;
 import static utilz.HelpMethods.GetEntityXPosNextToWall;
-import static utilz.HelpMethods.IsEntityInWater;
 import static utilz.HelpMethods.IsEntityOnFloor;
 
 import audio.AudioPlayer;
 
-import static utilz.Constants.ANI_SPEED;
 import static utilz.Constants.GRAVITY;
 import static utilz.Constants.UPS_SET;
 
@@ -28,7 +20,6 @@ public class Tumbleweed extends Enemy {
 	private boolean moving = false;
 	private int[][] lvlData;
 	private float lastTimeRunning;
-	private int aniSpeed;
 	
 	public Tumbleweed(float x, float y, int[][] lvlData) {
 		super(x, y, TUMBLE_WEED_WIDTH, TUMBLE_WEED_HEIGHT, TUMBLE_WEED);
@@ -51,7 +42,7 @@ public class Tumbleweed extends Enemy {
 					inAir = true;
 					airSpeed = 0;
 				}
-			} else if (aniIndex == GetSpriteAmount(TUMBLE_WEED, DEAD) - 1 && aniTick >= ANI_SPEED - 1) {
+			} else if (aniIndex == GetSpriteAmount(TUMBLE_WEED, DEAD) - 1 && aniTick >= aniSpeed - 1) {
 				resetTumbleWeed();
 			} else {
 				updateAnimationTick();
@@ -71,8 +62,10 @@ public class Tumbleweed extends Enemy {
 		updateAttackBox();
 		
 		playing.getObjectManager().checkSpikesTouched(this);
-		if (IsEntityInWater(hitbox, lvlData))
-			hurt(maxHealth);
+		
+		// check inside water
+		if (hitbox.y+hitbox.height*0.75f > playing.getCurrentWaterYPos())
+			currentHealth -= WATER_DMG_PER_SECOND / UPS_SET;
 
 		updateAnimationTick();
 		setAnimation(lvlData, playing);
@@ -85,6 +78,7 @@ public class Tumbleweed extends Enemy {
 	}
 
 	private void setAnimation(int[][] lvlData, Playing playing) {
+		aniSpeed = (int) (TUMBLE_WEED_MIN_ANI_SPEED - Math.abs(xSpeed) / TUMBLE_WEED_MAX_SPEED * (TUMBLE_WEED_MIN_ANI_SPEED - TUMBLE_WEED_MAX_ANI_SPEED));
 		int startAni = state;
 
 		if (state == HIT)
@@ -96,7 +90,6 @@ public class Tumbleweed extends Enemy {
 		}
 		else if ((playing.getGameTimeInSeconds()-lastTimeRunning) > 0.2f)
 			state = IDLE;
-		System.out.println(state);
 		if (startAni != state)
 			resetAniTick();
 	}

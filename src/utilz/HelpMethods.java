@@ -104,15 +104,6 @@ public class HelpMethods {
 	public static boolean IsProjectileHittingLevel(Projectile p, int[][] lvlData) {
 		return IsSolid(p.getHitbox().x + p.getHitbox().width / 2, p.getHitbox().y + p.getHitbox().height / 2, lvlData);
 	}
-
-	public static boolean IsEntityInWater(Rectangle2D.Float hitbox, int[][] lvlData) {
-		// Will only check if entity touch top water. Can't reach bottom water if not
-		// touched top water.
-		if (GetTileValue(hitbox.x, hitbox.y + hitbox.height, lvlData) != 48)
-			if (GetTileValue(hitbox.x + hitbox.width, hitbox.y + hitbox.height, lvlData) != 48)
-				return false;
-		return true;
-	}
 	
 	public static int[][] TriangleCoordinatesBaseLongShort(int xTile, int yTile, int[][] lvlData) {
 		int tileValue = lvlData[yTile][xTile];
@@ -824,6 +815,17 @@ public class HelpMethods {
 		return new Color((int) (c1.getRed()*ratio + c2.getRed()*(1.0f-ratio)), 
 				(int) (c1.getGreen()*ratio + c2.getGreen()*(1.0f-ratio)), 
 				(int) (c1.getBlue()*ratio + c2.getBlue()*(1.0f-ratio)));
+	}
+	
+	public static float linear(float currentX, float startX, float endX, float startY, float endY) {
+		float xRatio = Math.min(1.0f, (currentX - startX)/(endX - startX));
+//		System.out.println("(currentX - startX)/(endX - startX)");
+//		System.out.println((currentX - startX)/(endX - startX));
+//		System.out.println("xRatio");
+//		System.out.println(xRatio);
+//		System.out.println("endY - startY");
+//		System.out.println(endY - startY);
+		return startY + xRatio * (endY - startY);
 	}
 	
 }
