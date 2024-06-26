@@ -30,7 +30,7 @@ import org.lwjgl.glfw.GLFW;
 public class Player extends Entity {
 	
 	private BufferedImage[][] animations;
-	private boolean moving = false, attacking = false, respawning = false;
+	private boolean moving = false, attacking = false;
 	private boolean left, right, jump, grabOrThrow = false;
 	protected Rectangle2D.Float grabBox;
 	private TetrisTile isCarrying;
@@ -116,7 +116,7 @@ public class Player extends Entity {
 		loadAnimations();
 		initHitbox(HITBOX_BASE_WIDTH, HITBOX_BASE_HEIGHT);
 		initGrabBox(GRABBOX_BASE_WIDTH, GRABBOX_BASE_HEIGHT);
-		initAttackBox();
+		initAttackBox(ATTACKBOX_BASE_WIDTH, ATTACKBOX_BASE_HEIGHT);
 	}
 
 	public void setSpawn(Point spawn) {
@@ -127,9 +127,8 @@ public class Player extends Entity {
 	}
 
 
-	private void initAttackBox() {
-		attackBox = new Rectangle2D.Float(x, y, (int) (35 * Game.SCALE), (int) (20 * Game.SCALE));
-		resetAttackBox();
+	private void initAttackBox(int width, int height) {
+		attackBox = new Rectangle2D.Float(x, y, (int) (width * Game.SCALE), (int) (height * Game.SCALE));
 	}
 	
 	protected void initGrabBox(int width, int height) {
@@ -153,10 +152,9 @@ public class Player extends Entity {
 				// Check if player died in air
 				if (!IsEntityOnFloor(hitbox, lvlData)) {
 					inAir = true;
-					airSpeed = 0;
+					//airSpeed = 0;
 				}
 			} else if (aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANI_SPEED - 1) {
-				//playing.setGameOver(true);
 				//playing.getGame().getAudioPlayer().stopSong();
 				resetAtDeath();
 				playing.getGame().getAudioPlayer().playEffect(AudioPlayer.GAMEOVER);
@@ -338,10 +336,6 @@ public class Player extends Entity {
 		playing.checkSpikesTouched(this);
 	}
 
-	private void checkPotionTouched() {
-		playing.checkPotionTouched(this);
-	}
-
 	private void checkAttack() {
 		if (attackChecked || aniIndex != 1)
 			return;
@@ -389,28 +383,9 @@ public class Player extends Entity {
 		}
 	}
 
-	private void setAttackBoxOnRightSide() {
-		attackBox.x = hitbox.x + hitbox.width - (int) (Game.SCALE * 5);
-	}
-
-	private void setAttackBoxOnLeftSide() {
-		attackBox.x = hitbox.x - hitbox.width - (int) (Game.SCALE * 10);
-	}
-
 	private void updateAttackBox() {
-		if (right && left) {
-			if (flipW == 1) {
-				setAttackBoxOnRightSide();
-			} else {
-				setAttackBoxOnLeftSide();
-			}
-
-		} else if (right || (powerAttackActive && flipW == 1))
-			setAttackBoxOnRightSide();
-		else if (left || (powerAttackActive && flipW == -1))
-			setAttackBoxOnLeftSide();
-
-		attackBox.y = hitbox.y + (Game.SCALE * 10);
+		attackBox.x = hitbox.x - (attackBox.width-hitbox.width)/2;
+		attackBox.y = hitbox.y - (attackBox.height-hitbox.height)/2;
 	}
 	
 
@@ -606,7 +581,6 @@ public class Player extends Entity {
 					return;
 
 		float xSpeed = 0;
-
 		if (left && !right) {
 			xSpeed -= walkSpeed;
 			flipX = width;
@@ -625,7 +599,6 @@ public class Player extends Entity {
 				else
 					xSpeed = walkSpeed;
 			}
-
 			xSpeed *= 3;
 		}
 
@@ -674,20 +647,38 @@ public class Player extends Entity {
 		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
 			hitbox.x += xSpeed;
 		else {
-			
 			//hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed);
 			float[] playerCoord = GetEntityXPosNextToWall(hitbox, xSpeed, lvlData, 0.1f);
 			if (CanMoveHere(playerCoord[0], playerCoord[1], hitbox.width, hitbox.height, lvlData)) {
+				if (isPlayer1) {
+				System.out.println(hitbox.x);
+				System.out.println(hitbox.y);
+				System.out.println(playerCoord[0]);
+				System.out.println(playerCoord[1]);
+				System.out.println("went perfectly uphill");
+				}
 				hitbox.x = playerCoord[0];
 				hitbox.y = playerCoord[1];
 			}
 			else if (CanMoveHere(playerCoord[0], playerCoord[1]-5.0f, hitbox.width, hitbox.height, lvlData)) {
+				if (isPlayer1) {
+				System.out.println(hitbox.x);
+				System.out.println(hitbox.y);
+				System.out.println(playerCoord[0]);
+				System.out.println(playerCoord[1]-5.0f);
+				System.out.println("need little help to get up the hill");
+				}
 				hitbox.x = playerCoord[0];
 				hitbox.y = playerCoord[1]-5.0f;
-				// System.out.println("need little help to get up the hill");
 			}
 			else {
-				// System.out.println("failed to move (slope uphill | next to wall) due to !CanMoveHere()");
+				if (isPlayer1) {
+				System.out.println(hitbox.x);
+				System.out.println(hitbox.y);
+				System.out.println(playerCoord[0]);
+				System.out.println(playerCoord[1]-5.0f);
+				System.out.println("failed to move (slope uphill | next to wall) due to !CanMoveHere()");
+				}
 			}
 				
 			if (powerAttackActive) {
@@ -742,7 +733,6 @@ public class Player extends Entity {
 	}
 
 	private void loadAnimations() {
-		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
 		String fileName="", baseDir="";
 		animations = new BufferedImage[NUM_ANIMATIONS*2][MAX_ANIMATION_LENGTH];
 		
@@ -918,17 +908,9 @@ public class Player extends Entity {
 
 		hitbox.x = x;
 		hitbox.y = y;
-		resetAttackBox();
 
 		if (!IsEntityOnFloor(hitbox, lvlData))
 			inAir = true;
-	}
-
-	private void resetAttackBox() {
-		if (flipW == 1)
-			setAttackBoxOnRightSide();
-		else
-			setAttackBoxOnLeftSide();
 	}
 
 	public int getTileY() {

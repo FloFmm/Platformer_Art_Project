@@ -294,8 +294,10 @@ public class Constants {
 		public static final int PLAYER_GREEN_VALUE = 100;
 		public static final int HITBOX_BASE_WIDTH = 16;
 		public static final int GRABBOX_BASE_WIDTH = (int) (HITBOX_BASE_WIDTH * 1.75f);
+		public static final int ATTACKBOX_BASE_WIDTH = (int) (HITBOX_BASE_WIDTH * 1.75f);
 		public static final int HITBOX_BASE_HEIGHT = 27;
 		public static final int GRABBOX_BASE_HEIGHT = (int) (HITBOX_BASE_HEIGHT * 1.25f);
+		public static final int ATTACKBOX_BASE_HEIGHT = (int) (HITBOX_BASE_HEIGHT * 1.25f);
 		
 		public static final int PLAYER_BASE_HEIGHT = 64;
 		public static final int PLAYER_BASE_WIDTH = 64;

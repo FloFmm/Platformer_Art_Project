@@ -384,74 +384,43 @@ public class HelpMethods {
 	public static float[] GetEntityXPosNextToWall(Rectangle2D.Float hitbox, float xSpeed, int[][] lvlData, float offset) {
 		int currentTile = (int) (hitbox.x / Game.TILES_SIZE);
 		int yIndex = (int) (hitbox.y+hitbox.height-1)/Game.TILES_SIZE;
-		int tileValue, xIndex;
-		if (xSpeed > 0) {
-			// Right
-			xIndex = (int) (hitbox.x+hitbox.width-1+xSpeed)/Game.TILES_SIZE;
-			if (xIndex < 0 || xIndex >= lvlData.length || yIndex < 0 || yIndex >= lvlData[0].length)
-				tileValue = 1;
-			else
-				tileValue = lvlData[yIndex][xIndex];
-			// System.out.println(tileValue);
-			if (tileValue >= 111 && tileValue <= 989) {
-				int[] interpretation = InterpretTriangleTileValue(tileValue);
-				int simpleOrient = interpretation[3]; // 1 to 4
-				switch (simpleOrient) {
-					case 1 -> {
-						double gradient = GradientOfTriangle(tileValue);
-						double factor = 1.0d/Math.sqrt(1+gradient*gradient);
-//						System.out.println("===STAT================");
-//						System.out.println(hitbox.x);
-//						System.out.println((float) (hitbox.x+xSpeed*factor));
-//						System.out.println("=======================");
-////						System.out.println(hitbox.y);
-////						System.out.println((float) (hitbox.y-Math.abs(xSpeed)*gradient*factor));
-//						
-//						System.out.println(factor);
-//						System.out.println(gradient);
-						return new float[] {(float) (hitbox.x+xSpeed*factor-offset), 
-								(float) (hitbox.y-Math.abs(xSpeed)*gradient*factor-offset)};
-	 				}
-					case 2 -> {
-						return new float[] {hitbox.x, hitbox.y};
-	 				}
-				}
+		int tileValue;
+		int c = 1;
+		int xIndex = (int) (hitbox.x+hitbox.width-1+xSpeed)/Game.TILES_SIZE;
+		if (xSpeed < 0) {
+			c = 3;
+			xIndex = (int) (hitbox.x+xSpeed)/Game.TILES_SIZE;
+		}
+		if (xIndex < 0 || xIndex >= lvlData[0].length || yIndex < 0 || yIndex >= lvlData.length) {
+			tileValue = 3;
+			System.out.println("out of bounds");
+		}
+		else
+			tileValue = lvlData[yIndex][xIndex];
+		if (tileValue >= 111 && tileValue <= 989) {
+			int[] interpretation = InterpretTriangleTileValue(tileValue);
+			int simpleOrient = interpretation[3]; // 1 to 4
+			System.out.println("simpleOrient");
+			System.out.println(simpleOrient);
+			if (simpleOrient == c) {
+				double gradient = GradientOfTriangle(tileValue);
+				double factor = 1.0d/Math.sqrt(1+gradient*gradient);
+				System.out.println(1);
+				return new float[] {(float) (hitbox.x+xSpeed*factor), 
+						(float) (hitbox.y-Math.abs(xSpeed)*gradient*factor)};
+				
+			} else if (simpleOrient == (c+1)) {
+				System.out.println(2);
+				return new float[] {hitbox.x, hitbox.y};
 			}
+		}
+		if (xSpeed > 0) {
+			//System.out.println(3);
 			int tileXPos = currentTile * Game.TILES_SIZE;
 			int xOffset = (int) (Game.TILES_SIZE - hitbox.width);
 			return new float[] {tileXPos + xOffset + 1, hitbox.y};
 		} else {
-			// Left
-			xIndex = (int) (hitbox.x+xSpeed)/Game.TILES_SIZE;
-			tileValue = lvlData[yIndex][xIndex];
-			if (tileValue >= 111 && tileValue <= 989) {
-				int[] interpretation = InterpretTriangleTileValue(tileValue);
-				int simpleOrient = interpretation[3]; // 1 to 4
-				switch (simpleOrient) {
-					case 3 -> {
-						double gradient = GradientOfTriangle(tileValue);
-						double factor = 1.0d/Math.sqrt(1+gradient*gradient);
-//						System.out.println("===STAT================");
-//						System.out.println(hitbox.x);
-//						System.out.println((float) (hitbox.x+xSpeed*factor));
-//						System.out.println("=======================");
-////						System.out.println(hitbox.y);
-////						System.out.println((float) (hitbox.y-Math.abs(xSpeed)*gradient*factor));
-////						
-//						System.out.println(factor);
-//						System.out.println(gradient);
-//						System.out.println(hitbox.x+xSpeed*factor+offset);
-//						System.out.println(hitbox.y-Math.abs(xSpeed)*gradient*factor-offset);
-//						
-						return new float[] {(float) (hitbox.x+xSpeed*factor+offset), 
-								(float) (hitbox.y-Math.abs(xSpeed)*gradient*factor-offset)};
-						
-	 				}
-					case 4 -> {
-						return new float[] {hitbox.x, hitbox.y};
-	 				}
-				}
-			}
+			//System.out.println(4);
 			return new float[] {currentTile * Game.TILES_SIZE + 1, hitbox.y};
 		}
 	}

@@ -10,7 +10,6 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class LoadSave {
-	public static final String PLAYER_ATLAS = "player_sprites.png";
 	public static final String LEVEL_ATLAS = "outside_sprites.png";
 	public static final String MENU_BUTTONS = "button_atlas.png";
 	public static final String MENU_BACKGROUND = "controller_labeled.png";
