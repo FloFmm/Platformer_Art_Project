@@ -55,22 +55,22 @@ public class Player extends Entity {
 	private int windsockHeight = (int) (Game.GAME_WIDTH/20);
 	private int windsockY = (int) (Game.GAME_HEIGHT/20);
 	
-	private int statusBarWidth = (int) (192 * Game.SCALE);
+	private int statusBarWidth = (int) (128 * Game.SCALE);
 	private int middleSeperatorWidth = (int) (Game.GAME_WIDTH/5);
-	private int statusBarHeight = (int) (58 * Game.SCALE);
+	private int statusBarHeight = (int) (64 * Game.SCALE);
 	private int statusBarX = (int) (10 * Game.SCALE);
-	private int statusBarY = (int) (10 * Game.SCALE);
+	private int statusBarY = (int) (0 * Game.SCALE);
 
-	private int healthBarWidth = (int) (150 * Game.SCALE);
-	private int healthBarHeight = (int) (4 * Game.SCALE);
-	private int healthBarXStart = (int) (34 * Game.SCALE);
-	private int healthBarYStart = (int) (14 * Game.SCALE);
+	private int healthBarWidth = (int) (statusBarWidth*800/1024);
+	private int healthBarHeight = (int) (statusBarHeight*100/512);
+	private int healthBarXStart = (int) (statusBarWidth*180/1024);
+	private int healthBarYStart = (int) (statusBarHeight*80/512);
 	private int healthWidth = healthBarWidth;
 
-	private int powerBarWidth = (int) (104 * Game.SCALE);
-	private int powerBarHeight = (int) (2 * Game.SCALE);
-	private int powerBarXStart = (int) (44 * Game.SCALE);
-	private int powerBarYStart = (int) (34 * Game.SCALE);
+	private int powerBarWidth = (int) (statusBarWidth*800/1024);
+	private int powerBarHeight = (int) (statusBarHeight*100/512);
+	private int powerBarXStart = (int) (statusBarWidth*180/1024);
+	private int powerBarYStart = (int) (statusBarHeight*270/512);
 	private int powerWidth = powerBarWidth;
 	private int powerMaxValue = 200;
 	private int powerValue = powerMaxValue;
@@ -487,21 +487,24 @@ public class Player extends Entity {
 	
 	public void drawUI(Graphics g) {
 		// Background ui
-		g.drawImage(statusBarImg, statusBarX, statusBarY, statusBarWidth, statusBarHeight, null);
-		
 		int xDrawOffset = 0;
-		if (!isPlayer1)
+		int xStatusBarOffset = statusBarX;
+		if (!isPlayer1) {
 			xDrawOffset = -Game.GAME_WIDTH/2;
+			xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH/2 - statusBarWidth);
+		}
 		g.drawImage(middleSeperatorImg, Game.GAME_WIDTH/2-middleSeperatorWidth/2 + xDrawOffset, 0, middleSeperatorWidth, Game.GAME_HEIGHT, null);
 		
 		// Health bar
 		g.setColor(Color.red);
-		g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
+		g.fillRect(healthBarXStart + xStatusBarOffset, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
 
 		// Power Bar
 		g.setColor(Color.yellow);
-		g.fillRect(powerBarXStart + statusBarX, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
-		
+		g.fillRect(powerBarXStart + xStatusBarOffset, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
+		g.drawImage(statusBarImg, xStatusBarOffset, statusBarY, statusBarWidth, statusBarHeight, null);
+
+			
 		// temperature
 		Color tempColor = new Color((int) (playing.getTemperature()*255/MAX_TEMP),0,(int) (255-playing.getTemperature()*255/MAX_TEMP));
 		g.setColor(tempColor);
@@ -653,11 +656,12 @@ public class Player extends Entity {
 	}
 
 	private void jump() {
-		if (inAir)
-			return;
-		playing.getGame().getAudioPlayer().playEffect(AudioPlayer.JUMP);
-		inAir = true;
-		airSpeed = jumpSpeed;
+		boolean jumping = (airSpeed < 0);
+		if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < TIME_TO_JUMP_WHEN_ALREADY_IN_AIR))) {
+			playing.getGame().getAudioPlayer().playEffect(AudioPlayer.JUMP);
+			inAir = true;
+			airSpeed = jumpSpeed;
+		}
 	}
 
 	private void resetInAir() {

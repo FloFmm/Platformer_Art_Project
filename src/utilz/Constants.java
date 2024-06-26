@@ -205,7 +205,7 @@ public class Constants {
 	public static class Environment {
 		// temperature
 		public static float MAX_TEMP = 100;
-		public static float TIME_TO_REACH_MAX_TEMP = 1 * 60;
+		public static float TIME_TO_REACH_MAX_TEMP = 10 * 60;
 		
 		// wind
 		public static float WEAK_WIND_TH = 0.25f*Game.SCALE;
@@ -283,6 +283,8 @@ public class Constants {
 	public static class PlayerConstants {
 		public static final float PLAYER_WALKSPEED = Game.SCALE * 1.0f;
 		public static final float PLAYER_JUMP_SPEED = -2.25f * Game.SCALE;
+		public static final float TIME_TO_JUMP_WHEN_ALREADY_IN_AIR = 0.25f;
+		
 		
 		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
 		public static final float CLOSE_TO_BORDER_VERTICAL = 0.6f;
@@ -376,14 +378,14 @@ public class Constants {
 		public static final int DOUBLE_TILE = 14;
 		
 		public static final Color THROW_ARC_COLOR = new Color(100,100,100);
-		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*5.0f;
+		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*3.0f;
 		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
 		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 3.0f;
 		public static final float THROW_ANGLE_STEP = 5.0f;
 		public static final float MAX_THROW_ANGLE = 60.0f;
 				
-		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = -TETRIS_TILE_MAX_THROW_SPEED*1.0f;
-		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*1.0f;
+		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = -TETRIS_TILE_MAX_THROW_SPEED*0.5f;
+		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.5f;
 		public static final float TETRIS_TILE_MIN_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.75f;
 		public static final float TETRIS_TILE_MAX_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED*1.5f;
 		public static final float TETRIS_TILE_TIME_TO_EXPLODE = 1f;
@@ -504,9 +506,9 @@ public class Constants {
 			{0,0,0,0, 1,1,1,0, 0,0,0,0},
 			{0,0,0,0, 1,1,1,1, 0,0,0,0},
 			
-			{0,0,0,1, 1,1,0,1, 0,0,0,0},
-			{0,0,1,1, 0,1,0,1, 1,0,0,0},
-			{0,1,1,0, 0,1,0,0, 1,1,0,0},
+			{0,0,0,1, 1,1,0,1, 1,0,0,0},
+			{0,0,1,1, 0,1,0,0, 1,1,0,0},
+			{0,1,1,0, 0,1,0,0, 0,0,0,0},
 			{0,0,0,0, 0,1,0,0, 0,0,0,0},
 			
 			{0,0,0,0, 0,1,0,0, 0,0,0,0},
@@ -536,8 +538,8 @@ public class Constants {
 			{0,0,0,0, 1,0,1,0, 0,0,0,0},
 			{0,0,0,0, 1,1,1,1, 0,0,0,0},
 			
-			{0,0,0,1, 1,1,0,1, 0,0,0,0},
-			{0,0,1,1, 0,1,0,1, 1,0,0,0},
+			{0,0,0,1, 1,1,0,1, 1,0,0,0},
+			{0,0,1,1, 0,1,0,0, 1,1,0,0},
 			{0,1,1,0, 0,1,0,0, 1,1,0,0},
 			{0,1,1,0, 0,1,0,0, 1,1,0,0},
 		
@@ -570,8 +572,8 @@ public class Constants {
 			
 			{0,0,0,0, 0,0,0,0, 0,0,0,0},
 			{0,0,0,0, 0,0,0,0, 0,0,0,0},
-			{0,0,0,0, 0,0,0,0, 0,0,0,0},
 			{0,0,0,0, 0,0,0,0, 1,1,0,0},
+			{0,1,1,0, 0,0,0,0, 1,1,0,0},
 			
 			{0,1,1,0, 0,0,0,0, 1,1,0,0},
 			{0,1,1,0, 0,0,0,0, 1,1,0,0},
