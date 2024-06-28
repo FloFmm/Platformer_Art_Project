@@ -204,16 +204,19 @@ public class Constants {
 
 	public static class Environment {
 		// temperature
-		public static float MAX_TEMP = 100;
-		public static float TIME_TO_REACH_MAX_TEMP = 10 * 60;
+		public static final float MAX_TEMP = 100.0f;
+		public static final float TIME_TO_REACH_MAX_TEMP = 10.0f * 60;
+		public static final float TEMP_FROM_FINISHED_WINDMILL = -40.0f;
+		public static final float TEMP_FROM_EXPLOSION = 3.0f;
+		
 		
 		// wind
-		public static float WEAK_WIND_TH = 0.25f*Game.SCALE;
-		public static float STRONG_WIND_TH = 0.75f*Game.SCALE;
-		public static float MAX_WIND_SPEED_START = 0.5f*Game.SCALE;
-		public static float MAX_WIND_SPEED_END = 1.5f*Game.SCALE;
-		public static float TIME_BETWEEN_WIND_CHANGE_START = 5;
-		public static float TIME_BETWEEN_WIND_CHANGE_END = 10;
+		public static final float WEAK_WIND_TH = 0.25f*Game.SCALE;
+		public static final float STRONG_WIND_TH = 0.75f*Game.SCALE;
+		public static final float MAX_WIND_SPEED_START = 0.5f*Game.SCALE;
+		public static final float MAX_WIND_SPEED_END = 1.5f*Game.SCALE;
+		public static final float TIME_BETWEEN_WIND_CHANGE_START = 5;
+		public static final float TIME_BETWEEN_WIND_CHANGE_END = 10;
 		
 		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45, 150);
 		

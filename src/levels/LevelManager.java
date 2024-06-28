@@ -120,4 +120,10 @@ public class LevelManager {
 	public void setLevelIndex(int lvlIndex) {
 		this.lvlIndex = lvlIndex;
 	}
+	
+
+	public Game getGame() {
+		return game;
+	}
+
 }

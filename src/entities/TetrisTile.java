@@ -1,6 +1,7 @@
 package entities;
 
 import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.Environment.*;
 import static utilz.Constants.UPS_SET;
 import static utilz.Constants.EnemyConstants.TUMBLE_WEED;
 import static utilz.Constants.EnemyConstants.TUMBLE_WEED_MAX_SPEED;
@@ -213,7 +214,7 @@ public class TetrisTile extends Entity {
 				
 				hitbox.y += airSpeed;
 				airSpeed += GRAVITY;
-				updateXPos(xSpeed);
+				updateXPos(xSpeed, lvlData);
 			} else {
 				if (isInBuildingZone() && airSpeed > 0) {
 					BuildingZone currentBZ = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
@@ -244,37 +245,13 @@ public class TetrisTile extends Entity {
 			}
 
 		} else {
-			updateXPos(xSpeed);
+			updateXPos(xSpeed, lvlData);
 		}
 		
 		if (Math.abs(hitbox.x - oldXPos) > 0.1f || Math.abs(hitbox.y - oldYPos) > 0.1f)
 			moving = true;
 		else
 			moving = false;
-	}
-
-	private void updateXPos(float xSpeed) {
-		
-		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
-			hitbox.x += xSpeed;
-		else {
-			
-			//hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed);
-			float[] playerCoord = GetEntityXPosNextToWall(hitbox, xSpeed, lvlData, 0.1f);
-			if (CanMoveHere(playerCoord[0], playerCoord[1], hitbox.width, hitbox.height, lvlData)) {
-				hitbox.x = playerCoord[0];
-				hitbox.y = playerCoord[1];
-			}
-			else if (CanMoveHere(playerCoord[0], playerCoord[1]-5.0f, hitbox.width, hitbox.height, lvlData)) {
-				hitbox.x = playerCoord[0];
-				hitbox.y = playerCoord[1]-5.0f;
-				// System.out.println("need little help to get up the hill");
-			}
-			else {
-				// System.out.println("failed to move (slope uphill | next to wall) due to !CanMoveHere()");
-			}
-				
-		}
 	}
 
 	public void startExplosionTimer() {
@@ -295,6 +272,8 @@ public class TetrisTile extends Entity {
 		airSpeed = -(random.nextFloat()*
         		(TETRIS_TILE_MAX_EXPLOSION_Y_SPEED - TETRIS_TILE_MIN_EXPLOSION_Y_SPEED) + 
         		TETRIS_TILE_MIN_EXPLOSION_Y_SPEED);
+		tetrisTileManager.getPlaying().setTempFromExplosion(tetrisTileManager.getPlaying().getTempFromExplosion() + TEMP_FROM_EXPLOSION);
+
 	}
 	
 	private boolean isInBuildingZone() {

@@ -4,6 +4,7 @@ import static utilz.Constants.Directions.DOWN;
 import static utilz.Constants.Directions.LEFT;
 import static utilz.Constants.Directions.UP;
 import static utilz.HelpMethods.CanMoveHere;
+import static utilz.HelpMethods.GetEntityXPosNextToWall;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -73,7 +74,28 @@ public abstract class Entity {
 		g.drawRect((int) hitbox.x - xLvlOffset, (int) hitbox.y - yLvlOffset, (int) hitbox.width, (int) hitbox.height);
 	}
 	
-
+	protected void updateXPos(float xSpeed, int[][] lvlData) {
+		float upHillHelp = 3.5f*Game.SCALE;
+		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
+			hitbox.x += xSpeed;
+		else {
+			//hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed);
+			float[] playerCoord = GetEntityXPosNextToWall(hitbox, xSpeed, lvlData, 0.1f);
+			if (CanMoveHere(playerCoord[0], playerCoord[1], hitbox.width, hitbox.height, lvlData)) {
+				//System.out.println("went perfectly uphill");
+				hitbox.x = playerCoord[0];
+				hitbox.y = playerCoord[1];
+			}
+			else if (CanMoveHere(playerCoord[0], playerCoord[1]-upHillHelp, hitbox.width, hitbox.height, lvlData)) {
+				//System.out.println("need little help to get up the hill");
+				hitbox.x = playerCoord[0];
+				hitbox.y = playerCoord[1]-upHillHelp;
+			}
+			else {
+				//System.out.println("failed to move (slope uphill | next to wall) due to !CanMoveHere()");
+			}
+		}
+	}
 
 	protected void initHitbox(int width, int height) {
 		hitbox = new Rectangle2D.Float(x, y, (int) (width * Game.SCALE), (int) (height * Game.SCALE));

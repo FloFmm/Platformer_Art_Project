@@ -2,6 +2,7 @@ package zones;
 
 import static utilz.HelpMethods.*;
 import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.Environment.*;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -23,8 +24,7 @@ public class BuildingZone {
 	private List<TetrisTile> tetrisTiles = new ArrayList<>();
 	private String zoneType;
 	private boolean finished = false;
-
-
+	private BuildingZoneManager buildingZoneManager;
 	public BuildingZone(int x, int y, int width, int height, int buildingZoneIndex, String zoneType) {
 		this.buildingZoneIndex = buildingZoneIndex;
 		hitbox = new Rectangle2D.Float(x, y, (int) (width), (int) (height));
@@ -90,7 +90,8 @@ public class BuildingZone {
 			System.out.println("successfully added");
 			if (isFinished()) {
 				System.out.println("finished a building zone");
-				finished = true;
+				
+				eventOnFinish();
 			}
 				
 			tetrisTiles.add(tetrisTile);
@@ -108,6 +109,17 @@ public class BuildingZone {
             }
         }
 		return true;
+	}
+	
+	public void eventOnFinish() {
+		finished = true;
+		if (zoneType=="windmill") {
+			buildingZoneManager.getPlaying().setTemperature(buildingZoneManager.getPlaying().getTemperature() + TEMP_FROM_FINISHED_WINDMILL);;
+		}
+	}
+	
+	public void setBuildingZoneManager(BuildingZoneManager buildingZoneManager) {
+		this.buildingZoneManager = buildingZoneManager;
 	}
 	
 	public boolean isFinished() {

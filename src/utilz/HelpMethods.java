@@ -384,43 +384,55 @@ public class HelpMethods {
 	public static float[] GetEntityXPosNextToWall(Rectangle2D.Float hitbox, float xSpeed, int[][] lvlData, float offset) {
 		int currentTile = (int) (hitbox.x / Game.TILES_SIZE);
 		int yIndex = (int) (hitbox.y+hitbox.height-1)/Game.TILES_SIZE;
-		int tileValue;
+		int tileValue, currentTileValue, relevantTileValue=-1000;
 		int c = 1;
 		int xIndex = (int) (hitbox.x+hitbox.width-1+xSpeed)/Game.TILES_SIZE;
+		int currentXIndex = (int) (hitbox.x+hitbox.width-1)/Game.TILES_SIZE;
 		if (xSpeed < 0) {
 			c = 3;
 			xIndex = (int) (hitbox.x+xSpeed)/Game.TILES_SIZE;
+			currentXIndex = (int) hitbox.x/Game.TILES_SIZE;
 		}
+		
 		if (xIndex < 0 || xIndex >= lvlData[0].length || yIndex < 0 || yIndex >= lvlData.length) {
 			tileValue = 3;
-			System.out.println("out of bounds");
+			//System.out.println("out of bounds");
 		}
 		else
 			tileValue = lvlData[yIndex][xIndex];
-		if (tileValue >= 111 && tileValue <= 989) {
-			int[] interpretation = InterpretTriangleTileValue(tileValue);
+		
+		if (currentXIndex < 0 || currentXIndex >= lvlData[0].length || yIndex < 0 || yIndex >= lvlData.length) {
+			currentTileValue = 3;
+			//System.out.println("out of bounds");
+		}
+		else
+			currentTileValue = lvlData[yIndex][currentXIndex];
+		
+		// decide between current and next tile player touches
+		if (tileValue >= 111 && tileValue <= 989)
+			relevantTileValue = tileValue;
+		else if (currentTileValue >= 111 && currentTileValue <= 989)
+			relevantTileValue = currentTileValue;
+		
+		if (relevantTileValue!=-1000) {
+			int[] interpretation = InterpretTriangleTileValue(relevantTileValue);
 			int simpleOrient = interpretation[3]; // 1 to 4
-			System.out.println("simpleOrient");
-			System.out.println(simpleOrient);
 			if (simpleOrient == c) {
-				double gradient = GradientOfTriangle(tileValue);
+				double gradient = GradientOfTriangle(relevantTileValue);
 				double factor = 1.0d/Math.sqrt(1+gradient*gradient);
-				System.out.println(1);
 				return new float[] {(float) (hitbox.x+xSpeed*factor), 
 						(float) (hitbox.y-Math.abs(xSpeed)*gradient*factor)};
 				
 			} else if (simpleOrient == (c+1)) {
-				System.out.println(2);
 				return new float[] {hitbox.x, hitbox.y};
 			}
 		}
+		
 		if (xSpeed > 0) {
-			//System.out.println(3);
 			int tileXPos = currentTile * Game.TILES_SIZE;
 			int xOffset = (int) (Game.TILES_SIZE - hitbox.width);
 			return new float[] {tileXPos + xOffset + 1, hitbox.y};
 		} else {
-			//System.out.println(4);
 			return new float[] {currentTile * Game.TILES_SIZE + 1, hitbox.y};
 		}
 	}

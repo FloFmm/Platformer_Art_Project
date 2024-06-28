@@ -610,7 +610,7 @@ public class Player extends Entity {
 			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
 				hitbox.y += airSpeed;
 				airSpeed += GRAVITY;
-				updateXPos(xSpeed);
+				updateXPos(xSpeed, lvlData);
 			} else {
 				//TODO
 				//hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
@@ -623,7 +623,11 @@ public class Player extends Entity {
 			}
 
 		} else {
-			updateXPos(xSpeed);
+			updateXPos(xSpeed, lvlData);
+			if (powerAttackActive && !CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)) {
+				powerAttackActive = false;
+				powerAttackTick = 0;
+			}
 		}
 		moving = true;
 	}
@@ -641,53 +645,6 @@ public class Player extends Entity {
 		inAir = false;
 		airSpeed = 0;
 	}
-
-	private void updateXPos(float xSpeed) {
-		
-		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
-			hitbox.x += xSpeed;
-		else {
-			//hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed);
-			float[] playerCoord = GetEntityXPosNextToWall(hitbox, xSpeed, lvlData, 0.1f);
-			if (CanMoveHere(playerCoord[0], playerCoord[1], hitbox.width, hitbox.height, lvlData)) {
-				if (isPlayer1) {
-				System.out.println(hitbox.x);
-				System.out.println(hitbox.y);
-				System.out.println(playerCoord[0]);
-				System.out.println(playerCoord[1]);
-				System.out.println("went perfectly uphill");
-				}
-				hitbox.x = playerCoord[0];
-				hitbox.y = playerCoord[1];
-			}
-			else if (CanMoveHere(playerCoord[0], playerCoord[1]-5.0f, hitbox.width, hitbox.height, lvlData)) {
-				if (isPlayer1) {
-				System.out.println(hitbox.x);
-				System.out.println(hitbox.y);
-				System.out.println(playerCoord[0]);
-				System.out.println(playerCoord[1]-5.0f);
-				System.out.println("need little help to get up the hill");
-				}
-				hitbox.x = playerCoord[0];
-				hitbox.y = playerCoord[1]-5.0f;
-			}
-			else {
-				if (isPlayer1) {
-				System.out.println(hitbox.x);
-				System.out.println(hitbox.y);
-				System.out.println(playerCoord[0]);
-				System.out.println(playerCoord[1]-5.0f);
-				System.out.println("failed to move (slope uphill | next to wall) due to !CanMoveHere()");
-				}
-			}
-				
-			if (powerAttackActive) {
-				powerAttackActive = false;
-				powerAttackTick = 0;
-			}
-		}
-	}
-	
 
 	public void selfHurtFromPowerAttack(int value) {
 		if (selfHurt)

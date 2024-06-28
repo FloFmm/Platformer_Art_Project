@@ -20,6 +20,7 @@ public class BuildingZoneManager {
 	private Level currentLevel;
 	private BufferedImage rocketImg, windmillImg, rocketTutorialImg, windmillTutorialImg;
 	private boolean player1Finished = false, player2Finished = false;
+	
 	public BuildingZoneManager(Playing playing) {
 		this.playing = playing;
 		loadBuildingZoneImgs();
@@ -42,7 +43,10 @@ public class BuildingZoneManager {
 		player2Finished = true;
 		for (int i=0; i<bz.size(); i++) {
 			c = bz.get(i);
+			c.setBuildingZoneManager(this);
 			c.update(playing);
+			if (c.getFinished())
+				c.eventOnFinish();
 			if (i==0)
 				player1Finished = c.getFinished();
 			else
@@ -96,4 +100,9 @@ public class BuildingZoneManager {
 		rocketTutorialImg = LoadSave.GetSpriteAtlas("building_zones/rocket_tutorial.png");
 		windmillTutorialImg = LoadSave.GetSpriteAtlas("building_zones/windmill_tutorial.png");
 	}
+	
+	public Playing getPlaying() {
+		return playing;
+	}
+
 }

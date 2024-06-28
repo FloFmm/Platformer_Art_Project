@@ -106,7 +106,7 @@ public class Tumbleweed extends Enemy {
 			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
 				hitbox.y += airSpeed;
 				airSpeed += GRAVITY;
-				updateXPos(xSpeed);
+				updateXPos(xSpeed, lvlData);
 			} else {
 				if (airSpeed > 0)
 					resetInAir();
@@ -115,7 +115,7 @@ public class Tumbleweed extends Enemy {
 			}
 
 		} else {
-			updateXPos(xSpeed);
+			updateXPos(xSpeed, lvlData);
 		}
 		float floatError = 0.0001f;
 		moving = !(oldXPos - floatError <= hitbox.x && hitbox.x <= oldXPos + floatError &&
@@ -125,22 +125,6 @@ public class Tumbleweed extends Enemy {
 				walkDir = RIGHT;
 			else
 				walkDir = LEFT;
-	}
-
-	private void updateXPos(float xSpeed) {
-		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
-			hitbox.x += xSpeed;
-		else {
-			float[] playerCoord = GetEntityXPosNextToWall(hitbox, xSpeed, lvlData, 0.1f);
-			if (CanMoveHere(playerCoord[0], playerCoord[1], hitbox.width, hitbox.height, lvlData)) {
-				hitbox.x = playerCoord[0];
-				hitbox.y = playerCoord[1];
-			}
-			else if (CanMoveHere(playerCoord[0], playerCoord[1]-5.0f, hitbox.width, hitbox.height, lvlData)) {
-				hitbox.x = playerCoord[0];
-				hitbox.y = playerCoord[1]-5.0f;
-			}
-		}
 	}
 	
 	private void resetInAir() {

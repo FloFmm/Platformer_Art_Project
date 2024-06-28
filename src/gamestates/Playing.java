@@ -444,6 +444,10 @@ public class Playing extends State implements Statemethods {
 		currentWaterYPos = WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentDarknessAlpha = 0;
+		temperature = 0;
+		tempFromTime = 0; 
+		tempFromExplosion = 0; 
+		tempFromWindmills = 0;
 		
 	}
 
