@@ -8,6 +8,7 @@ import static utilz.Constants.ANI_SPEED;
 import static utilz.Constants.Directions.*;
 import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.ControllerConstants.*;
+import static utilz.Constants.UI.*;
 import static utilz.Constants.Environment.*;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -45,28 +46,37 @@ public class Player extends Entity {
 	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
 	// StatusBarUI
-	private BufferedImage statusBarImg, middleSeperatorImg, windsockImg1, windsockImg2, windsockImg3;
-
-	private int tempScaleWidth = (int) (Game.GAME_WIDTH/80);
-	private int tempScaleMaxHeight = (int) (Game.GAME_HEIGHT/3);
-	private int tempScaleY = (int) (Game.GAME_HEIGHT/2);
+	private BufferedImage statusBarImg, windsockImg1, windsockImg2, windsockImg3, tempScaleImg;
+	private int middleSeperatorWidth = (int) (16*Game.SCALE);
+	
+	private Color tempScaleBackgroundColor = BACKGROUND_GREY;
+	private int tempScaleWidth = (int) (middleSeperatorWidth*1f);
+	private int tempScaleHeight = (int) (tempScaleWidth*4.5f);
+	private int tempScaleY = (int) (Game.GAME_HEIGHT/3);
+	private int tempBarWidth = (int) (tempScaleWidth*0.5f);
+	private int tempBarMaxHeight = (int) (tempScaleHeight*0.9f);
+	private int tempBarY = (int) (tempScaleY+0.1f*tempScaleHeight);
 	
 	private int windsockWidth = (int) (Game.GAME_WIDTH/20);
 	private int windsockHeight = (int) (Game.GAME_WIDTH/20);
 	private int windsockY = (int) (Game.GAME_HEIGHT/20);
 	
 	private int statusBarWidth = (int) (128 * Game.SCALE);
-	private int middleSeperatorWidth = (int) (Game.GAME_WIDTH/5);
+	private Color middleSeperatorColor = BASE_GREY;
 	private int statusBarHeight = (int) (64 * Game.SCALE);
 	private int statusBarX = (int) (10 * Game.SCALE);
 	private int statusBarY = (int) (0 * Game.SCALE);
 
+	private Color healthBarBackgroundColor = BACKGROUND_GREY;
+	private Color healthBarColor = BASE_GREY;
 	private int healthBarWidth = (int) (statusBarWidth*800/1024);
 	private int healthBarHeight = (int) (statusBarHeight*100/512);
 	private int healthBarXStart = (int) (statusBarWidth*180/1024);
 	private int healthBarYStart = (int) (statusBarHeight*80/512);
 	private int healthWidth = healthBarWidth;
 
+	private Color powerBarBackgroundColor = BACKGROUND_GREY;
+	private Color powerBarColor = BASE_GREY;
 	private int powerBarWidth = (int) (statusBarWidth*800/1024);
 	private int powerBarHeight = (int) (statusBarHeight*100/512);
 	private int powerBarXStart = (int) (statusBarWidth*180/1024);
@@ -346,7 +356,6 @@ public class Player extends Entity {
 
 		playing.checkEnemyPlayerHit(isPlayer1);
 		playing.checkEnemyHit(attackBox);
-		playing.checkObjectHit(attackBox);
 		playing.getGame().getAudioPlayer().playAttackSound();
 	}
 	
@@ -432,8 +441,10 @@ public class Player extends Entity {
 		float[] throwSpeed = calcThrowSpeed();
 		float tileXSpeed = throwSpeed[0];
 		float tileAirSpeed = throwSpeed[1];
-		
-		g.setColor(THROW_ARC_COLOR);
+		if (isPlayer1)
+			g.setColor(THROW_ARC_COLOR_PLAYER1);
+		else
+			g.setColor(THROW_ARC_COLOR_PLAYER2);
 		int circle_x , circle_y;
 		int radius, maxRadius = 11, minRadius = 7;
 		float maxThrowTime = tileAirSpeed / GRAVITY * 2;
@@ -468,26 +479,40 @@ public class Player extends Entity {
 			xDrawOffset = -Game.GAME_WIDTH/2;
 			xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH/2 - statusBarWidth);
 		}
-		g.drawImage(middleSeperatorImg, Game.GAME_WIDTH/2-middleSeperatorWidth/2 + xDrawOffset, 0, middleSeperatorWidth, Game.GAME_HEIGHT, null);
+		// middle separator
+		g.setColor(middleSeperatorColor);
+		g.fillRect(Game.GAME_WIDTH/2-middleSeperatorWidth/2 + xDrawOffset, 0, middleSeperatorWidth, Game.GAME_HEIGHT);
+		
+		// temperature
+		g.setColor(tempScaleBackgroundColor);
+		g.fillRect(Game.GAME_WIDTH/2-tempScaleWidth/2 + xDrawOffset, 
+				tempScaleY, 
+				tempScaleWidth, 
+				tempBarMaxHeight);
+		Color tempColor = new Color((int) (playing.getTemperature()*255/MAX_TEMP),0,(int) (255-playing.getTemperature()*255/MAX_TEMP));
+		g.setColor(tempColor);
+		int tempBarHeight = (int) (tempBarMaxHeight * playing.getTemperature() / MAX_TEMP);
+		g.fillRect(Game.GAME_WIDTH/2-tempBarWidth/2 + xDrawOffset, 
+				tempBarY - tempBarHeight, 
+				tempBarWidth, 
+				tempBarHeight);
+		g.drawImage(tempScaleImg, Game.GAME_WIDTH/2-tempScaleWidth/2, tempScaleY, tempScaleWidth, tempScaleHeight, null);
 		
 		// Health bar
-		g.setColor(Color.red);
+		g.setColor(healthBarBackgroundColor);
+		g.fillRect(healthBarXStart + xStatusBarOffset, healthBarYStart + statusBarY, healthBarWidth, healthBarHeight);
+		g.setColor(healthBarColor);
 		g.fillRect(healthBarXStart + xStatusBarOffset, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
 
 		// Power Bar
-		g.setColor(Color.yellow);
+		g.setColor(powerBarBackgroundColor);
+		g.fillRect(powerBarXStart + xStatusBarOffset, powerBarYStart + statusBarY, powerBarWidth, powerBarHeight);
+		g.setColor(powerBarColor);
 		g.fillRect(powerBarXStart + xStatusBarOffset, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
 		g.drawImage(statusBarImg, xStatusBarOffset, statusBarY, statusBarWidth, statusBarHeight, null);
 
 			
-		// temperature
-		Color tempColor = new Color((int) (playing.getTemperature()*255/MAX_TEMP),0,(int) (255-playing.getTemperature()*255/MAX_TEMP));
-		g.setColor(tempColor);
-		int tempScaleHeight = (int) (tempScaleMaxHeight * playing.getTemperature() / MAX_TEMP);
-		g.fillRect(Game.GAME_WIDTH/2-tempScaleWidth/2 + xDrawOffset, 
-				tempScaleY - tempScaleHeight, 
-				tempScaleWidth, 
-				tempScaleHeight);
+
 		
 		// windsock
 		BufferedImage wsImg;
@@ -612,14 +637,12 @@ public class Player extends Entity {
 				airSpeed += GRAVITY;
 				updateXPos(xSpeed, lvlData);
 			} else {
-				//TODO
-				//hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
 				if (airSpeed > 0)
 					resetInAir();
 				else
 					airSpeed = fallSpeedAfterCollision;
 				// TODO
-				// updateXPos(xSpeed);
+				updateXPos(xSpeed, lvlData);
 			}
 
 		} else {
@@ -771,7 +794,7 @@ public class Player extends Entity {
 			}
 		}
 		statusBarImg = LoadSave.GetSpriteAtlas(LoadSave.STATUS_BAR);
-		middleSeperatorImg = LoadSave.GetSpriteAtlas(LoadSave.MIDDLE_SEPERATOR);
+		tempScaleImg = LoadSave.GetSpriteAtlas(LoadSave.TEMP_SCALE);
 		windsockImg1 = LoadSave.GetSpriteAtlas(LoadSave.WINDSOCK1);
 		windsockImg2 = LoadSave.GetSpriteAtlas(LoadSave.WINDSOCK2);
 		windsockImg3 = LoadSave.GetSpriteAtlas(LoadSave.WINDSOCK3);

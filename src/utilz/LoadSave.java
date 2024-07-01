@@ -11,50 +11,32 @@ import javax.imageio.ImageIO;
 
 public class LoadSave {
 	public static final String LEVEL_ATLAS = "outside_sprites.png";
-	public static final String MENU_BUTTONS = "button_atlas.png";
-	public static final String MENU_BACKGROUND = "controller_labeled.png";
-	public static final String PAUSE_BACKGROUND = "pause_menu.png";
-	public static final String SOUND_BUTTONS = "sound_button.png";
-	public static final String URM_BUTTONS = "urm_buttons.png";
-	public static final String VOLUME_BUTTONS = "volume_buttons.png";
-	public static final String MENU_BACKGROUND_IMG = "background_menu.png";
+	public static final String MENU_BUTTONS = "displays/button_atlas.png";
+	public static final String MENU_BACKGROUND = "displays/controller_labeled.png";
+	public static final String PAUSE_BACKGROUND = "displays/pause_menu.png";
+	public static final String SOUND_BUTTONS = "displays/sound_button.png";
+	public static final String URM_BUTTONS = "displays/urm_buttons.png";
+	public static final String MENU_BACKGROUND_IMG = "displays/menu_background.png";
 	public static final String PLAYING_BG_IMG = "playing_bg_img.png";
 	public static final String PLAYING_FG_IMG = "playing_fg_img.png";
 	
-	public static final String TUMBLE_WEED_SPRITE = "tumble_weed_sprite.png";
-	public static final String STATUS_BAR = "health_power_bar.png";
-	public static final String MIDDLE_SEPERATOR = "middle_seperator.png";
-	public static final String WINDSOCK1 = "windsock1.png";
-	public static final String WINDSOCK2 = "windsock2.png";
-	public static final String WINDSOCK3 = "windsock3.png";
+	public static final String TUMBLE_WEED_SPRITE = "animation/tumbleweed/tumble_weed_sprite.png";
+	
+	public static final String STATUS_BAR = "displays/health_power_bar.png";
+	public static final String TEMP_SCALE = "displays/thermometer.png";
+	public static final String WINDSOCK1 = "displays/flag1.png";
+	public static final String WINDSOCK2 = "displays/flag2.png";
+	public static final String WINDSOCK3 = "displays/flag3.png";
 	
 	
-	public static final String COMPLETED_IMG = "completed_sprite.png";
-	public static final String POTION_ATLAS = "potions_sprites.png";
-	public static final String CONTAINER_ATLAS = "objects_sprites.png";
-	public static final String TRAP_ATLAS = "trap_atlas.png";
-	public static final String CANNON_ATLAS = "cannon_atlas.png";
-	public static final String CANNON_BALL = "ball.png";
-	public static final String DEATH_SCREEN = "death_screen.png";
-	public static final String OPTIONS_MENU = "options_background.png";
-	public static final String PINKSTAR_ATLAS = "pinkstar_atlas.png";
-	public static final String QUESTION_ATLAS = "question_atlas.png";
-	public static final String EXCLAMATION_ATLAS = "exclamation_atlas.png";
-	public static final String SHARK_ATLAS = "shark_atlas.png";
-	public static final String CREDITS = "credits.png";
-	public static final String GRASS_ATLAS = "grass_atlas.png";
-	public static final String TREE_ONE_ATLAS = "tree_one_atlas.png";
-	public static final String TREE_TWO_ATLAS = "tree_two_atlas.png";
-	public static final String GAME_COMPLETED = "game_completed.png";
-	public static final String RAIN_PARTICLE = "rain_particle.png";
-	public static final String WATER_TOP = "water_atlas_animation.png";
-	public static final String WATER_BOTTOM = "water.png";
-	public static final String CONTROLLER_ONLINE = "controller_online.png";
-	public static final String CONTROLLER_OFFLINE = "controller_offline.png";
-	public static final String PAUSED = "paused.png";
-	public static final String VICTORY_IMG = "victory.png";
-	public static final String DEFEAT_IMG = "defeat.png";
-	
+	public static final String OPTIONS_MENU = "displays/options_background.png";
+	public static final String CREDITS = "displays/credits.png";
+	public static final String CONTROLLER_ONLINE = "displays/controller_online.png";
+	public static final String CONTROLLER_OFFLINE = "displays/controller_offline.png";
+	public static final String PAUSED = "displays/paused.png";
+	public static final String VICTORY_IMG = "displays/victory.png";
+	public static final String DEFEAT_IMG = "displays/defeat.png";
+	public static final String VOLUME_BUTTONS = "displays/volume_buttons.png";
 
 	public static BufferedImage GetSpriteAtlas(String fileName) {
 		BufferedImage img = null;

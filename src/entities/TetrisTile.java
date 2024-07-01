@@ -120,7 +120,7 @@ public class TetrisTile extends Entity {
 			
 			if (noOverlapBetweenTetrisTiles && returnV == null) {
 				returnV = pos;
-				printMatrix(resultMatrixAfterAddingTT);
+				//printMatrix(resultMatrixAfterAddingTT);
 			}
 		}
 		return returnV;
@@ -159,10 +159,12 @@ public class TetrisTile extends Entity {
 		float oldXPos = hitbox.x;
 		float oldYPos = hitbox.y;
 		
+		// if already build in a building zone
 		if (lockedInBuildingZone != null) {
 			return;
 		}
 		
+		// if carried by player
 		if (isCarriedBy != null) {
 			hitbox.x = isCarriedBy.hitbox.x + isCarriedBy.hitbox.width/2 - hitbox.width/2; 
 			hitbox.y = isCarriedBy.hitbox.y - hitbox.height;
@@ -170,7 +172,7 @@ public class TetrisTile extends Entity {
 			return;
 		}
 		
-		
+		// acceleration in air and deceleration on floor
 		if (IsEntityOnFloor(hitbox, lvlData)) {
 			if (Math.abs(xSpeed) > 0) {
 				float abs_deceleration_on_floor = Math.abs(windSpeed/(UPS_SET*TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR));
@@ -187,8 +189,11 @@ public class TetrisTile extends Entity {
 		}
 			
  
+		
 		if (inAir) {
+			// in air
 			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
+				// can move in y direction
 				if (isInBuildingZone() && airSpeed > 0) {
 					BuildingZone currentBuildingZone = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
 					if (!tetrisTileCanMoveHere(hitbox.x, hitbox.y + airSpeed, currentBuildingZone)) {
@@ -198,10 +203,7 @@ public class TetrisTile extends Entity {
 							hitbox.y = xy[1];
 							xSpeed = 0;
 							if (movingInGrid) {
-								airSpeed = 0;
-								inAir = false;
-								lockedInBuildingZone = currentBuildingZone;
-								lockedInBuildingZone.addTetrisTile(this);
+								currentBuildingZone.addTetrisTile(this);
 								movingInGrid = false;
 							}
 							else {
@@ -214,8 +216,10 @@ public class TetrisTile extends Entity {
 				
 				hitbox.y += airSpeed;
 				airSpeed += GRAVITY;
-				updateXPos(xSpeed, lvlData);
+				if (!movingInGrid)
+					updateXPos(xSpeed, lvlData);
 			} else {
+				// cannot move in y direction
 				if (isInBuildingZone() && airSpeed > 0) {
 					BuildingZone currentBZ = tetrisTileManager.getPlaying().getBuildingZoneManager().checkInBuildingZone(hitbox);
 					airSpeed = 0;
@@ -223,16 +227,12 @@ public class TetrisTile extends Entity {
 					
 					int[] xy = closestLockingXY(hitbox.x, hitbox.y + airSpeed, currentBZ);
 					if (xy != null) {
-						lockedInBuildingZone = currentBZ;
 						hitbox.x = xy[0];
-						hitbox.y = (int) Math.floor((double) Math.round(hitbox.y + airSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
-						xSpeed = 0;
-						lockedInBuildingZone.addTetrisTile(this);
+						hitbox.y = xy[1];//(int) Math.floor((double) Math.round(hitbox.y + airSpeed)/TETRIS_GRID_SIZE)*TETRIS_GRID_SIZE;
+						currentBZ.addTetrisTile(this);
 					}
 				}
 				else {
-					//TODO
-					//hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
 					if (airSpeed > 0) {
 						inAir = false;
 						airSpeed = 0;
@@ -240,14 +240,18 @@ public class TetrisTile extends Entity {
 					else
 						airSpeed = fallSpeedAfterCollision;
 					// TODO
-					// updateXPos(xSpeed);
+					if (!movingInGrid)
+						updateXPos(xSpeed, lvlData);
 				}
 			}
 
 		} else {
-			updateXPos(xSpeed, lvlData);
+			// not in air
+			if (!movingInGrid)
+				updateXPos(xSpeed, lvlData);
 		}
 		
+		// check whether moving
 		if (Math.abs(hitbox.x - oldXPos) > 0.1f || Math.abs(hitbox.y - oldYPos) > 0.1f)
 			moving = true;
 		else
@@ -362,6 +366,10 @@ public class TetrisTile extends Entity {
 		this.xSpeed = xSpeed;
 	}
 	
+	public void setAirSpeed(float airSpeed) {
+		this.airSpeed = airSpeed;
+	}
+	
 	public Player getIsCarriedBy() {
 		return isCarriedBy;
 	}
@@ -384,6 +392,14 @@ public class TetrisTile extends Entity {
 
 	public void setLockedInBuildingZone(BuildingZone lockedInBuildingZone) {
 		this.lockedInBuildingZone = lockedInBuildingZone;		
+	}
+
+	public void setMovingInGrid(boolean movingInGrid) {
+		this.movingInGrid = movingInGrid;
+	}
+
+	public void setInAir(boolean inAir) {
+		this.inAir = inAir;
 	}
 
 }

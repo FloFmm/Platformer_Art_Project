@@ -68,9 +68,14 @@ public class BuildingZone {
 				tetrisTile.getXDrawOffset(), 
 				tetrisTile.getYDrawOffset());
 		if (matrixEquiv(oldMatrix, matrix)) {
-			tetrisTile.setLockedInBuildingZone(null);
 			return false;
 		}
+		
+		tetrisTile.setXSpeed(0);
+		tetrisTile.setAirSpeed(0);
+		tetrisTile.setMovingInGrid(false);
+		tetrisTile.setInAir(false);
+		tetrisTile.setLockedInBuildingZone(this);
 		
 		
 		if (!isCompletable(matrix)) {
@@ -93,10 +98,10 @@ public class BuildingZone {
 				
 				eventOnFinish();
 			}
-				
 			tetrisTiles.add(tetrisTile);
+			return true;
 		}
-		return true;
+		
 	}
 	
 	public boolean isCompletable(int[][] m) {
@@ -173,5 +178,12 @@ public class BuildingZone {
 	
 	public int[][] getMatrix() {
 		return matrix;
+	}
+
+
+	public void resetBuildingZone() {
+		tetrisTiles = new ArrayList<>();
+		finished = false;
+		initMatrixes();
 	}
 }

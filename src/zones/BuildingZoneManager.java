@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import entities.Player;
+import entities.Tumbleweed;
 import gamestates.Playing;
 import levels.Level;
 import main.Game;
@@ -103,6 +104,11 @@ public class BuildingZoneManager {
 	
 	public Playing getPlaying() {
 		return playing;
+	}
+
+	public void resetAllBuildingZones() {
+		for (BuildingZone c : currentLevel.getBuildingZones())
+			c.resetBuildingZone();
 	}
 
 }

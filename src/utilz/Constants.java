@@ -1,5 +1,4 @@
 package utilz;
-
 import main.Game;
 import static utilz.HelpMethods.*;
 
@@ -207,7 +206,7 @@ public class Constants {
 		public static final float MAX_TEMP = 100.0f;
 		public static final float TIME_TO_REACH_MAX_TEMP = 10.0f * 60;
 		public static final float TEMP_FROM_FINISHED_WINDMILL = -40.0f;
-		public static final float TEMP_FROM_EXPLOSION = 3.0f;
+		public static final float TEMP_FROM_EXPLOSION = 1.5f;
 		
 		
 		// wind
@@ -247,6 +246,9 @@ public class Constants {
 	}
 
 	public static class UI {
+		public static final Color BASE_GREY = new Color(131,131,131);
+		public static final Color BACKGROUND_GREY = new Color(60,60,60);
+		
 		public static class Buttons {
 			public static final int B_WIDTH_DEFAULT = 768;
 			public static final int B_HEIGHT_DEFAULT = 256;
@@ -382,7 +384,8 @@ public class Constants {
 		public static final int SINGLE_TILE = 13;
 		public static final int DOUBLE_TILE = 14;
 		
-		public static final Color THROW_ARC_COLOR = new Color(100,100,100);
+		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28);
+		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43);
 		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*3.0f;
 		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
 		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 3.0f;

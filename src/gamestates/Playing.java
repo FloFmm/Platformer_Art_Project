@@ -16,14 +16,10 @@ import entities.TetrisTileManager;
 import levels.LevelManager;
 import main.Game;
 import objects.ObjectManager;
-import ui.GameCompletedOverlay;
 import ui.GameOverOverlay;
-import ui.LevelCompletedOverlay;
 import ui.PauseOverlay;
 import utilz.LoadSave;
 import zones.BuildingZoneManager;
-import effects.DialogueEffect;
-import effects.Rain;
 
 import static utilz.Constants.Dialogue.*;
 import static utilz.Constants.PlayerConstants.*;
@@ -41,9 +37,6 @@ public class Playing extends State implements Statemethods {
 	private BuildingZoneManager buildingZoneManager;
 	private PauseOverlay pauseOverlay;
 	private GameOverOverlay gameOverOverlay;
-	private GameCompletedOverlay gameCompletedOverlay;
-	private LevelCompletedOverlay levelCompletedOverlay;
-	private Rain rain;
 	
 	// timed events
 	private Random random;
@@ -62,7 +55,6 @@ public class Playing extends State implements Statemethods {
 
 	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
 	private BufferedImage[] questionImgs, exclamationImgs;
-	private ArrayList<DialogueEffect> dialogEffects = new ArrayList<>();
 
 	private boolean gameOver=false, player1Won=false, player2Won=false;
 	private boolean lvlCompleted;
@@ -76,7 +68,6 @@ public class Playing extends State implements Statemethods {
 		super(game);
 		random = new Random();
 		initClasses();
-		loadDialogue();
 		calcLvlOffset();
 		loadStartLevel();
 		player1.resetLvlOffsets();
@@ -84,35 +75,6 @@ public class Playing extends State implements Statemethods {
 		currentWaterYPos = WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentDarknessAlpha = 0;
-	}
-
-	private void loadDialogue() {
-		loadDialogueImgs();
-
-		// Load dialogue array with premade objects, that gets activated when needed.
-		// This is a simple
-		// way of avoiding ConcurrentModificationException error. (Adding to a list that
-		// is being looped through.
-
-		for (int i = 0; i < 10; i++)
-			dialogEffects.add(new DialogueEffect(0, 0, EXCLAMATION));
-		for (int i = 0; i < 10; i++)
-			dialogEffects.add(new DialogueEffect(0, 0, QUESTION));
-
-		for (DialogueEffect de : dialogEffects)
-			de.deactive();
-	}
-
-	private void loadDialogueImgs() {
-		BufferedImage qtemp = LoadSave.GetSpriteAtlas(LoadSave.QUESTION_ATLAS);
-		questionImgs = new BufferedImage[5];
-		for (int i = 0; i < questionImgs.length; i++)
-			questionImgs[i] = qtemp.getSubimage(i * 14, 0, 14, 12);
-
-		BufferedImage etemp = LoadSave.GetSpriteAtlas(LoadSave.EXCLAMATION_ATLAS);
-		exclamationImgs = new BufferedImage[5];
-		for (int i = 0; i < exclamationImgs.length; i++)
-			exclamationImgs[i] = etemp.getSubimage(i * 14, 0, 14, 12);
 	}
 
 	public void loadLevel(int lvlIndex) {
@@ -198,10 +160,6 @@ public class Playing extends State implements Statemethods {
 
 		pauseOverlay = new PauseOverlay(this);
 		gameOverOverlay = new GameOverOverlay(this);
-		levelCompletedOverlay = new LevelCompletedOverlay(this);
-		gameCompletedOverlay = new GameCompletedOverlay(this);
-
-		rain = new Rain();
 	}
 
 	@Override
@@ -209,10 +167,6 @@ public class Playing extends State implements Statemethods {
 
 		if (paused)
 			pauseOverlay.update();
-		else if (lvlCompleted)
-			levelCompletedOverlay.update();
-		else if (gameCompleted)
-			gameCompletedOverlay.update();
 		else if (gameOver)
 			gameOverOverlay.update();
 //		else if (playerDying) {
@@ -221,7 +175,6 @@ public class Playing extends State implements Statemethods {
 //		}
 		else {
 			updateTimedEvents();
-			updateDialogue();
 			//if (drawRain)
 			//	rain.update(xLvlOffset);
 			levelManager.update();
@@ -256,15 +209,9 @@ public class Playing extends State implements Statemethods {
 		}
 		
 		// TODO
-		//if (temperature >= MAX_TEMP - 0.1) {
-		//	gameOver = true;
-		//}		
-	}
-
-	private void updateDialogue() {
-		for (DialogueEffect de : dialogEffects)
-			if (de.isActive())
-				de.update();
+		if (temperature >= MAX_TEMP - 0.1) {
+			gameOver = true;
+		}		
 	}
 	
 	private void checkCloseToBorder(Player player) {
@@ -411,10 +358,6 @@ public class Playing extends State implements Statemethods {
 			pauseOverlay.draw(g, isPlayer1);
 		} else if (gameOver)
 			gameOverOverlay.draw(g, isPlayer1);
-		else if (lvlCompleted)
-			levelCompletedOverlay.draw(g, xDrawOffset);
-		else if (gameCompleted)
-			gameCompletedOverlay.draw(g);
 		
 
 	}
@@ -440,7 +383,7 @@ public class Playing extends State implements Statemethods {
 		enemyManager.resetAllEnemies();
 		objectManager.resetAllObjects();
 		tetrisTileManager.resetAllTetrisTiles();
-		dialogEffects.clear();
+		buildingZoneManager.resetAllBuildingZones();
 		currentWaterYPos = WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentDarknessAlpha = 0;
@@ -453,10 +396,6 @@ public class Playing extends State implements Statemethods {
 
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
-	}
-
-	public void checkObjectHit(Rectangle2D.Float attackBox) {
-		objectManager.checkObjectHit(attackBox);
 	}
 
 	public void checkEnemyHit(Rectangle2D.Float attackBox) {
@@ -483,10 +422,6 @@ public class Playing extends State implements Statemethods {
 	
 	public void checkTetrisTileGrabbed(Rectangle2D.Float grabBox, Player player) {
 		tetrisTileManager.checkTetrisTileGrabbed(grabBox, player);
-	}
-
-	public void checkPotionTouched(Player player) {
-		objectManager.checkObjectTouched(player);
 	}
 
 	public void checkSpikesTouched(Entity p) {
