@@ -20,6 +20,7 @@ public class Tumbleweed extends Enemy {
 	private boolean moving = false;
 	private int[][] lvlData;
 	private float lastTimeRunning;
+	private boolean friendly = true;
 	
 	public Tumbleweed(float x, float y, int[][] lvlData) {
 		super(x, y, TUMBLE_WEED_WIDTH, TUMBLE_WEED_HEIGHT, TUMBLE_WEED);
@@ -70,10 +71,10 @@ public class Tumbleweed extends Enemy {
 		updateAnimationTick();
 		setAnimation(lvlData, playing);
 		
-		if (!playing.getPlayer1().getPowerAttackActive()) 
+		if (!friendly && !playing.getPlayer1().getPowerAttackActive()) 
 			checkPlayerHit(attackBox, playing.getPlayer1());
 		
-		if (!playing.getPlayer1().getPowerAttackActive()) 
+		if (!friendly && !playing.getPlayer1().getPowerAttackActive()) 
 			checkPlayerHit(attackBox, playing.getPlayer2());
 	}
 
@@ -158,5 +159,9 @@ public class Tumbleweed extends Enemy {
 	
 	public boolean getMoving() {
 		return moving;
+	}
+
+	public boolean getFriendly() {
+		return friendly;
 	}
 }

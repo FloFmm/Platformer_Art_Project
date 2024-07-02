@@ -1,6 +1,7 @@
 package entities;
 
 import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.ObjectConstants.*;
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.UPS_SET;
 import static utilz.Constants.EnemyConstants.TUMBLE_WEED;
@@ -9,6 +10,7 @@ import static utilz.Constants.PlayerConstants.IDLE;
 import static utilz.HelpMethods.*;
 import static utilz.Constants.*;
 
+import java.util.List;
 import java.util.Random;
 
 import org.lwjgl.opengl.EXTX11SyncObject;
@@ -32,7 +34,9 @@ public class TetrisTile extends Entity {
 	int[][] matrix;
 	boolean movingInGrid = false;
 	boolean moving = false;
-	private long explosionStartTime = -1;
+	private float explosionStartTime = -1;
+	private String explosionType = "small";
+	private BuildingZone currentBZ;
 	
 
 	public TetrisTile(float x, float y, int width, int height, int tileIndex, int[][] lvlData) {
@@ -46,7 +50,7 @@ public class TetrisTile extends Entity {
 	}
 
 	public void update(Playing playing) {
-		if (explosionStartTime != -1 && (System.nanoTime() - explosionStartTime)/1000_000_000.0f > TETRIS_TILE_TIME_TO_EXPLODE)
+		if (explosionStartTime != -1 && (tetrisTileManager.getPlaying().getGameTimeInSeconds() - explosionStartTime) > TETRIS_TILE_TIME_TO_EXPLODE)
 			explosion();
 		updatePos(playing.getWindSpeed());
 		updateHitBox();
@@ -258,26 +262,60 @@ public class TetrisTile extends Entity {
 			moving = false;
 	}
 
-	public void startExplosionTimer() {
-		explosionStartTime = System.nanoTime();
+	public void startExplosionTimer(String explosionType, BuildingZone currentBZ, float offset) {
+		if ((tetrisTileManager.getPlaying().getGameTimeInSeconds() - explosionStartTime) < TETRIS_TILE_TIME_TO_EXPLODE)
+			explosion();
+		explosionStartTime = tetrisTileManager.getPlaying().getGameTimeInSeconds()-offset;
+		this.explosionType  = explosionType;
+		this.currentBZ = currentBZ;
 	}
 	
 	public void explosion() {
+		float temp_increase=TEMP_FROM_WINDMILL_EXPLOSION;
+		int width=WINDMILL_EXPLOSION_WIDTH, height=WINDMILL_EXPLOSION_HEIGHT;
+		if (explosionType == "large") {
+			temp_increase = TEMP_FROM_ROCKET_EXPLOSION;
+			width = ROCKET_EXPLOSION_WIDTH;
+			height = ROCKET_EXPLOSION_HEIGHT;
+			
+			List<TetrisTile> buildInTiles = currentBZ.getTetrisTiles();
+			TetrisTile closestTile = null;
+			float closestDistance = 1000_000_000;
+			for (TetrisTile tt : buildInTiles) {
+				float xD = tt.getHitbox().x - hitbox.x, yD = tt.getHitbox().y - hitbox.y;
+				float d = (float) Math.sqrt(xD*xD + yD*yD);
+				if (d < closestDistance) {
+					closestDistance = d; 
+					closestTile = tt;
+				}
+			}
+			if (closestTile != null && closestDistance < MAX_DISTANCE_FOR_FOLOWUP_EXPLOSION) {
+				closestTile.startExplosionTimer("small", currentBZ, 0.5f*TETRIS_TILE_TIME_TO_EXPLODE);
+			}
+		}
+		tetrisTileManager.getPlaying().getObjectManager().addExplosion((int) (hitbox.x+hitbox.width/2), (int) (hitbox.y+hitbox.height/2), width, height);
 		explosionStartTime = -1;
 		isCarriedBy = null;
 		movingInGrid = false;
 		inAir = true;
+		if (lockedInBuildingZone != null && lockedInBuildingZone.getTetrisTiles().contains(this))
+			lockedInBuildingZone.removeTetrisTile(this);
 		lockedInBuildingZone = null;
 		Random random = new Random();
-		hitbox.y -= 100.0f;
+		hitbox.y -= 1.0f;
         xSpeed = random.nextFloat()*
-        		(TETRIS_TILE_MAX_EXPLOSION_X_SPEED - TETRIS_TILE_MIN_EXPLOSION_X_SPEED) + 
-        		TETRIS_TILE_MIN_EXPLOSION_X_SPEED;
+        		(2*TETRIS_TILE_MAX_EXPLOSION_X_SPEED) + 
+        		-TETRIS_TILE_MAX_EXPLOSION_X_SPEED;
 		airSpeed = -(random.nextFloat()*
         		(TETRIS_TILE_MAX_EXPLOSION_Y_SPEED - TETRIS_TILE_MIN_EXPLOSION_Y_SPEED) + 
         		TETRIS_TILE_MIN_EXPLOSION_Y_SPEED);
-		tetrisTileManager.getPlaying().setTempFromExplosion(tetrisTileManager.getPlaying().getTempFromExplosion() + TEMP_FROM_EXPLOSION);
-
+		if (explosionType == "small") {
+			xSpeed = xSpeed/2;
+			airSpeed = airSpeed/2;
+		}
+		if (Math.abs(xSpeed) < TETRIS_TILE_MIN_EXPLOSION_X_SPEED)
+			xSpeed = TETRIS_TILE_MIN_EXPLOSION_X_SPEED*Math.signum(xSpeed);
+		tetrisTileManager.getPlaying().setTempFromExplosion(tetrisTileManager.getPlaying().getTempFromExplosion() + temp_increase);
 	}
 	
 	private boolean isInBuildingZone() {

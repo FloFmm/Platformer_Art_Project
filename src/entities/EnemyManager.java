@@ -26,15 +26,10 @@ public class EnemyManager {
 	}
 
 	public void update(int[][] lvlData) {
-		boolean isAnyActive = false;
 		for (Tumbleweed c : currentLevel.getCrabs())
 			if (c.isActive()) {
 				c.update(lvlData, playing);
-				isAnyActive = true;
 			}
-
-		//if (!isAnyActive)
-		//	playing.setLevelCompleted(true);
 	}
 
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -49,8 +44,8 @@ public class EnemyManager {
 				g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()], (int) c.getHitbox().x - xLvlOffset - TUMBLE_WEED_DRAWOFFSET_X + c.flipX(),
 						(int) c.getHitbox().y - yLvlOffset - TUMBLE_WEED_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), TUMBLE_WEED_WIDTH * c.flipW(), TUMBLE_WEED_HEIGHT, null);
 
-				c.drawHitbox(g, xLvlOffset, yLvlOffset);
-				c.drawAttackBox(g, xLvlOffset, yLvlOffset);
+				//c.drawHitbox(g, xLvlOffset, yLvlOffset);
+				//c.drawAttackBox(g, xLvlOffset, yLvlOffset);
 			}
 
 	}

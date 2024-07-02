@@ -30,11 +30,10 @@ public class GameObject {
 			aniIndex++;
 			if (aniIndex >= GetSpriteAmount(objType)) {
 				aniIndex = 0;
-				if (objType == BARREL || objType == BOX) {
+				if (objType == EXPLOSION) {
 					doAnimation = false;
 					active = false;
-				} else if (objType == CANNON_LEFT || objType == CANNON_RIGHT)
-					doAnimation = false;
+				}
 			}
 		}
 	}
@@ -43,11 +42,7 @@ public class GameObject {
 		aniIndex = 0;
 		aniTick = 0;
 		active = true;
-
-		if (objType == BARREL || objType == BOX || objType == CANNON_LEFT || objType == CANNON_RIGHT)
-			doAnimation = false;
-		else
-			doAnimation = true;
+		doAnimation = true;
 	}
 
 	protected void initHitbox(int width, int height) {

@@ -54,11 +54,8 @@ public class Playing extends State implements Statemethods {
 	private int maxLvlOffsetX, maxLvlOffsetY;
 
 	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
-	private BufferedImage[] questionImgs, exclamationImgs;
 
 	private boolean gameOver=false, player1Won=false, player2Won=false;
-	private boolean lvlCompleted;
-	private boolean gameCompleted;
 
 	private float windSpeed = 2.0f;//5.0f;
 	public boolean useController = true;
@@ -69,7 +66,7 @@ public class Playing extends State implements Statemethods {
 		random = new Random();
 		initClasses();
 		calcLvlOffset();
-		loadStartLevel();
+		loadLevel(levelManager.getLevelIndex(), false);
 		player1.resetLvlOffsets();
 		player2.resetLvlOffsets();
 		currentWaterYPos = WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
@@ -77,10 +74,10 @@ public class Playing extends State implements Statemethods {
 		currentDarknessAlpha = 0;
 	}
 
-	public void loadLevel(int lvlIndex) {
-		resetAll();
+	public void loadLevel(int lvlIndex, boolean resetAll) {
 		levelManager.setLevelIndex(lvlIndex);
-		levelManager.loadNextLevel();
+		if (resetAll)
+			resetAll();
 		enemyManager.loadEnemies(levelManager.getCurrentLevel());
 		objectManager.loadObjects(levelManager.getCurrentLevel());
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
@@ -88,38 +85,6 @@ public class Playing extends State implements Statemethods {
 		loadLvlImgs();
 		calcLvlOffset();
 
-		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
-		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
-		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-		player1.resetAll();
-		player2.resetAll();
-	}
-	
-	public void loadNextLevel() {
-		levelManager.setLevelIndex(levelManager.getLevelIndex() + 1);
-		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-		resetAll();
-		loadLvlImgs();
-		calcLvlOffset();
-		
-		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
-		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
-		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-		player2.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
-		player1.resetAll();
-		player2.resetAll();
-	}
-
-	private void loadStartLevel() {
-		enemyManager.loadEnemies(levelManager.getCurrentLevel());
-		objectManager.loadObjects(levelManager.getCurrentLevel());
-		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
-		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
-		loadLvlImgs();
-		calcLvlOffset();
-		
 		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
@@ -343,12 +308,10 @@ public class Playing extends State implements Statemethods {
 		}
 		
 		// ui
-		int xDrawOffset = 0;
 		if (isPlayer1)
 			player1.drawUI(g);
 		else {
 			player2.drawUI(g);
-			xDrawOffset = -Game.GAME_WIDTH/2;
 		}
 
 		// overlay
@@ -363,18 +326,9 @@ public class Playing extends State implements Statemethods {
 	}
 
 
-	public void setGameCompleted() {
-		gameCompleted = true;
-	}
-
-	public void resetGameCompleted() {
-		gameCompleted = false;
-	}
-
 	public void resetAll() {
 		gameOver = false;
 		paused = false;
-		lvlCompleted = false;
 		gameTimeInSeconds = 0;
 		gameUpdates = 0;
 		
@@ -428,18 +382,6 @@ public class Playing extends State implements Statemethods {
 		objectManager.checkSpikesTouched(p);
 	}
 
-	public void setLevelCompleted(boolean levelCompleted) {
-		game.getAudioPlayer().lvlCompleted();
-		if (levelManager.getLevelIndex() + 1 >= levelManager.getAmountOfLevels()) {
-			// No more levels
-			gameCompleted = true;
-			levelManager.setLevelIndex(0);
-			levelManager.loadNextLevel();
-			resetAll();
-			return;
-		}
-		this.lvlCompleted = levelCompleted;
-	}
 
 	public void setMaxLvlOffsetX(int lvlOffset) {
 		this.maxLvlOffsetX = lvlOffset;

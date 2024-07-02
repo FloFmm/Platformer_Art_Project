@@ -35,7 +35,7 @@ public class Player extends Entity {
 	private boolean left, right, jump, grabOrThrow = false;
 	protected Rectangle2D.Float grabBox;
 	private TetrisTile isCarrying;
-	private float throwPushDownStartTime, startTimeInAir;
+	private float startTimeInAir;
 	private int[][] lvlData;
 	private float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
 	private float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
@@ -97,10 +97,14 @@ public class Player extends Entity {
 	private int powerGrowTick;
 	
 	// grab and throw
-	private float throwAngle = 0;
+	private float throwHeightInSmallTiles = TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES/2, throwWidthInSmallTiles = TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES/2;
 	private boolean throwActive=false;
 	
 	//controller
+	private int[] buttonStates = new int[NUM_BUTTONS];
+	private int[] prevButtonStates = new int[NUM_BUTTONS];
+	private float[] pushDownStartTimes = new float[NUM_BUTTONS];
+	private float[] buttonLastPressed = new float[NUM_BUTTONS];
 	private int controllerID; 
 	private int prevGrabOrThrowControllerState = GLFW.GLFW_RELEASE, grabOrThrowControllerState = GLFW.GLFW_RELEASE;
 	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
@@ -127,6 +131,11 @@ public class Player extends Entity {
 		initHitbox(HITBOX_BASE_WIDTH, HITBOX_BASE_HEIGHT);
 		initGrabBox(GRABBOX_BASE_WIDTH, GRABBOX_BASE_HEIGHT);
 		initAttackBox(ATTACKBOX_BASE_WIDTH, ATTACKBOX_BASE_HEIGHT);
+		
+		for (int i=0; i<NUM_BUTTONS; i+=1) {
+			buttonStates[i] = GLFW.GLFW_RELEASE;
+			prevButtonStates[i] = GLFW.GLFW_RELEASE;
+		}
 	}
 
 	public void setSpawn(Point spawn) {
@@ -222,6 +231,17 @@ public class Player extends Entity {
 		boolean controllerIsPresent = GLFW.glfwJoystickPresent(controllerID);
 		if (controllerIsPresent) {
 			ByteBuffer buttons = GLFW.glfwGetJoystickButtons(controllerID);
+			for (int i = 0; i<NUM_BUTTONS; i+=1) {
+				prevButtonStates[i] = buttonStates[i];
+				buttonStates[i] = buttons.get(i);
+				if (buttonStates[i] == GLFW.GLFW_PRESS && prevButtonStates[i] == GLFW.GLFW_RELEASE) {
+		        	pushDownStartTimes[i] = playing.getGameTimeInSeconds();
+		        }
+				if (buttonStates[i] == GLFW.GLFW_PRESS)
+					buttonLastPressed[i] = playing.getGameTimeInSeconds();
+			}
+			
+			
 			// jump
 	        int jumpControllerState = buttons.get(CONTROLLER_A_BUTTON_ID);
 	        if (jumpControllerState == GLFW.GLFW_PRESS) {
@@ -241,34 +261,23 @@ public class Player extends Entity {
 	        // grab or throw
 	        prevGrabOrThrowControllerState = grabOrThrowControllerState;
 	        grabOrThrowControllerState = buttons.get(CONTROLLER_X_BUTTON_ID);
-	        if (grabOrThrowControllerState == GLFW.GLFW_PRESS) {
-	        	
-	        	if (!grabOrThrow) {
-					grabOrThrow = true;
-					throwPushDownStartTime = playing.getGameTimeInSeconds();	
-				}
-	        }
 	        if (grabOrThrowControllerState == GLFW.GLFW_RELEASE && prevGrabOrThrowControllerState == GLFW.GLFW_PRESS) {
 				grabOrThrow = false;
 				grabOrThrow();
 	        }
 	        
 	        // throw direction
-	        prevControllerLeftButtonState = controllerLeftButtonState;
-	        controllerLeftButtonState = buttons.get(CONTROLLER_LEFT_BUTTON_ID);
-	        if (controllerLeftButtonState == GLFW.GLFW_RELEASE && prevControllerLeftButtonState == GLFW.GLFW_PRESS) {
-				if (throwAngle - THROW_ANGLE_STEP >= -MAX_THROW_ANGLE)
-					throwAngle -= THROW_ANGLE_STEP;
-				else
-					throwAngle = -MAX_THROW_ANGLE;
-	        }
-	        prevControllerRightButtonState = controllerRightButtonState;
-	        controllerRightButtonState = buttons.get(CONTROLLER_RIGHT_BUTTON_ID);
-	        if (controllerRightButtonState == GLFW.GLFW_RELEASE && prevControllerRightButtonState == GLFW.GLFW_PRESS) {
-				if (throwAngle + THROW_ANGLE_STEP <= MAX_THROW_ANGLE)
-					throwAngle += THROW_ANGLE_STEP;
-				else
-					throwAngle = MAX_THROW_ANGLE;
+	        int[] directions = {CONTROLLER_LEFT_BUTTON_ID, CONTROLLER_RIGHT_BUTTON_ID, CONTROLLER_UP_BUTTON_ID, CONTROLLER_DOWN_BUTTON_ID};
+	        for (int i : directions) {
+		        if (buttonStates[i] == GLFW.GLFW_RELEASE && prevButtonStates[i] == GLFW.GLFW_PRESS) {
+		        	changeThrowDirection(i);
+		        } 
+		        else if (buttonStates[i] == GLFW.GLFW_PRESS) {
+		        	if (playing.getGameTimeInSeconds() - pushDownStartTimes[i] > TIME_FOR_FIRST_THROW_ARC_CHANGE + TIME_BETWEEN_THROW_CHANGES) {
+		        		pushDownStartTimes[i] += TIME_BETWEEN_THROW_CHANGES;
+		        		changeThrowDirection(i);
+		        	}
+		        }
 	        }
 	        
 	        // rotate tetris tile
@@ -284,28 +293,7 @@ public class Player extends Entity {
 	        // joysticks
 	        FloatBuffer axes = GLFW.glfwGetJoystickAxes(controllerID);
 	        float left_js_x = axes.get(0);
-	        float right_js_x = axes.get(2);
-	        float right_js_y = axes.get(3);
-	        
-	        // right joystick for throw direction
-	        if (Math.sqrt(right_js_x*right_js_x + right_js_y*right_js_y) > JOYSTICK_DEAD_ZONE) {
-				if (right_js_y < 0) {
-					throwAngle = (float) Math.toDegrees(Math.atan(right_js_x/Math.abs(right_js_y)));
-					if (throwAngle > MAX_THROW_ANGLE)
-						throwAngle = MAX_THROW_ANGLE;
-					if (throwAngle < -MAX_THROW_ANGLE)
-						throwAngle = -MAX_THROW_ANGLE;
-				}
-				else {
-					if (right_js_x > 0)
-						throwAngle = MAX_THROW_ANGLE;
-					else
-						throwAngle = -MAX_THROW_ANGLE;
-				}
-			}
-	        
 	        // left joystick for running
-			
 			if (left_js_x > JOYSTICK_DEAD_ZONE) {
 				setRight(true);
 				setLeft(false);
@@ -325,6 +313,23 @@ public class Player extends Entity {
 	        if (pauseControllerState == GLFW.GLFW_RELEASE && prevPauseControllerState == GLFW.GLFW_PRESS) {
 	        	playing.setPaused(!playing.getPaused());
 	        }
+		}
+	}
+	
+	private void changeThrowDirection(int buttonId) {
+		switch(buttonId) {
+			case CONTROLLER_LEFT_BUTTON_ID:
+        		throwWidthInSmallTiles = Math.max(throwWidthInSmallTiles-1, -TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES);
+				break;
+			case CONTROLLER_RIGHT_BUTTON_ID:
+        		throwWidthInSmallTiles = Math.min(throwWidthInSmallTiles+1, TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES);
+				break;
+			case CONTROLLER_UP_BUTTON_ID:
+        		throwHeightInSmallTiles = Math.min(throwHeightInSmallTiles+1, TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES);
+				break;
+			case CONTROLLER_DOWN_BUTTON_ID:
+        		throwHeightInSmallTiles = Math.max(throwHeightInSmallTiles-1, 1);
+				break;
 		}
 	}
 
@@ -360,21 +365,8 @@ public class Player extends Entity {
 	}
 	
 	public float[] calcThrowSpeed() {
-		float now = playing.getGameTimeInSeconds();
-		float pushDownDuration = (now-throwPushDownStartTime);
-		int increasingOrDecreasing = (int)((now-throwPushDownStartTime)/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED % 2);
-		if (increasingOrDecreasing == 0) {
-			pushDownDuration = pushDownDuration % TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED;
-		}
-		else {
-			pushDownDuration = TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED - (pushDownDuration % TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED);
-		}
-		float throwSpeed = (float) Math.min(TETRIS_TILE_MAX_THROW_SPEED, 
-				TETRIS_TILE_MAX_THROW_SPEED*Math.sqrt(pushDownDuration/TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED));
-		
-		float tileXSpeed = (float) Math.sin(Math.toRadians(throwAngle)) * throwSpeed;
-		float tileAirSpeed = (float) Math.cos(Math.toRadians(throwAngle)) * throwSpeed;
-		
+		float tileAirSpeed = (float) Math.sqrt(2.0f * GRAVITY * throwHeightInSmallTiles*Game.TILES_SIZE/4.0f); 
+		float tileXSpeed = (float) ((throwWidthInSmallTiles*Game.TILES_SIZE/4.0f)/(2.0f*tileAirSpeed/GRAVITY));
 		return new float[] {tileXSpeed, tileAirSpeed};
 	}
 	
@@ -425,10 +417,15 @@ public class Player extends Entity {
 			aniStateOffset = NUM_ANIMATIONS;		
 		g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
 				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
-		drawHitbox(g, xLvlOffset, yLvlOffset);
-		drawGrabBox(g, xLvlOffset, yLvlOffset);
-		drawAttackBox(g, xLvlOffset, yLvlOffset);
-		if (grabOrThrow && (isCarrying != null))
+		//drawHitbox(g, xLvlOffset, yLvlOffset);
+		//drawGrabBox(g, xLvlOffset, yLvlOffset);
+		//drawAttackBox(g, xLvlOffset, yLvlOffset);
+		if ((playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_X_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
+			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_RIGHT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
+			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_LEFT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
+			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_UP_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
+			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_DOWN_BUTTON_ID] < THROW_ARC_SHOW_TIME)
+			&& (isCarrying != null) && throwHeightInSmallTiles > 0)
 			drawThrowArc(g, xLvlOffset, yLvlOffset, 21);
 	}
 	
@@ -846,12 +843,6 @@ public class Player extends Entity {
 	public TetrisTile getIsCarrying() {
 		return isCarrying;
 	}
-	
-	
-	public void setThrowPushDownStartTime(long throwPushDownStartTime) {
-		
-		this.throwPushDownStartTime = System.nanoTime();
-	}
 
 	public void resetAll() {
 		resetAtDeath();
@@ -859,14 +850,14 @@ public class Player extends Entity {
 	}
 	
 	public void resetLvlOffsets() {
-		if (!isPlayer1) {
-			xLvlOffset = playing.getMaxLvlOffsetX();//(int)(hitbox.x - Game.GAME_WIDTH/4);
-		}
-		else {
-			xLvlOffset = 0;//- Game.GAME_WIDTH/2 + 1;
-		}
-		//System.out.println(playing.getMaxLvlOffsetX());
-		yLvlOffset = (int)(hitbox.y - Game.GAME_HEIGHT/2); // playing.getMaxLvlOffsetY();
+//		if (!isPlayer1) {
+//			xLvlOffset = playing.getMaxLvlOffsetX();//(int)(hitbox.x - Game.GAME_WIDTH/4);
+//		}
+//		else {
+//			xLvlOffset = 0;//- Game.GAME_WIDTH/2 + 1;
+//		}
+		yLvlOffset = (int)(hitbox.y - Game.GAME_HEIGHT/2); 
+		xLvlOffset = (int)(hitbox.x - Game.GAME_WIDTH/4); 
 	}
 
 	public void resetAtDeath() {
@@ -888,7 +879,9 @@ public class Player extends Entity {
 
 		hitbox.x = x;
 		hitbox.y = y;
-
+		throwHeightInSmallTiles = TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES/2;
+		throwWidthInSmallTiles = TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES/2;
+		throwActive=false;
 		if (!IsEntityOnFloor(hitbox, lvlData))
 			inAir = true;
 	}

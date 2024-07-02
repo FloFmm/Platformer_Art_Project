@@ -40,7 +40,7 @@ public class Constants {
 
 	public static class ObjectConstants {
 
-		public static final int RED_POTION = 0;
+		public static final int EXPLOSION = 0;
 		public static final int BLUE_POTION = 1;
 		public static final int BARREL = 2;
 		public static final int BOX = 3;
@@ -51,19 +51,12 @@ public class Constants {
 		public static final int TREE_TWO = 8;
 		public static final int TREE_THREE = 9;
 
-		public static final int RED_POTION_VALUE = 15;
-		public static final int BLUE_POTION_VALUE = 10;
-
-		public static final int CONTAINER_WIDTH_DEFAULT = 40;
-		public static final int CONTAINER_HEIGHT_DEFAULT = 30;
-		public static final int CONTAINER_WIDTH = (int) (Game.SCALE * CONTAINER_WIDTH_DEFAULT);
-		public static final int CONTAINER_HEIGHT = (int) (Game.SCALE * CONTAINER_HEIGHT_DEFAULT);
-
-		public static final int POTION_WIDTH_DEFAULT = 12;
-		public static final int POTION_HEIGHT_DEFAULT = 16;
-		public static final int POTION_WIDTH = (int) (Game.SCALE * POTION_WIDTH_DEFAULT);
-		public static final int POTION_HEIGHT = (int) (Game.SCALE * POTION_HEIGHT_DEFAULT);
-
+		public static final int ROCKET_EXPLOSION_WIDTH = (int) (200*Game.SCALE);
+		public static final int ROCKET_EXPLOSION_HEIGHT = (int) (200*Game.SCALE);
+		public static final int WINDMILL_EXPLOSION_WIDTH = (int) (100*Game.SCALE);
+		public static final int WINDMILL_EXPLOSION_HEIGHT = (int) (100*Game.SCALE);
+		public static final float MAX_DISTANCE_FOR_FOLOWUP_EXPLOSION = 4.0f*Game.TILES_SIZE/4.0f;
+		
 		public static final int SPIKE_WIDTH_DEFAULT = 32;
 		public static final int SPIKE_HEIGHT_DEFAULT = 32;
 		public static final int SPIKE_WIDTH = (int) (Game.SCALE * SPIKE_WIDTH_DEFAULT);
@@ -76,12 +69,8 @@ public class Constants {
 
 		public static int GetSpriteAmount(int object_type) {
 			switch (object_type) {
-			case RED_POTION, BLUE_POTION:
-				return 7;
-			case BARREL, BOX:
-				return 8;
-			case CANNON_LEFT, CANNON_RIGHT:
-				return 7;
+			case EXPLOSION:
+				return 12;
 			}
 			return 1;
 		}
@@ -145,8 +134,8 @@ public class Constants {
 		public static final int DEAD = 3;
 		public static final int NUM_ENEMY_STATES = 4;
 
-		public static final int TUMBLE_WEED_WIDTH_DEFAULT = 30;
-		public static final int TUMBLE_WEED_HEIGHT_DEFAULT = 30;
+		public static final int TUMBLE_WEED_WIDTH_DEFAULT = 72;
+		public static final int TUMBLE_WEED_HEIGHT_DEFAULT = 72;
 		public static final int TUMBLE_WEED_WIDTH = (int) (TUMBLE_WEED_WIDTH_DEFAULT * Game.SCALE);
 		public static final int TUMBLE_WEED_HEIGHT = (int) (TUMBLE_WEED_HEIGHT_DEFAULT * Game.SCALE);
 		public static final int TUMBLE_WEED_HITBOX_WIDTH_DEFAULT = 24;
@@ -206,7 +195,8 @@ public class Constants {
 		public static final float MAX_TEMP = 100.0f;
 		public static final float TIME_TO_REACH_MAX_TEMP = 10.0f * 60;
 		public static final float TEMP_FROM_FINISHED_WINDMILL = -40.0f;
-		public static final float TEMP_FROM_EXPLOSION = 1.5f;
+		public static final float TEMP_FROM_ROCKET_EXPLOSION = 1.5f;
+		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 0.5f;
 		
 		
 		// wind
@@ -386,13 +376,17 @@ public class Constants {
 		
 		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28);
 		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43);
-		public static final float TETRIS_TILE_MAX_THROW_HEIGHT = 32*Game.SCALE*3.0f;
-		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT*2*GRAVITY);
-		public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 3.0f;
-		public static final float THROW_ANGLE_STEP = 5.0f;
-		public static final float MAX_THROW_ANGLE = 60.0f;
+		public static final float THROW_ARC_SHOW_TIME = 2.5f;
+		public static final float TIME_BETWEEN_THROW_CHANGES = 0.06f;
+		public static final float TIME_FOR_FIRST_THROW_ARC_CHANGE = 0.15f;
+		public static final int TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES = 6*4;
+		public static final int TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES = 6*4;
+		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES*Game.TILES_SIZE*2*GRAVITY);
+		//public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 3.0f;
+		//public static final float THROW_ANGLE_STEP = 5.0f;
+		//public static final float MAX_THROW_ANGLE = 60.0f;
 				
-		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = -TETRIS_TILE_MAX_THROW_SPEED*0.5f;
+		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.1f;
 		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.5f;
 		public static final float TETRIS_TILE_MIN_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.75f;
 		public static final float TETRIS_TILE_MAX_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED*1.5f;
@@ -723,7 +717,7 @@ public class Constants {
 		public static final int CONTROLLER_RIGHT_BUTTON_ID = 15;
 		public static final int CONTROLLER_DOWN_BUTTON_ID = 16;
 		public static final int CONTROLLER_LEFT_BUTTON_ID = 17;
-		
+		public static final int NUM_BUTTONS = 18;
 		
 	}
 

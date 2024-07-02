@@ -87,7 +87,10 @@ public class BuildingZone {
 					tetrisTile.getXDrawOffset(), 
 					tetrisTile.getYDrawOffset());
 			
-			lastAddedTile.startExplosionTimer();
+			String explosionType = "small";
+			if (zoneType.contains("rocket"))
+				explosionType = "large";
+			lastAddedTile.startExplosionTimer(explosionType, this, 0);
 			return false;
 		}
 		else {
@@ -101,7 +104,17 @@ public class BuildingZone {
 			tetrisTiles.add(tetrisTile);
 			return true;
 		}
-		
+	}
+	
+	public void removeTetrisTile(TetrisTile tetrisTile) {
+		if (tetrisTiles.contains(tetrisTile)) {
+			matrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
+					tetrisTile.getHitbox().y, 
+					matrixScalarMul(tetrisTile.getMatrix(),-1), 
+					tetrisTile.getXDrawOffset(), 
+					tetrisTile.getYDrawOffset());
+			tetrisTiles.remove(tetrisTile);
+		}
 	}
 	
 	public boolean isCompletable(int[][] m) {
@@ -185,5 +198,9 @@ public class BuildingZone {
 		tetrisTiles = new ArrayList<>();
 		finished = false;
 		initMatrixes();
+	}
+	
+	public List<TetrisTile> getTetrisTiles() {
+		return tetrisTiles;
 	}
 }

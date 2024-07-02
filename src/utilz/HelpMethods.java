@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import main.Game;
-import objects.Projectile;
 
 public class HelpMethods {
 
@@ -99,10 +98,6 @@ public class HelpMethods {
 		if ((y <= triangleBaseY && y+height >= triangleBaseY) || (x <= triangleBaseX && x+width >= triangleBaseX))
 			return true;
 		return false;
-	}
-
-	public static boolean IsProjectileHittingLevel(Projectile p, int[][] lvlData) {
-		return IsSolid(p.getHitbox().x + p.getHitbox().width / 2, p.getHitbox().y + p.getHitbox().height / 2, lvlData);
 	}
 	
 	public static int[][] TriangleCoordinatesBaseLongShort(int xTile, int yTile, int[][] lvlData) {

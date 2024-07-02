@@ -54,7 +54,7 @@ public class Menu extends State implements Statemethods {
 				mb.applyGamestate();
 				if (mb.getState() == Gamestate.PLAYING) {
 					int rowId = mb.getRowIndex();
-					game.getPlaying().loadLevel(rowId);
+					game.getPlaying().loadLevel(rowId, true);
 					game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
 				}
 				resetButtons();
