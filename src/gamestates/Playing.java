@@ -4,11 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Random;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import entities.EnemyManager;
 import entities.Entity;
 import entities.Player;
@@ -21,7 +17,6 @@ import ui.PauseOverlay;
 import utilz.LoadSave;
 import zones.BuildingZoneManager;
 
-import static utilz.Constants.Dialogue.*;
 import static utilz.Constants.PlayerConstants.*;
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.UPS_SET;
@@ -39,6 +34,8 @@ public class Playing extends State implements Statemethods {
 	private GameOverOverlay gameOverOverlay;
 	
 	// timed events
+	private boolean loading=true;
+	private int imgID = 0;
 	private Random random;
 	private int gameUpdates = 0;
 	private float gameTimeInSeconds = 0;
@@ -53,7 +50,7 @@ public class Playing extends State implements Statemethods {
 	private int lowerBorder = (int) (CLOSE_TO_BORDER_VERTICAL * Game.GAME_HEIGHT/2);
 	private int maxLvlOffsetX, maxLvlOffsetY;
 
-	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
+	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg, loadingImg;
 
 	private boolean gameOver=false, player1Won=false, player2Won=false;
 
@@ -72,6 +69,7 @@ public class Playing extends State implements Statemethods {
 		currentWaterYPos = WATER_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentDarknessAlpha = 0;
+		loadImgs();
 	}
 
 	public void loadLevel(int lvlIndex, boolean resetAll) {
@@ -125,29 +123,29 @@ public class Playing extends State implements Statemethods {
 
 		pauseOverlay = new PauseOverlay(this);
 		gameOverOverlay = new GameOverOverlay(this);
+		
+	}
+	
+	private void loadImgs() {
+		loadingImg = LoadSave.GetSpriteAtlas(LoadSave.LOADING);
 	}
 
 	@Override
 	public void update() {
-
 		if (paused)
 			pauseOverlay.update();
 		else if (gameOver)
 			gameOverOverlay.update();
-//		else if (playerDying) {
-//			player1.update();
-//			player2.update();
-//		}
 		else {
+			player1.update();
+			player2.update();
+			if (loading)
+				return;
 			updateTimedEvents();
-			//if (drawRain)
-			//	rain.update(xLvlOffset);
 			levelManager.update();
 			objectManager.update(levelManager.getCurrentLevel().getLevelData(), player1, player2);
 			tetrisTileManager.update();
 			buildingZoneManager.update();
-			player1.update();
-			player2.update();
 			enemyManager.update(levelManager.getCurrentLevel().getLevelData());
 			checkCloseToBorder(player1);
 			checkCloseToBorder(player2);
@@ -208,22 +206,30 @@ public class Playing extends State implements Statemethods {
 
 	@Override
 	public void draw(Graphics g, boolean isPlayer1) {
+		
 		int curLvlWidth = levelManager.getCurrentLevel().getLvlWidth();
 		int curLvlHeight = levelManager.getCurrentLevel().getLvlHeight();
-		int xLvlOffset, yLvlOffset;
+		int xLvlOffset = player2.getXLvlOffset();
+		int yLvlOffset = player2.getYLvlOffset();
+		int xDrawOffset = -Game.GAME_WIDTH/2;
 		if (isPlayer1) {
 			xLvlOffset = player1.getXLvlOffset();
 			yLvlOffset = player1.getYLvlOffset();
+			xDrawOffset = 0;
 		}
-		else {
-			xLvlOffset = player2.getXLvlOffset();
-			yLvlOffset = player2.getYLvlOffset();
+		
+		imgID +=1;
+		// loading
+		if (loading) {
+			g.drawImage(loadingImg, xDrawOffset, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
+			if (imgID == 1 || imgID==2) {
+				return;
+			}
 		}
 		
 		// sky
 		if (levelManager.getCurrentLevel().getDrawSky())
 			g.drawImage(skyImg, - (int) (xLvlOffset * SKY_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
-				
 		// background 1
 		if (levelManager.getCurrentLevel().getDrawBackground())
 			g.drawImage(backgroundImg1, - (int) (xLvlOffset * BG1_SPEED), -yLvlOffset, curLvlWidth, curLvlHeight, null);
@@ -273,10 +279,6 @@ public class Playing extends State implements Statemethods {
 		if (levelManager.getCurrentLevel().getDrawPolygons())
 			levelManager.draw(g, xLvlOffset, yLvlOffset);
 		
-		
-		//if (drawRain)
-		//	rain.draw(g, xLvlOffset, yLvlOffset);
-		
 		// objects
 		objectManager.draw(g, xLvlOffset, yLvlOffset);
 		
@@ -322,7 +324,10 @@ public class Playing extends State implements Statemethods {
 		} else if (gameOver)
 			gameOverOverlay.draw(g, isPlayer1);
 		
-
+		//loading
+		if (loading) {
+			g.drawImage(loadingImg, xDrawOffset, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
+		}
 	}
 
 
@@ -345,6 +350,8 @@ public class Playing extends State implements Statemethods {
 		tempFromTime = 0; 
 		tempFromExplosion = 0; 
 		tempFromWindmills = 0;
+		loading = true;
+		imgID = 0;
 		
 	}
 
@@ -506,6 +513,14 @@ public class Playing extends State implements Statemethods {
 
 	public float getCurrentWaterYPos() {
 		return currentWaterYPos;
+	}
+
+	public boolean getLoading() {
+		return loading;
+	}
+
+	public void setLoading(boolean loading) {
+		this.loading = loading;
 	}
 
 }

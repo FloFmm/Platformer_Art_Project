@@ -10,6 +10,7 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class LoadSave {
+	public static final String LOADING = "displays/loading.png";
 	public static final String LEVEL_ATLAS = "outside_sprites.png";
 	public static final String MENU_BUTTONS = "displays/button_atlas.png";
 	public static final String MENU_BACKGROUND = "displays/controller_labeled.png";
@@ -23,7 +24,7 @@ public class LoadSave {
 	public static final String TUMBLE_WEED_SPRITE = "animation/tumbleweed/tumble_weed_sprite.png";
 	
 	public static final String STATUS_BAR = "displays/health_power_bar.png";
-	public static final String TEMP_SCALE = "displays/thermometer.png";
+	public static final String TEMP_SCALE = "displays/middle_seperator.png";
 	public static final String WINDSOCK1 = "displays/flag1.png";
 	public static final String WINDSOCK2 = "displays/flag2.png";
 	public static final String WINDSOCK3 = "displays/flag3.png";

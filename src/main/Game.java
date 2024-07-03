@@ -99,7 +99,7 @@ public class Game implements Runnable {
 	public void render(Graphics g, boolean isPlayer1) {
 		switch (Gamestate.state) {
 		case MENU -> menu.draw(g, isPlayer1);
-		case PLAYING -> playing.draw(g, isPlayer1);
+		case PLAYING -> {playing.draw(g, isPlayer1);}
 		case CREDITS -> credits.draw(g, isPlayer1);
 		}
 	}

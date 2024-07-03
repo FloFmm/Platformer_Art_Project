@@ -374,8 +374,8 @@ public class Constants {
 		public static final int SINGLE_TILE = 13;
 		public static final int DOUBLE_TILE = 14;
 		
-		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28);
-		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43);
+		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28,100);
+		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43,100);
 		public static final float THROW_ARC_SHOW_TIME = 2.5f;
 		public static final float TIME_BETWEEN_THROW_CHANGES = 0.06f;
 		public static final float TIME_FOR_FIRST_THROW_ARC_CHANGE = 0.15f;

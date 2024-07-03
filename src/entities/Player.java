@@ -10,8 +10,11 @@ import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.ControllerConstants.*;
 import static utilz.Constants.UI.*;
 import static utilz.Constants.Environment.*;
+
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -47,22 +50,19 @@ public class Player extends Entity {
 
 	// StatusBarUI
 	private BufferedImage statusBarImg, windsockImg1, windsockImg2, windsockImg3, tempScaleImg;
-	private int middleSeperatorWidth = (int) (16*Game.SCALE);
 	
 	private Color tempScaleBackgroundColor = BACKGROUND_GREY;
-	private int tempScaleWidth = (int) (middleSeperatorWidth*1f);
-	private int tempScaleHeight = (int) (tempScaleWidth*4.5f);
-	private int tempScaleY = (int) (Game.GAME_HEIGHT/3);
-	private int tempBarWidth = (int) (tempScaleWidth*0.5f);
-	private int tempBarMaxHeight = (int) (tempScaleHeight*0.9f);
-	private int tempBarY = (int) (tempScaleY+0.1f*tempScaleHeight);
+	private int tempScaleWidth = (int) (25*Game.SCALE);
+	private int tempBarWidth = (int) (12*Game.SCALE);
+	private int tempBarMaxHeight = (int) (170*Game.SCALE);
+	private int tempBarY = (int) (76*Game.SCALE);
+	
 	
 	private int windsockWidth = (int) (Game.GAME_WIDTH/20);
 	private int windsockHeight = (int) (Game.GAME_WIDTH/20);
 	private int windsockY = (int) (Game.GAME_HEIGHT/20);
 	
 	private int statusBarWidth = (int) (128 * Game.SCALE);
-	private Color middleSeperatorColor = BASE_GREY;
 	private int statusBarHeight = (int) (64 * Game.SCALE);
 	private int statusBarX = (int) (10 * Game.SCALE);
 	private int statusBarY = (int) (0 * Game.SCALE);
@@ -110,8 +110,6 @@ public class Player extends Entity {
 	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
 	private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
 	private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
-	private int prevControllerLeftButtonState = GLFW.GLFW_RELEASE, controllerLeftButtonState = GLFW.GLFW_RELEASE;
-	private int prevControllerRightButtonState = GLFW.GLFW_RELEASE, controllerRightButtonState = GLFW.GLFW_RELEASE;
 	
 	private final boolean isPlayer1;
 
@@ -158,6 +156,8 @@ public class Player extends Entity {
 		boolean startInAir = inAir;
 		
 		updateControllerInputs();
+		if(playing.getLoading())
+			return;
 		updateHealthBar();
 		updatePowerBar();
 
@@ -240,15 +240,20 @@ public class Player extends Entity {
 				if (buttonStates[i] == GLFW.GLFW_PRESS)
 					buttonLastPressed[i] = playing.getGameTimeInSeconds();
 			}
-			
+			// continue on loading screen
+			if (playing.getLoading() ) {
+				if (prevButtonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_PRESS && buttonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_RELEASE)
+					playing.setLoading(false);
+				return;
+			}
 			
 			// jump
-	        int jumpControllerState = buttons.get(CONTROLLER_A_BUTTON_ID);
-	        if (jumpControllerState == GLFW.GLFW_PRESS) {
+	        if (buttonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_PRESS) {
 	        	jump = true;
 	        }
-	        if (jumpControllerState == GLFW.GLFW_RELEASE) {
+	        if (buttonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_RELEASE) {
 	        	jump = false;
+	        	
 	        }
 	        
 	        // dash
@@ -435,6 +440,7 @@ public class Player extends Entity {
 	}
 
 	protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset, int numArcPoints) {
+		Graphics2D g2 = (Graphics2D) g;
 		float[] throwSpeed = calcThrowSpeed();
 		float tileXSpeed = throwSpeed[0];
 		float tileAirSpeed = throwSpeed[1];
@@ -442,11 +448,12 @@ public class Player extends Entity {
 			g.setColor(THROW_ARC_COLOR_PLAYER1);
 		else
 			g.setColor(THROW_ARC_COLOR_PLAYER2);
-		int circle_x , circle_y;
-		int radius, maxRadius = 11, minRadius = 7;
+		int circle_x , circle_y, lastX=0, lastY=0;
+		int radius, maxRadius = 13, minRadius = 6;
 		float maxThrowTime = tileAirSpeed / GRAVITY * 2;
 		float xDistanceTraveled, xDistanceDueStartSpeed, xDistanceDueWind, time;
-		for (int i=0; i < numArcPoints; i++) {
+		boolean lastPointExists=false;
+		for (int i=0; i < numArcPoints+1; i++) {
 			time = i/(numArcPoints-1.0f)*maxThrowTime;
 			xDistanceDueStartSpeed = time * tileXSpeed;
 			if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET)
@@ -456,13 +463,19 @@ public class Player extends Entity {
 						playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET);
 			xDistanceTraveled = xDistanceDueStartSpeed + xDistanceDueWind;
 			
-			radius = (int)(minRadius + (numArcPoints/2.0f - Math.abs(numArcPoints/2.0f - i))/(numArcPoints/2.0f) * (maxRadius-minRadius));
+			radius = (int)(minRadius + i/((float) numArcPoints) * (maxRadius-minRadius));
 			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - radius/2 + xDistanceTraveled); 
 			
 			if (isCarrying != null) {
-				circle_y = (int) (hitbox.y - yLvlOffset - isCarrying.hitbox.height/2 - radius/2 - 
+				circle_y = (int) (hitbox.y - yLvlOffset - radius/2 - //isCarrying.hitbox.height/2 -
 						calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
-				g.fillOval(circle_x,circle_y,radius,radius);
+				if (lastPointExists) {
+	                g2.setStroke(new BasicStroke((int) radius));
+					g2.drawLine(lastX, lastY, circle_x, circle_y);
+				}
+				lastX = circle_x;
+				lastY = circle_y;
+				lastPointExists = true;
 			}
 		}
 		
@@ -476,24 +489,21 @@ public class Player extends Entity {
 			xDrawOffset = -Game.GAME_WIDTH/2;
 			xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH/2 - statusBarWidth);
 		}
-		// middle separator
-		g.setColor(middleSeperatorColor);
-		g.fillRect(Game.GAME_WIDTH/2-middleSeperatorWidth/2 + xDrawOffset, 0, middleSeperatorWidth, Game.GAME_HEIGHT);
 		
 		// temperature
 		g.setColor(tempScaleBackgroundColor);
-		g.fillRect(Game.GAME_WIDTH/2-tempScaleWidth/2 + xDrawOffset, 
-				tempScaleY, 
-				tempScaleWidth, 
+		g.fillRect(Game.GAME_WIDTH/2-tempBarWidth/2 + xDrawOffset, 
+				tempBarY, 
+				tempBarWidth, 
 				tempBarMaxHeight);
 		Color tempColor = new Color((int) (playing.getTemperature()*255/MAX_TEMP),0,(int) (255-playing.getTemperature()*255/MAX_TEMP));
 		g.setColor(tempColor);
 		int tempBarHeight = (int) (tempBarMaxHeight * playing.getTemperature() / MAX_TEMP);
 		g.fillRect(Game.GAME_WIDTH/2-tempBarWidth/2 + xDrawOffset, 
-				tempBarY - tempBarHeight, 
+				tempBarY + tempBarMaxHeight - tempBarHeight, 
 				tempBarWidth, 
-				tempBarHeight);
-		g.drawImage(tempScaleImg, Game.GAME_WIDTH/2-tempScaleWidth/2, tempScaleY, tempScaleWidth, tempScaleHeight, null);
+				(int) (tempBarHeight+20*Game.SCALE));
+		g.drawImage(tempScaleImg, Game.GAME_WIDTH/2-tempScaleWidth/2 + xDrawOffset, 0, tempScaleWidth, Game.GAME_HEIGHT, null);
 		
 		// Health bar
 		g.setColor(healthBarBackgroundColor);
@@ -508,9 +518,6 @@ public class Player extends Entity {
 		g.fillRect(powerBarXStart + xStatusBarOffset, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
 		g.drawImage(statusBarImg, xStatusBarOffset, statusBarY, statusBarWidth, statusBarHeight, null);
 
-			
-
-		
 		// windsock
 		BufferedImage wsImg;
 		int flip = 1;
