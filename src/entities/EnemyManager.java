@@ -41,8 +41,8 @@ public class EnemyManager {
 	private void drawTumbleWeeds(Graphics g, int xLvlOffset, int yLvlOffset) {
 		for (Tumbleweed c : currentLevel.getCrabs())
 			if (c.isActive()) {
-				g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()], (int) c.getHitbox().x - xLvlOffset - TUMBLE_WEED_DRAWOFFSET_X + c.flipX(),
-						(int) c.getHitbox().y - yLvlOffset - TUMBLE_WEED_DRAWOFFSET_Y + (int) c.getPushDrawOffset(), TUMBLE_WEED_WIDTH * c.flipW(), TUMBLE_WEED_HEIGHT, null);
+				g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()], (int) (c.getHitbox().x - xLvlOffset - TUMBLE_WEED_DRAWOFFSET_X*c.getSizeFactor() + c.flipX()),
+						(int) (c.getHitbox().y - yLvlOffset - TUMBLE_WEED_DRAWOFFSET_Y*c.getSizeFactor() + (int) c.getPushDrawOffset()), (int) (TUMBLE_WEED_WIDTH*c.getSizeFactor() * c.flipW()), (int) (TUMBLE_WEED_HEIGHT*c.getSizeFactor()), null);
 
 				//c.drawHitbox(g, xLvlOffset, yLvlOffset);
 				//c.drawAttackBox(g, xLvlOffset, yLvlOffset);

@@ -54,7 +54,7 @@ public class Playing extends State implements Statemethods {
 
 	private boolean gameOver=false, player1Won=false, player2Won=false;
 
-	private float windSpeed = 2.0f;//5.0f;
+	private float windSpeed = 0.0f;
 	public boolean useController = true;
 	
 	

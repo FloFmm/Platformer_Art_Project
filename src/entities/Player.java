@@ -52,15 +52,14 @@ public class Player extends Entity {
 	private BufferedImage statusBarImg, windsockImg1, windsockImg2, windsockImg3, tempScaleImg;
 	
 	private Color tempScaleBackgroundColor = BACKGROUND_GREY;
-	private int tempScaleWidth = (int) (25*Game.SCALE);
-	private int tempBarWidth = (int) (12*Game.SCALE);
-	private int tempBarMaxHeight = (int) (170*Game.SCALE);
-	private int tempBarY = (int) (76*Game.SCALE);
-	
+	private int tempScaleWidth = (int) (20*Game.SCALE);
+	private int tempBarWidth = (int) (10*Game.SCALE);
+	private int tempBarMaxHeight = (int) (108*Game.SCALE);
+	private int tempBarY = (int) (25*Game.SCALE);
 	
 	private int windsockWidth = (int) (Game.GAME_WIDTH/20);
 	private int windsockHeight = (int) (Game.GAME_WIDTH/20);
-	private int windsockY = (int) (Game.GAME_HEIGHT/20);
+	private int windsockY = (int) (Game.GAME_HEIGHT/2);
 	
 	private int statusBarWidth = (int) (128 * Game.SCALE);
 	private int statusBarHeight = (int) (64 * Game.SCALE);

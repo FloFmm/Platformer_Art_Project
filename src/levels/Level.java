@@ -58,7 +58,7 @@ public class Level {
 			this.drawSky = true;
 			this.drawBackground = false;
 			this.drawClouds = false;
-			this.drawWater = true;
+			this.drawWater = false;
 			this.drawDarkness=false;
 		}
 		else {
@@ -204,8 +204,9 @@ public class Level {
 
 	private void loadEntities(int greenValue, int x, int y) {
 		Random random = new Random();
+        float tumbleWeedSizeFactor = 1.0f;//random.nextFloat(); TODO
 		switch (greenValue) {
-		case TUMBLE_WEED -> crabs.add(new Tumbleweed(x * Game.TILES_SIZE, y * Game.TILES_SIZE, lvlData));
+		case TUMBLE_WEED -> crabs.add(new Tumbleweed(x * Game.TILES_SIZE, y * Game.TILES_SIZE, tumbleWeedSizeFactor, lvlData));
 		case TETRIS_TILE_GREEN_VALUE -> tetrisTiles.add(new TetrisTile(x * Game.TILES_SIZE, y * Game.TILES_SIZE, 
 				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES), lvlData));
 		case PLAYER_GREEN_VALUE -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);

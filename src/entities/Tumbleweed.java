@@ -7,6 +7,8 @@ import static utilz.HelpMethods.CanMoveHere;
 import static utilz.HelpMethods.GetEntityXPosNextToWall;
 import static utilz.HelpMethods.IsEntityOnFloor;
 
+import java.util.Random;
+
 import audio.AudioPlayer;
 
 import static utilz.Constants.GRAVITY;
@@ -21,12 +23,13 @@ public class Tumbleweed extends Enemy {
 	private int[][] lvlData;
 	private float lastTimeRunning;
 	private boolean friendly = true;
+	private float sizeFactor = 1.0f;
 	
-	public Tumbleweed(float x, float y, int[][] lvlData) {
-		super(x, y, TUMBLE_WEED_WIDTH, TUMBLE_WEED_HEIGHT, TUMBLE_WEED);
+	public Tumbleweed(float x, float y, float sizeFactor, int[][] lvlData) {
+		super(x, y, (int) (sizeFactor*TUMBLE_WEED_WIDTH), (int) (sizeFactor*TUMBLE_WEED_HEIGHT), TUMBLE_WEED);
 		this.lvlData = lvlData;
-		initHitbox(TUMBLE_WEED_HITBOX_WIDTH_DEFAULT, TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT);
-		initAttackBox(TUMBLE_WEED_HITBOX_WIDTH_DEFAULT, TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT, 0);
+		initHitbox((int) (sizeFactor*TUMBLE_WEED_HITBOX_WIDTH_DEFAULT), (int) (sizeFactor*TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT));
+		initAttackBox((int) (sizeFactor*TUMBLE_WEED_HITBOX_WIDTH_DEFAULT), (int) (sizeFactor*TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT), 0);
 		
 	}
 
@@ -79,7 +82,7 @@ public class Tumbleweed extends Enemy {
 	}
 
 	private void setAnimation(int[][] lvlData, Playing playing) {
-		aniSpeed = (int) (TUMBLE_WEED_MIN_ANI_SPEED - Math.abs(xSpeed) / TUMBLE_WEED_MAX_SPEED * (TUMBLE_WEED_MIN_ANI_SPEED - TUMBLE_WEED_MAX_ANI_SPEED));
+		aniSpeed = (int) (TUMBLE_WEED_MIN_ANI_SPEED - Math.abs(xSpeed) / TUMBLE_WEED_MAX_SPEED * (TUMBLE_WEED_MIN_ANI_SPEED - TUMBLE_WEED_MAX_ANI_SPEED) / sizeFactor);
 		int startAni = state;
 
 		if (state == HIT)
@@ -99,7 +102,7 @@ public class Tumbleweed extends Enemy {
 		float oldXPos = hitbox.x;
 		float oldYPos = hitbox.y;
 		if ((Math.signum(xSpeed) == Math.signum(windSpeed) && Math.abs(xSpeed) < Math.abs(TUMBLE_WEED_MAX_SPEED)) || Math.signum(xSpeed) != Math.signum(windSpeed))
-			xSpeed += windSpeed/(UPS_SET*TUMBLE_WEED_TIME_TO_REACH_WIND_SPEED);
+			xSpeed += windSpeed/(UPS_SET*TUMBLE_WEED_TIME_TO_REACH_WIND_SPEED)/sizeFactor;
 		if (!inAir)
 			if (!IsEntityOnFloor(hitbox, lvlData))
 				inAir = true;
@@ -163,5 +166,9 @@ public class Tumbleweed extends Enemy {
 
 	public boolean getFriendly() {
 		return friendly;
+	}
+
+	public float getSizeFactor() {
+		return sizeFactor;
 	}
 }

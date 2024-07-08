@@ -354,23 +354,20 @@ public class Constants {
 		public static final int TETRIS_TILE_HEIGHT_DEFAULT = 32;
 		public static final int TETRIS_TILE_WIDTH = (int) (TETRIS_TILE_WIDTH_DEFAULT * Game.SCALE);
 		public static final int TETRIS_TILE_HEIGHT = (int) (TETRIS_TILE_HEIGHT_DEFAULT * Game.SCALE);
-		public static final int NUM_TETRIS_TILES = 15;
+		public static final int NUM_TETRIS_TILES = 12;
 		
-		public static final int T_TILE = 0;
+		public static final int LONG_I_TILE = 0;
 		public static final int L_TILE = 1;
 		public static final int J_TILE = 2;
-		public static final int Z_TILE = 3;
-		public static final int S_TILE = 4;
+		public static final int STAIRS_TILE = 3;
+		public static final int DOUBLE_TILE = 4;
 		public static final int O_TILE = 5;
 		public static final int Q_TILE = 6;
-		public static final int CROSS_TILE = 7;
+		public static final int SINGLE_TILE = 7;
 		public static final int LONG_T_TILE = 8;
 		public static final int LONG_Z_TILE = 9;
 		public static final int LONG_S_TILE = 10;
 		public static final int I_TILE = 11;
-		public static final int LONG_I_TILE = 12;
-		public static final int SINGLE_TILE = 13;
-		public static final int DOUBLE_TILE = 14;
 		
 		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28,100);
 		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43,100);
@@ -590,11 +587,11 @@ public class Constants {
 		public static int[][] GetTetrisTileShape (int tileIndex, int rotation) {
 			int[][] matrix;
 			switch (tileIndex) {
-			case T_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									 {0,1,0,0},
-									 {1,1,1,0},
-									 {0,0,0,0}};
+			case STAIRS_TILE:
+				matrix = new int[][] {{0,0,0,1}, 
+									 {0,0,1,1},
+									 {0,1,1,0},
+									 {1,1,0,0}};
 				break;		
 			case L_TILE:
 				matrix = new int[][] {{0,1,0,0}, 
@@ -607,19 +604,7 @@ public class Constants {
 									{0,0,1,0},
 									{0,1,1,0},
 									{0,0,0,0}};
-				break;		
-			case Z_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{1,1,0,0},
-									{0,1,1,0},
-									{0,0,0,0}};
-				break;		
-			case S_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{0,1,1,0},
-									{1,1,0,0},
-									{0,0,0,0}};
-				break;		
+				break;				
 			case O_TILE:
 				matrix = new int[][] {{0,0,0,0}, 
 									{0,1,1,0},
@@ -630,12 +615,6 @@ public class Constants {
 				matrix = new int[][] {{0,1,0,0}, 
 									{0,1,0,0},
 									{1,1,1,0},
-									{0,0,0,0}};
-				break;	
-			case CROSS_TILE:
-				matrix = new int[][] {{0,1,0,0}, 
-									{1,1,1,0},
-									{0,1,0,0},
 									{0,0,0,0}};
 				break;	
 			case Q_TILE:
