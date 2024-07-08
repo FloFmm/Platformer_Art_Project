@@ -3,6 +3,7 @@ package levels;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -96,59 +97,59 @@ public class Level {
 	}
 	
 	private void loadLvlImgs() {
-		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_water.png"))) {
+		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_water.png") != null) {
 			waterImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_water.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_water.png");
+			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_water.png");
 			waterImg = levelManager.getLevelByIndex(lvlId-1).getWaterImg();
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_sky.png"))) {
+		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_sky.png")!=null) {
 			skyImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_sky.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_sky.png");
+			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_sky.png");
 			skyImg = levelManager.getLevelByIndex(lvlId-1).getSkyImg();
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_cloud1.png"))) {
+		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_cloud1.png")!=null) {
 			cloudImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud1.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_cloud1.png");
+			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_cloud1.png");
 			cloudImg1 = levelManager.getLevelByIndex(lvlId-1).getCloudImg1();
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_cloud2.png"))) {
+		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_cloud2.png")!=null) {
 			cloudImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud2.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_cloud2.png");
+			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_cloud2.png");
 			cloudImg2 = levelManager.getLevelByIndex(lvlId-1).getCloudImg2();
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_background1.png"))) {
+		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_background1.png")!=null) {
 			backgroundImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background1.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_background1.png");
+			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_background1.png");
 			backgroundImg1 = levelManager.getLevelByIndex(lvlId-1).getBackgroundImg1();
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_background2.png"))) {
+		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_background2.png")!=null) {
 			backgroundImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background2.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_background2.png");
+			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_background2.png");
 			backgroundImg2 = levelManager.getLevelByIndex(lvlId-1).getBackgroundImg2();
 		}
 		
-		if (Files.exists(Paths.get("res/layers/" + (lvlId) + "_foreground.png"))) {
+		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_foreground.png")!=null) {
 			foregroundImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_foreground.png");
 		}
 		else {
-			System.out.println("file does not exist: " + "res/layers/" + (lvlId) + "_foreground.png");
+			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_foreground.png");
 			foregroundImg = levelManager.getLevelByIndex(lvlId-1).getForegroundImg();
 		}
 	}

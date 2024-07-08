@@ -449,7 +449,7 @@ public class Player extends Entity {
 		else
 			g.setColor(THROW_ARC_COLOR_PLAYER2);
 		int circle_x , circle_y, lastX=0, lastY=0;
-		int radius, maxRadius = 13, minRadius = 6;
+		int radius, maxRadius = 15, minRadius = 6;
 		float maxThrowTime = tileAirSpeed / GRAVITY * 2;
 		float xDistanceTraveled, xDistanceDueStartSpeed, xDistanceDueWind, time;
 		boolean lastPointExists=false;
@@ -467,7 +467,7 @@ public class Player extends Entity {
 			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - radius/2 + xDistanceTraveled); 
 			
 			if (isCarrying != null) {
-				circle_y = (int) (hitbox.y - yLvlOffset - radius/2 - //isCarrying.hitbox.height/2 -
+				circle_y = (int) (hitbox.y - yLvlOffset - radius/2 - isCarrying.hitbox.height/2 -
 						calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
 				if (lastPointExists) {
 	                g2.setStroke(new BasicStroke((int) radius));
@@ -754,7 +754,7 @@ public class Player extends Entity {
 			}
 			for (int i = 0; i < animations[j].length; i++) {
 				if (i<GetSpriteAmount(j)) {
-					if (Files.exists(Paths.get("res/" + baseDir + "/" + fileName + i + ".png"))) {
+					if (Thread.currentThread().getContextClassLoader().getResource(baseDir + "/" + fileName + i + ".png")!=null) {
 						
 						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/" + fileName + i + ".png");
 					}
@@ -773,7 +773,7 @@ public class Player extends Entity {
 					
 					if (j == IDLE || j == RUNNING || j == JUMP || j == FALLING || j==ATTACK) {
 						// carry animations
-						if (Files.exists(Paths.get("res/" + baseDir + "/carry" + fileName + i + ".png"))) {
+						if (Thread.currentThread().getContextClassLoader().getResource(baseDir + "/carry" + fileName + i + ".png")!=null) {
 							animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/carry" + fileName + i + ".png");
 						}
 						else {

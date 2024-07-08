@@ -193,11 +193,10 @@ public class Constants {
 	public static class Environment {
 		// temperature
 		public static final float MAX_TEMP = 100.0f;
-		public static final float TIME_TO_REACH_MAX_TEMP = 10.0f * 60;
+		public static final float TIME_TO_REACH_MAX_TEMP = 15.0f * 60;
 		public static final float TEMP_FROM_FINISHED_WINDMILL = -40.0f;
 		public static final float TEMP_FROM_ROCKET_EXPLOSION = 1.5f;
 		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 0.5f;
-		
 		
 		// wind
 		public static final float WEAK_WIND_TH = 0.25f*Game.SCALE;
@@ -206,7 +205,6 @@ public class Constants {
 		public static final float MAX_WIND_SPEED_END = 1.5f*Game.SCALE;
 		public static final float TIME_BETWEEN_WIND_CHANGE_START = 5;
 		public static final float TIME_BETWEEN_WIND_CHANGE_END = 10;
-		
 		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45, 150);
 		
 		// darkness
@@ -221,7 +219,7 @@ public class Constants {
 		
 		// water
 		public static final float WATER_START_OFFSET_FACTOR = 1.0f;
-		public static final float WATER_END_OFFSET_FACTOR = 0.8f;
+		public static final float WATER_END_OFFSET_FACTOR = 0.83f;
 		public static final float WATER_MOVE_SPEED = 0.05f*Game.SCALE;
 		public static final float WATER_DMG_PER_SECOND = 10.0f;
 		public static final float WATER_PLAYER_SLOW_FACTOR = 0.5f;
@@ -393,7 +391,7 @@ public class Constants {
 		public static final float TETRIS_TILE_TIME_TO_EXPLODE = 1f;
 		
 		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 1.0f;
-		public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.2f;
+		public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.1f;
 		public static final int TETRIS_GRID_SIZE = Game.TILES_SIZE/4;
 		
 		public static final int[][] ROCKET_GOAL_MATRIX = new int[][] {

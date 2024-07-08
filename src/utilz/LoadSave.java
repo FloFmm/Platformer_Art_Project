@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -68,8 +70,36 @@ public class LoadSave {
         }
         return result;
     }
+    public static BufferedImage[] GetAllLevels() {
+        List<BufferedImage> imageList = new ArrayList<>();
+        
+        // Get the resources as input streams
+        for (int i = 1; ; i++) {
+            String resourcePath = "/lvls/" + i + ".png";
+            InputStream inputStream = LoadSave.class.getResourceAsStream(resourcePath);
+            if (inputStream == null) {
+                break; // No more levels found
+            }
+            try {
+                BufferedImage image = ImageIO.read(inputStream);
+                imageList.add(image);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
-	public static BufferedImage[] GetAllLevels() {
+        // Convert list to array
+        BufferedImage[] imgs = new BufferedImage[imageList.size()];
+        imageList.toArray(imgs);
+        return imgs;
+    }
+	public static BufferedImage[] GetAllLevelsOld() {
 		URL url = LoadSave.class.getResource("/lvls");
 		File file = null;
 
