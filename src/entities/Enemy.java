@@ -73,11 +73,6 @@ public abstract class Enemy extends Entity {
 			if (aniIndex >= GetSpriteAmount(enemyType, state)) {
 				if (enemyType == TUMBLE_WEED) {
 					aniIndex = 0;
-
-					switch (state) {
-					case HIT -> state = IDLE;
-					case DEAD -> active = false;
-					}
 				} 
 			}
 		}

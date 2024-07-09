@@ -204,11 +204,11 @@ public class Level {
 
 	private void loadEntities(int greenValue, int x, int y) {
 		Random random = new Random();
-        float tumbleWeedSizeFactor = 1.0f;//random.nextFloat(); TODO
+        float tumbleWeedSizeFactor = random.nextFloat()/2.0f + 0.5f;
 		switch (greenValue) {
 		case TUMBLE_WEED -> crabs.add(new Tumbleweed(x * Game.TILES_SIZE, y * Game.TILES_SIZE, tumbleWeedSizeFactor, lvlData));
 		case TETRIS_TILE_GREEN_VALUE -> tetrisTiles.add(new TetrisTile(x * Game.TILES_SIZE, y * Game.TILES_SIZE, 
-				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES), lvlData));
+				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES), lvlData, false));
 		case PLAYER_GREEN_VALUE -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
 		}
 	}
@@ -335,6 +335,12 @@ public class Level {
 
 	public BufferedImage getWaterImg() {
 		return waterImg;
+	}
+
+
+
+	public int getLvlId() {
+		return lvlId;
 	}
 
 }

@@ -39,15 +39,19 @@ public class EnemyManager {
 
 
 	private void drawTumbleWeeds(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Tumbleweed c : currentLevel.getCrabs())
+		for (Tumbleweed c : currentLevel.getCrabs()) {
 			if (c.isActive()) {
-				g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()], (int) (c.getHitbox().x - xLvlOffset - TUMBLE_WEED_DRAWOFFSET_X*c.getSizeFactor() + c.flipX()),
-						(int) (c.getHitbox().y - yLvlOffset - TUMBLE_WEED_DRAWOFFSET_Y*c.getSizeFactor() + (int) c.getPushDrawOffset()), (int) (TUMBLE_WEED_WIDTH*c.getSizeFactor() * c.flipW()), (int) (TUMBLE_WEED_HEIGHT*c.getSizeFactor()), null);
+
+				g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()], 
+						(int) (c.getHitbox().x - xLvlOffset - c.getXDrawOffset() + c.flipX()),
+						(int) (c.getHitbox().y - yLvlOffset - c.getYDrawOffset()), 
+						(int) (c.getWidth() * c.flipW()), 
+						(int) (c.getHeight()), null);
 
 				//c.drawHitbox(g, xLvlOffset, yLvlOffset);
 				//c.drawAttackBox(g, xLvlOffset, yLvlOffset);
 			}
-
+		}
 	}
 
 	public void checkEnemyHit(Rectangle2D.Float attackBox) {
@@ -67,6 +71,14 @@ public class EnemyManager {
 		
 		for (int i = 1; i<GetSpriteAmount(TUMBLE_WEED, RUNNING);i++) {
 			tumbleWeedArr[RUNNING][i] = rotateImage(tumbleWeedArr[RUNNING][i-1], 360/GetSpriteAmount(TUMBLE_WEED, RUNNING));
+		}
+		
+		for (int i = 0; i<GetSpriteAmount(TUMBLE_WEED, HIT);i++) {
+			tumbleWeedArr[HIT][i] = tumbleWeedArr[RUNNING][i];
+		}
+		
+		for (int i = 0; i<GetSpriteAmount(TUMBLE_WEED, DEAD);i++) {
+			tumbleWeedArr[DEAD][i] = tumbleWeedArr[RUNNING][i];
 		}
 	}
 

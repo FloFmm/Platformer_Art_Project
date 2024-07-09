@@ -126,4 +126,12 @@ public abstract class Entity {
 	
 	public void kill() {
 	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
 }

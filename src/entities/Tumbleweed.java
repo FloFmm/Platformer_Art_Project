@@ -23,14 +23,17 @@ public class Tumbleweed extends Enemy {
 	private int[][] lvlData;
 	private float lastTimeRunning;
 	private boolean friendly = true;
-	private float sizeFactor = 1.0f;
+	private float sizeFactor;
+	private int xDrawOffset, yDrawOffset;
 	
 	public Tumbleweed(float x, float y, float sizeFactor, int[][] lvlData) {
 		super(x, y, (int) (sizeFactor*TUMBLE_WEED_WIDTH), (int) (sizeFactor*TUMBLE_WEED_HEIGHT), TUMBLE_WEED);
+		this.sizeFactor = sizeFactor;
 		this.lvlData = lvlData;
 		initHitbox((int) (sizeFactor*TUMBLE_WEED_HITBOX_WIDTH_DEFAULT), (int) (sizeFactor*TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT));
 		initAttackBox((int) (sizeFactor*TUMBLE_WEED_HITBOX_WIDTH_DEFAULT), (int) (sizeFactor*TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT), 0);
-		
+		this.xDrawOffset = (int) (TUMBLE_WEED_DRAWOFFSET_X * sizeFactor);
+		this.yDrawOffset = (int) (TUMBLE_WEED_DRAWOFFSET_Y * sizeFactor);
 	}
 
 	public void update(int[][] lvlData, Playing playing) {
@@ -170,5 +173,12 @@ public class Tumbleweed extends Enemy {
 
 	public float getSizeFactor() {
 		return sizeFactor;
+	}
+
+	public int getXDrawOffset() {
+		return xDrawOffset;
+	}
+	public int getYDrawOffset() {
+		return yDrawOffset;
 	}
 }

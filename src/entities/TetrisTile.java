@@ -38,11 +38,14 @@ public class TetrisTile extends Entity {
 	private String explosionType = "small";
 	private BuildingZone currentBZ;
 	
+	private boolean isPredictionTile = false;
 
-	public TetrisTile(float x, float y, int width, int height, int tileIndex, int[][] lvlData) {
+
+	public TetrisTile(float x, float y, int width, int height, int tileIndex, int[][] lvlData, boolean isPredictionTile) {
 		super(x, y, width, height);
 		this.tileIndex = tileIndex;
 		this.lvlData = lvlData;
+		this.isPredictionTile = isPredictionTile;
 		Random random = new Random();
 		this.rotation = random.nextInt(4);
 		matrix = GetTetrisTileShape (tileIndex, rotation);
@@ -130,7 +133,7 @@ public class TetrisTile extends Entity {
 		return returnV;
 	}
 	
-	private void updateHitBox() {
+	public void updateHitBox() {
 		//TODO
 		matrix = GetTetrisTileShape(tileIndex, rotation);
 		int maxRowIndex = -1;
@@ -159,7 +162,7 @@ public class TetrisTile extends Entity {
 		hitbox.height =  (maxRowIndex - minRowIndex + 1) * Game.TILES_SIZE/4;
 	}
 
-	private void updatePos(float windSpeed) {
+	public void updatePos(float windSpeed) {
 		float oldXPos = hitbox.x;
 		float oldYPos = hitbox.y;
 		
@@ -360,7 +363,10 @@ public class TetrisTile extends Entity {
 	}
 	
 	public void grabbed(Player player) {
+		if (isCarriedBy != null && isCarriedBy.getIsPlayer1() != player.getIsPlayer1())
+			isCarriedBy.setIsCarrying(null);
 		isCarriedBy = player;
+		player.setIsCarrying(this);
 		movingInGrid = false;
 	}
 	
@@ -440,4 +446,24 @@ public class TetrisTile extends Entity {
 		this.inAir = inAir;
 	}
 
+	public void setTileIndex(int tileIndex) {
+		this.tileIndex = tileIndex;
+	}
+
+	public void setMatrix(int[][] matrix) {
+		this.matrix = matrix;
+	}
+
+	public boolean getMoving() {
+		return moving;
+	}
+	
+	
+	public boolean getMovingInGrid() {
+		return movingInGrid;
+	}
+
+	public boolean getIsPredictionTile() {
+		return isPredictionTile;
+	}
 }

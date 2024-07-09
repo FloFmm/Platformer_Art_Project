@@ -98,7 +98,7 @@ public class Player extends Entity {
 	// grab and throw
 	private float throwHeightInSmallTiles = TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES/2, throwWidthInSmallTiles = TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES/2;
 	private boolean throwActive=false;
-	
+	private boolean drawThrowArc = false;
 	//controller
 	private int[] buttonStates = new int[NUM_BUTTONS];
 	private int[] prevButtonStates = new int[NUM_BUTTONS];
@@ -429,8 +429,12 @@ public class Player extends Entity {
 			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_LEFT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
 			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_UP_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
 			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_DOWN_BUTTON_ID] < THROW_ARC_SHOW_TIME)
-			&& (isCarrying != null) && throwHeightInSmallTiles > 0)
-			drawThrowArc(g, xLvlOffset, yLvlOffset, 21);
+			&& (isCarrying != null) && throwHeightInSmallTiles > 0) {
+			drawThrowArc(g, xLvlOffset, yLvlOffset);
+			drawThrowArc = true;
+		}
+		drawThrowArc = false;
+			
 	}
 	
 	protected void drawGrabBox(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -438,7 +442,7 @@ public class Player extends Entity {
 		g.drawRect((int) grabBox.x - xLvlOffset, (int) grabBox.y - yLvlOffset, (int) grabBox.width, (int) grabBox.height);
 	}
 
-	protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset, int numArcPoints) {
+	protected void drawThrowArcOld(Graphics g, int xLvlOffset, int yLvlOffset, int numArcPoints) {
 		Graphics2D g2 = (Graphics2D) g;
 		float[] throwSpeed = calcThrowSpeed();
 		float tileXSpeed = throwSpeed[0];
@@ -477,7 +481,34 @@ public class Player extends Entity {
 				lastPointExists = true;
 			}
 		}
+	}
+	
+	protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset) {
 		
+		Graphics2D g2 = (Graphics2D) g;
+		g.setColor(THROW_ARC_COLOR_PLAYER2);
+		int pIndex = 1;
+		if (isPlayer1) {
+			g.setColor(THROW_ARC_COLOR_PLAYER1);
+			pIndex = 0;
+		}
+			
+		int circle_x , circle_y, lastX=0, lastY=0, radius=10;
+		for (int i=0; i < NUM_THROW_ARC_PREDICTION_POINTS; i++) {
+			circle_x = playing.getTetrisTileManager().getThrowArcPredictionPoints()[pIndex][i][0] - xLvlOffset; 
+			circle_y = playing.getTetrisTileManager().getThrowArcPredictionPoints()[pIndex][i][1] - yLvlOffset; 
+			
+			if (circle_x == FINAL_PREDICTION_POINT || i == NUM_THROW_ARC_PREDICTION_POINTS-1) {
+				playing.getTetrisTileManager().drawPredictionTile(g, xLvlOffset, yLvlOffset, i-1, isPlayer1);
+				return;
+			}
+			if (i!=0) {
+                g2.setStroke(new BasicStroke((int) radius));
+				g2.drawLine(lastX, lastY, circle_x, circle_y);
+			}
+			lastX = circle_x;
+			lastY = circle_y;
+		}
 	}
 	
 	public void drawUI(Graphics g) {
@@ -934,6 +965,14 @@ public class Player extends Entity {
 	
 	public BufferedImage[][] getAnimations() {
 		return animations;
+	}
+
+	public boolean getIsPlayer1() {
+		return isPlayer1;
+	}
+
+	public boolean getDrawThrowArc() {
+		return drawThrowArc;
 	}
 
 }

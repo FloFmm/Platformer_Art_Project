@@ -9,6 +9,7 @@ import entities.EnemyManager;
 import entities.Entity;
 import entities.Player;
 import entities.TetrisTileManager;
+import levels.Level;
 import levels.LevelManager;
 import main.Game;
 import objects.ObjectManager;
@@ -82,7 +83,6 @@ public class Playing extends State implements Statemethods {
 		buildingZoneManager.loadBuildingZones(levelManager.getCurrentLevel());
 		loadLvlImgs();
 		calcLvlOffset();
-
 		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player1.setSpawn(levelManager.getCurrentLevel().getPlayerSpawn());
@@ -111,6 +111,7 @@ public class Playing extends State implements Statemethods {
 		enemyManager = new EnemyManager(this);
 		objectManager = new ObjectManager(this);
 		tetrisTileManager = new TetrisTileManager(this);
+		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager = new BuildingZoneManager(this);
 		player1 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, true);

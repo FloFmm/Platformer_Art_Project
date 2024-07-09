@@ -61,13 +61,13 @@ public class BuildingZone {
 	}
 
 	public boolean addTetrisTile(TetrisTile tetrisTile) {
-		int[][] oldMatrix = matrixDeepCopy(matrix);
-		matrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
+		//int[][] oldMatrix = matrixDeepCopy(matrix);
+		int[][] newMatrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
 				tetrisTile.getHitbox().y, 
 				tetrisTile.getMatrix(), 
 				tetrisTile.getXDrawOffset(), 
 				tetrisTile.getYDrawOffset());
-		if (matrixEquiv(oldMatrix, matrix)) {
+		if (matrixEquiv(newMatrix, matrix)) {
 			return false;
 		}
 		
@@ -78,30 +78,30 @@ public class BuildingZone {
 		tetrisTile.setLockedInBuildingZone(this);
 		
 		
-		if (!isCompletable(matrix)) {
-			//TetrisTile lastAddedTile = tetrisTiles.remove(tetrisTiles.size() - 1);
-			TetrisTile lastAddedTile = tetrisTile;
-			matrix = addTetrisTileMatrix(tetrisTile.getHitbox().x, 
-					tetrisTile.getHitbox().y, 
-					matrixScalarMul(tetrisTile.getMatrix(),-1), 
-					tetrisTile.getXDrawOffset(), 
-					tetrisTile.getYDrawOffset());
+		if (!isCompletable(newMatrix)) {
+			// unsuccessful
+			if (tetrisTile.getIsPredictionTile()) 
+				return false;
 			
 			String explosionType = "small";
 			if (zoneType.contains("rocket"))
 				explosionType = "large";
-			lastAddedTile.startExplosionTimer(explosionType, this, 0);
+			tetrisTile.startExplosionTimer(explosionType, this, 0);
 			return false;
 		}
 		else {
 			// successful
+			if (tetrisTile.getIsPredictionTile()) 
+				return true;
+			
+			tetrisTiles.add(tetrisTile);
+			matrix = newMatrix;
 			System.out.println("successfully added");
 			if (isFinished()) {
 				System.out.println("finished a building zone");
-				
 				eventOnFinish();
 			}
-			tetrisTiles.add(tetrisTile);
+			
 			return true;
 		}
 	}

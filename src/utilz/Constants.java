@@ -348,6 +348,11 @@ public class Constants {
 	}
 	
 	public static class TetrisTileConstants {
+		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28,100);
+		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43,100);
+		public static final Color TETRIS_TILE_PLAYER1_DEFAULT_COLOR = THROW_ARC_COLOR_PLAYER1;
+		public static final Color TETRIS_TILE_PLAYER2_DEFAULT_COLOR = THROW_ARC_COLOR_PLAYER2;
+		public static final int TETRIS_TILE_COLOR_TOLERANCE = 8;	
 		public static final int TETRIS_TILE_GREEN_VALUE = 255;
 		
 		public static final int TETRIS_TILE_WIDTH_DEFAULT = 32;
@@ -369,8 +374,9 @@ public class Constants {
 		public static final int LONG_S_TILE = 10;
 		public static final int I_TILE = 11;
 		
-		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28,100);
-		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43,100);
+		public static final int FINAL_PREDICTION_POINT = -1;
+		public static final float THROW_ARC_PREDICTION_TIME = 1.5f;
+		public static final int NUM_THROW_ARC_PREDICTION_POINTS = 30;
 		public static final float THROW_ARC_SHOW_TIME = 2.5f;
 		public static final float TIME_BETWEEN_THROW_CHANGES = 0.06f;
 		public static final float TIME_FOR_FIRST_THROW_ARC_CHANGE = 0.15f;
