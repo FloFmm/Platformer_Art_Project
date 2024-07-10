@@ -12,12 +12,7 @@ local.properties
 .project
 .classpath
 
-res/animation
-res/audio
+res/animation/player2
 
-res/building_zones/Untitled.xcf
-res/playing_fg_img.png
-res/tetris_tiles/0_old.png
-res/layers
 /target/
 /target-natives-linux/
