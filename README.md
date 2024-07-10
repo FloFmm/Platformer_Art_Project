@@ -16,14 +16,18 @@ The game features two opposing players playing on splitscreen:
 - 2 game controllers with at least 9 buttons and a joystick. 
 
 You might have to rebind the buttons to the correct action (e.g. JUMP) in the code:
-```sh src.utilz.Constants.ControllerConstants```
+```sh
+src.utilz.Constants.ControllerConstants
+```
 
 ## Installation and Execution
 
 Follow these steps to download and run the project:
 
 1. **Clone the repository (or download the zip file):**
-   ```sh git clone https://github.com/FloFmm/Platformer_Art_Project.git```
+   ```sh
+   git clone https://github.com/FloFmm/Platformer_Art_Project.git
+   ```
 2. **Navigate to the project directory:**
 ```sh
 cd Platformer_Art_Project
