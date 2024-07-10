@@ -194,7 +194,7 @@ public class Constants {
 		// temperature
 		public static final float MAX_TEMP = 100.0f;
 		public static final float TIME_TO_REACH_MAX_TEMP = 15.0f * 60;
-		public static final float TEMP_FROM_FINISHED_WINDMILL = -40.0f;
+		public static final float TEMP_FROM_FINISHED_WINDMILL = -30.0f;
 		public static final float TEMP_FROM_ROCKET_EXPLOSION = 1.5f;
 		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 0.5f;
 		

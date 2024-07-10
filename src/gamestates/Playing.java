@@ -166,7 +166,7 @@ public class Playing extends State implements Statemethods {
 				TIME_BETWEEN_WIND_CHANGE_START);
 		float currentMaxWindSpeed = Math.min(gameTimeInSeconds/TIME_TO_REACH_MAX_TEMP*
 				(MAX_WIND_SPEED_END - MAX_WIND_SPEED_START) + MAX_WIND_SPEED_START,
-				MAX_WIND_SPEED_END);;
+				MAX_WIND_SPEED_END);
 		if (gameTimeInSeconds - timeOfLastWindChange > currentTimeBetweenWindChange) {
 			timeOfLastWindChange = gameTimeInSeconds;
 			windSpeed = random.nextFloat(2 * currentMaxWindSpeed) - currentMaxWindSpeed;
@@ -275,7 +275,7 @@ public class Playing extends State implements Statemethods {
 		// foreground 
 		if (levelManager.getCurrentLevel().getDrawForeground())
 			g.drawImage(foregroundImg, -xLvlOffset, -yLvlOffset, curLvlWidth, curLvlHeight, null);
-		
+			
 		// polygons
 		if (levelManager.getCurrentLevel().getDrawPolygons())
 			levelManager.draw(g, xLvlOffset, yLvlOffset);
@@ -300,7 +300,7 @@ public class Playing extends State implements Statemethods {
 				else
 					currentWaterYPos += WATER_MOVE_SPEED;
 			}
-			g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+currentWaterYPos), curLvlWidth, curLvlHeight, null);
+			g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+currentWaterYPos), curLvlWidth, 1000, null);
 		}
 		
 		// darkness 2

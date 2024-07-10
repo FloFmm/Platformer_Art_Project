@@ -58,6 +58,7 @@ public class BuildingZoneManager {
 			playing.setPlayer1Won(true);
 		}
 		if (player2Finished) {
+			playing.setGameOver(true);
 			playing.setPlayer2Won(true);
 		}
 	}
