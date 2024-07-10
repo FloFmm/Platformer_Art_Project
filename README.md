@@ -19,8 +19,8 @@ Follow these steps to download and run the project:
 - tested on Java 17 (anything higher than 11 should work) and Maven 3.9.0
 - 2 game controllers with at least 9 buttons and a joystick. 
 
-You might have to rebind the buttons to the correct action (e.g. JUMP) in the code:
-	```sh
+You might have to rebind the buttons to the correct action (e.g. JUMP) in the code: 
+	```
 	src.utilz.Constants.ControllerConstants
 	```
 
