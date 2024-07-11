@@ -224,6 +224,7 @@ public class Constants {
 		public static final float WATER_DMG_PER_SECOND = 10.0f;
 		public static final float WATER_PLAYER_SLOW_FACTOR = 0.5f;
 		public static final float WATER_PLAYER_JUMP_SLOW_FACTOR = 0.75f;
+		public static final int WATER_HEIGHT = 1000;
 		
 		// layer speed 
 		public static final float SKY_SPEED = 0.5f;

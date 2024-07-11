@@ -132,7 +132,7 @@ public class BuildingZone {
 	public void eventOnFinish() {
 		finished = true;
 		if (zoneType=="windmill") {
-			buildingZoneManager.getPlaying().setTemperature(buildingZoneManager.getPlaying().getTemperature() + TEMP_FROM_FINISHED_WINDMILL);;
+			buildingZoneManager.getPlaying().setTempFromWindmills(buildingZoneManager.getPlaying().getTempFromWindmills() + TEMP_FROM_FINISHED_WINDMILL);;
 		}
 	}
 	

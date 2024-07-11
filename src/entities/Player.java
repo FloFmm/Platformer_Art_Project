@@ -339,7 +339,7 @@ public class Player extends Entity {
 
 	
 	private void checkInsideWater() {
-		if (hitbox.y + hitbox.height*0.75 > playing.getCurrentWaterYPos()) {
+		if (hitbox.y > playing.getCurrentWaterYPos() + WATER_HEIGHT*0.1f) {
 			currentHealth -= WATER_DMG_PER_SECOND / UPS_SET;
 			currentHealth = Math.max(currentHealth, 0);
 			walkSpeed = PLAYER_WALKSPEED*WATER_PLAYER_SLOW_FACTOR;

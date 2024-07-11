@@ -300,7 +300,7 @@ public class Playing extends State implements Statemethods {
 				else
 					currentWaterYPos += WATER_MOVE_SPEED;
 			}
-			g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+currentWaterYPos), curLvlWidth, 1000, null);
+			g.drawImage(waterImg, -xLvlOffset, (int) (-yLvlOffset+currentWaterYPos), curLvlWidth, WATER_HEIGHT, null);
 		}
 		
 		// darkness 2
