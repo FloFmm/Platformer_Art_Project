@@ -194,10 +194,10 @@ public class Constants {
 	public static class Environment {
 		// temperature
 		public static final float MAX_TEMP = 100.0f;
-		public static final float TIME_TO_REACH_MAX_TEMP = 2*60;//15.0f * 60;
+		public static final float TIME_TO_REACH_MAX_TEMP = 10*60;//15.0f * 60;
 		public static final float TEMP_FROM_FINISHED_WINDMILL = -30.0f;
-		public static final float TEMP_FROM_ROCKET_EXPLOSION = 1.5f;
-		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 0.5f;
+		public static final float TEMP_FROM_ROCKET_EXPLOSION = 2.5f;
+		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 1.0f;
 		
 		// wind
 		public static final float WEAK_WIND_TH = 0.25f*Game.SCALE;
@@ -414,15 +414,12 @@ public class Constants {
 		public static final int FINAL_PREDICTION_POINT = -1;
 		public static final float THROW_ARC_PREDICTION_TIME = 1.5f;
 		public static final int NUM_THROW_ARC_PREDICTION_POINTS = 30;
-		public static final float THROW_ARC_SHOW_TIME = 2.5f;
+		public static final float THROW_ARC_SHOW_TIME = 4.0f;
 		public static final float TIME_BETWEEN_THROW_CHANGES = 0.06f;
 		public static final float TIME_FOR_FIRST_THROW_ARC_CHANGE = 0.15f;
 		public static final int TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES = 6*4;
 		public static final int TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES = 6*4;
 		public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES*Game.TILES_SIZE*2*GRAVITY);
-		//public static final float TETRIS_TILE_TIME_FOR_MAX_THROW_SPEED = 3.0f;
-		//public static final float THROW_ANGLE_STEP = 5.0f;
-		//public static final float MAX_THROW_ANGLE = 60.0f;
 				
 		public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.1f;
 		public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED*0.5f;

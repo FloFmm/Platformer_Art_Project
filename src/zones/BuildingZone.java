@@ -130,8 +130,10 @@ public class BuildingZone {
 	}
 	
 	public void eventOnFinish() {
+		if (finished)
+			return;
 		finished = true;
-		if (zoneType=="windmill") {
+		if (zoneType.contains("windmill")) {
 			buildingZoneManager.getPlaying().setTempFromWindmills(buildingZoneManager.getPlaying().getTempFromWindmills() + TEMP_FROM_FINISHED_WINDMILL);;
 		}
 	}

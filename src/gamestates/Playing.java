@@ -162,7 +162,11 @@ public class Playing extends State implements Statemethods {
 		gameTimeInSeconds = (float) gameUpdates / UPS_SET;
 		tempFromTime = gameTimeInSeconds * MAX_TEMP / TIME_TO_REACH_MAX_TEMP;
 		temperature = Math.min(tempFromTime + tempFromExplosion + tempFromWindmills, MAX_TEMP);
-		
+		if (temperature < 0) {
+			tempFromWindmills -= temperature;
+			temperature = 0;
+		}
+			
 		float currentTimeBetweenWindChange = linear(temperature, 0, MAX_TEMP, TIME_BETWEEN_WIND_CHANGE_START, TIME_BETWEEN_WIND_CHANGE_END);
 		float currentMaxWindSpeed = linear(temperature, 0, MAX_TEMP, MAX_WIND_SPEED_START, MAX_WIND_SPEED_END);
 		if (gameTimeInSeconds - timeOfLastWindChange > currentTimeBetweenWindChange) {
@@ -264,6 +268,10 @@ public class Playing extends State implements Statemethods {
 				else
 					currentDarknessAlpha += DARKNESS_CHANGE_SPEED;
 			}
+			if (currentDarknessAlpha > 255)
+				currentDarknessAlpha = 255;
+			if (currentDarknessAlpha < 0)
+				currentDarknessAlpha = 0;
 			Color black = new Color(40,0,0, (int) currentDarknessAlpha);
 			g.setColor(black);
 			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);

@@ -330,8 +330,8 @@ public class TetrisTile extends Entity {
 		float[] yCoordinates = {hitbox.y, hitbox.y, (hitbox.y+hitbox.height-1), (hitbox.y+hitbox.height-1)};
 		int xIndex, yIndex;
 		for (int i = 0; i < 4; i++) {
-			xIndex = (int) (xCoordinates[i]/Game.TILES_SIZE);
-			yIndex = (int) (yCoordinates[i]/Game.TILES_SIZE);
+			xIndex = (int) (Math.max(0, Math.min(lvlData[0].length-1, xCoordinates[i]/Game.TILES_SIZE)));
+			yIndex = (int) (Math.max(0, Math.min(lvlData.length-1, yCoordinates[i]/Game.TILES_SIZE)));
 			if (lvlData[yIndex][xIndex] == 3)
 				return true;
 		}

@@ -57,9 +57,9 @@ public class Player extends Entity {
 	private int tempBarMaxHeight = (int) (108*Game.SCALE);
 	private int tempBarY = (int) (25*Game.SCALE);
 	
-	private int windsockWidth = (int) (Game.GAME_WIDTH/20);
-	private int windsockHeight = (int) (Game.GAME_WIDTH/20);
-	private int windsockY = (int) (30*Game.SCALE);
+	private int windsockWidth = (int) (Game.GAME_WIDTH/17);
+	private int windsockHeight = (int) (Game.GAME_WIDTH/17);
+	private int windsockY = (int) (3*Game.SCALE);
 	
 	private int statusBarWidth = (int) (128 * Game.SCALE);
 	private int statusBarHeight = (int) (64 * Game.SCALE);
@@ -517,11 +517,11 @@ public class Player extends Entity {
 		// Background ui
 		int xDrawOffset = 0;
 		int xStatusBarOffset = statusBarX;
-		int windsockXOffset = (int) (xStatusBarOffset + statusBarWidth + 20*Game.SCALE);
+		int xWindsockOffset = (int) (statusBarX + statusBarWidth + 30*Game.SCALE);
 		if (!isPlayer1) {
 			xDrawOffset = -Game.GAME_WIDTH/2;
 			xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH/2 - statusBarWidth);
-			windsockXOffset = (int) (Game.GAME_WIDTH/2 - xStatusBarOffset - statusBarWidth - 20*Game.SCALE);
+			xWindsockOffset = (int) (Game.GAME_WIDTH/2 - statusBarX - statusBarWidth - 30*Game.SCALE);
 		}
 		
 		// temperature
@@ -567,7 +567,7 @@ public class Player extends Entity {
 			wsImg = windsockImg3;
 			
 		int windsockX = 50;
-		g.drawImage(wsImg, windsockX  + xStatusBarOffset-flip*windsockWidth/2, windsockY, flip*windsockWidth, windsockHeight, null);
+		g.drawImage(wsImg, xWindsockOffset-flip*windsockWidth/2, windsockY, flip*windsockWidth, windsockHeight, null);
 		
 		
 	}
