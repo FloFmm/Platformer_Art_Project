@@ -1,6 +1,5 @@
 package gamestates;
 
-import static utilz.Constants.UI.URMButtons.URM_SIZE;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -15,21 +14,15 @@ import static utilz.Constants.ControllerConstants.*;
 public class Credits extends State implements Statemethods {
 	private MenuButton[] buttons = new MenuButton[1];
 	private BufferedImage backgroundImg, creditsImg;
-	private int bgX, bgY, bgW, bgH;
-	private int bgYFloat;
 	public Credits(Game game) {
 		super(game);
 		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
 		creditsImg = LoadSave.GetSpriteAtlas(LoadSave.CREDITS);
-		
-		int menuX = (int) (Game.GAME_WIDTH/2 - 0.5*URM_SIZE);
-		int bY = (int) (Game.GAME_HEIGHT/2);
-
 		loadButtons();
 	}
 	
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID);
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, game);
 	}
 
 	@Override

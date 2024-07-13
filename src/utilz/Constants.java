@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 public class Constants {
 	public static final int FPS_SET = 120;
 	public static final int UPS_SET = 200;
@@ -193,7 +194,7 @@ public class Constants {
 	public static class Environment {
 		// temperature
 		public static final float MAX_TEMP = 100.0f;
-		public static final float TIME_TO_REACH_MAX_TEMP = 15.0f * 60;
+		public static final float TIME_TO_REACH_MAX_TEMP = 2*60;//15.0f * 60;
 		public static final float TEMP_FROM_FINISHED_WINDMILL = -30.0f;
 		public static final float TEMP_FROM_ROCKET_EXPLOSION = 1.5f;
 		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 0.5f;
@@ -203,8 +204,8 @@ public class Constants {
 		public static final float STRONG_WIND_TH = 0.75f*Game.SCALE;
 		public static final float MAX_WIND_SPEED_START = 0.5f*Game.SCALE;
 		public static final float MAX_WIND_SPEED_END = 1.5f*Game.SCALE;
-		public static final float TIME_BETWEEN_WIND_CHANGE_START = 5;
-		public static final float TIME_BETWEEN_WIND_CHANGE_END = 10;
+		public static final float TIME_BETWEEN_WIND_CHANGE_START = 60;
+		public static final float TIME_BETWEEN_WIND_CHANGE_END = 5;
 		public static final Color FLOOR_TILE_COLOR = new Color(40, 40, 45, 150);
 		
 		// darkness
@@ -374,6 +375,41 @@ public class Constants {
 		public static final int LONG_Z_TILE = 9;
 		public static final int LONG_S_TILE = 10;
 		public static final int I_TILE = 11;
+		public static final float[] TETRIS_TILE_PROBS = {
+				0.10f, 
+				0.05f, 
+				0.05f, 
+				0.15f, 
+				0.15f, 
+				0.025f, 
+				0.025f, 
+				0.20f, 
+				0.10f, 
+				0.025f, 
+				0.025f, 
+				0.10f};
+		
+		public static int GetRandomTetrisTileIndex(Random random) {
+	        double r = random.nextFloat();
+	        double cumulativeProbability = 0.0;
+	        float probSum = 0.0f;
+	        
+	        for (int i = 0; i < NUM_TETRIS_TILES; i++) {
+	        	probSum += TETRIS_TILE_PROBS[i];
+	        }
+	        if (probSum < 0.999 || probSum > 1.001) {
+	        	System.out.println("probability of tetris tiles does not add up to 1.0");
+	        	System.out.println(probSum);
+	        }
+	        
+	        for (int i = 0; i < NUM_TETRIS_TILES; i++) {
+	            cumulativeProbability += TETRIS_TILE_PROBS[i];
+	            if (r <= cumulativeProbability) {
+	                return i;
+	            }
+	        }
+	        return NUM_TETRIS_TILES - 1; // fallback
+		}
 		
 		public static final int FINAL_PREDICTION_POINT = -1;
 		public static final float THROW_ARC_PREDICTION_TIME = 1.5f;
@@ -447,8 +483,8 @@ public class Constants {
 			{0,0,0,1, 1,1,1,1, 0,0,0,0},
 			
 			{0,0,0,1, 1,0,1,1, 0,0,0,0},
+			{0,0,0,1, 1,0,1,1, 0,0,0,0},
 			{0,0,0,1, 0,0,0,1, 0,0,0,0},
-			{0,0,0,1, 1,1,1,1, 0,0,0,0},
 			{0,0,0,1, 1,1,1,1, 0,0,0,0},
 			
 			{0,0,0,1, 1,1,1,1, 0,0,0,0},
@@ -535,12 +571,12 @@ public class Constants {
 			{0,0,0,0, 0,0,0,0, 0,0,0,0},
 			{0,0,0,0, 0,0,0,0, 0,0,0,0},
 			{0,0,0,0, 0,0,0,0, 0,0,0,0},
-			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
 			
-			{0,0,0,0, 0,0,0,0, 0,0,0,0},
-			{0,0,0,0, 0,0,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
+			{0,0,0,0, 0,1,0,0, 0,0,0,0},
 			{0,0,0,0, 1,0,1,0, 0,0,0,0},
-			{0,0,0,0, 1,1,1,1, 0,0,0,0},
+			{0,0,0,0, 1,0,1,1, 0,0,0,0},
 			
 			{0,0,0,1, 1,1,0,1, 1,0,0,0},
 			{0,0,1,1, 0,1,0,0, 1,1,0,0},

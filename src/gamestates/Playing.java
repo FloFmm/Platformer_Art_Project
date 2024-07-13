@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+
+import audio.AudioPlayer;
 import entities.EnemyManager;
 import entities.Entity;
 import entities.Player;
@@ -135,7 +137,7 @@ public class Playing extends State implements Statemethods {
 	public void update() {
 		if (paused)
 			pauseOverlay.update();
-		else if (gameOver)
+		else if (gameOver && !levelManager.getCurrentLevel().getIsTutorial())
 			gameOverOverlay.update();
 		else {
 			player1.update();
@@ -161,18 +163,16 @@ public class Playing extends State implements Statemethods {
 		tempFromTime = gameTimeInSeconds * MAX_TEMP / TIME_TO_REACH_MAX_TEMP;
 		temperature = Math.min(tempFromTime + tempFromExplosion + tempFromWindmills, MAX_TEMP);
 		
-		float currentTimeBetweenWindChange = Math.max(-gameTimeInSeconds/TIME_TO_REACH_MAX_TEMP*
-				(TIME_BETWEEN_WIND_CHANGE_END + TIME_BETWEEN_WIND_CHANGE_START) + TIME_BETWEEN_WIND_CHANGE_START,
-				TIME_BETWEEN_WIND_CHANGE_START);
-		float currentMaxWindSpeed = Math.min(gameTimeInSeconds/TIME_TO_REACH_MAX_TEMP*
-				(MAX_WIND_SPEED_END - MAX_WIND_SPEED_START) + MAX_WIND_SPEED_START,
-				MAX_WIND_SPEED_END);
+		float currentTimeBetweenWindChange = linear(temperature, 0, MAX_TEMP, TIME_BETWEEN_WIND_CHANGE_START, TIME_BETWEEN_WIND_CHANGE_END);
+		float currentMaxWindSpeed = linear(temperature, 0, MAX_TEMP, MAX_WIND_SPEED_START, MAX_WIND_SPEED_END);
 		if (gameTimeInSeconds - timeOfLastWindChange > currentTimeBetweenWindChange) {
 			timeOfLastWindChange = gameTimeInSeconds;
 			windSpeed = random.nextFloat(2 * currentMaxWindSpeed) - currentMaxWindSpeed;
+			AudioPlayer ap = game.getAudioPlayer();
+			ap.windFactor = linear(Math.abs(windSpeed), 0.0f, MAX_WIND_SPEED_END, ap.MIN_WIND_VOLUME_FACTOR, ap.MAX_WIND_VOLUME_FACTOR);
+			ap.updateSongVolume();
 		}
 		
-		// TODO
 		if (temperature >= MAX_TEMP - 0.1) {
 			gameOver = true;
 		}		
@@ -322,7 +322,7 @@ public class Playing extends State implements Statemethods {
 			g.setColor(new Color(0, 0, 0, 150));
 			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
 			pauseOverlay.draw(g, isPlayer1);
-		} else if (gameOver)
+		} else if (gameOver && !levelManager.getCurrentLevel().getIsTutorial())
 			gameOverOverlay.draw(g, isPlayer1);
 		
 		//loading
@@ -334,6 +334,8 @@ public class Playing extends State implements Statemethods {
 
 	public void resetAll() {
 		gameOver = false;
+		player1Won = false;
+		player2Won = false;
 		paused = false;
 		gameTimeInSeconds = 0;
 		gameUpdates = 0;

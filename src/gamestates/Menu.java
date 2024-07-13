@@ -8,6 +8,7 @@ import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
 
 import org.lwjgl.glfw.GLFW;
 
+import audio.AudioPlayer;
 import main.Game;
 import ui.MenuButton;
 import ui.VolumeButton;
@@ -19,6 +20,7 @@ public class Menu extends State implements Statemethods {
 	private BufferedImage backgroundImg, backgroundImgPink, controllerOnlineImg, controllerOfflineImg;
 	private int menuX, menuY, menuWidth, menuHeight;
 	private VolumeButton volumeButton;
+	private boolean useVolumeButton = false;
 	
 	public Menu(Game game) {
 		super(game);
@@ -39,11 +41,12 @@ public class Menu extends State implements Statemethods {
 	}
 
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID);
-		buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), 1, Gamestate.PLAYING, CONTROLLER_X_BUTTON_ID);
-		buttons[2] = new MenuButton(Game.GAME_WIDTH / 6, (int) (270 * Game.SCALE), 2, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID);
-		buttons[3] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID);
-		volumeButton = new VolumeButton((Game.GAME_WIDTH/6 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID, game);
+		buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), 1, Gamestate.PLAYING, CONTROLLER_X_BUTTON_ID, game);
+		buttons[2] = new MenuButton(Game.GAME_WIDTH / 6, (int) (270 * Game.SCALE), 2, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID, game);
+		buttons[3] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID, game);
+		if (useVolumeButton)
+			volumeButton = new VolumeButton((Game.GAME_WIDTH/6 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
 	}
 
 	@Override
@@ -55,13 +58,13 @@ public class Menu extends State implements Statemethods {
 				if (mb.getState() == Gamestate.PLAYING) {
 					int rowId = mb.getRowIndex();
 					game.getPlaying().loadLevel(rowId, true);
-					game.getAudioPlayer().setLevelSong(game.getPlaying().getLevelManager().getLevelIndex());
+					game.getAudioPlayer().playSong(AudioPlayer.WIND);
 				}
 				resetButtons();
 			}
 		}
-		
-		volumeButton.update();
+		if (useVolumeButton)
+			volumeButton.update();
 	}
 
 	@Override
@@ -88,8 +91,8 @@ public class Menu extends State implements Statemethods {
 	
 		for (MenuButton mb : buttons)
 			mb.draw(g, xDrawOffset);
-
-		volumeButton.draw(g, xDrawOffset);
+		if (useVolumeButton)
+			volumeButton.draw(g, xDrawOffset);
 	}
 
 	private void resetButtons() {

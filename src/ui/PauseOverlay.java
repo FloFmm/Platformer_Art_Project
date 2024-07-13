@@ -23,6 +23,7 @@ public class PauseOverlay implements Statemethods{
 	private BufferedImage backgroundImg, pausedImg, controllerOnlineImg, controllerOfflineImg;
 	private int menuX, menuY, menuWidth, menuHeight;
 	private VolumeButton volumeButton;
+	private boolean useVolumeButton = false;
 	
 	public PauseOverlay(Playing playing) {
 		this.playing = playing;
@@ -43,9 +44,10 @@ public class PauseOverlay implements Statemethods{
 	}
 	
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID);
-		buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID);
-		volumeButton = new VolumeButton((Game.GAME_WIDTH/6 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, playing.getGame());
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID, playing.getGame());
+		buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, playing.getGame());
+		if (useVolumeButton)
+			volumeButton = new VolumeButton((Game.GAME_WIDTH/6 - SLIDER_WIDTH/2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, playing.getGame());
 	}
 
 	@Override
@@ -65,8 +67,8 @@ public class PauseOverlay implements Statemethods{
 				resetButtons();
 			}
 		}
-
-		volumeButton.update();
+		if (useVolumeButton)
+			volumeButton.update();
 	}
 
 	@Override
@@ -94,7 +96,8 @@ public class PauseOverlay implements Statemethods{
 		for (MenuButton mb : buttons)
 			mb.draw(g, xDrawOffset);
 
-		volumeButton.draw(g, xDrawOffset);
+		if (useVolumeButton)
+			volumeButton.draw(g, xDrawOffset);
 	}
 	
 	private void resetButtons() {

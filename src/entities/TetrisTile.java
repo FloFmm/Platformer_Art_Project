@@ -315,6 +315,10 @@ public class TetrisTile extends Entity {
 		if (explosionType == "small") {
 			xSpeed = xSpeed/2;
 			airSpeed = airSpeed/2;
+			tetrisTileManager.getPlaying().getGame().getAudioPlayer().playSmallExplosion();
+		}
+		else {
+			tetrisTileManager.getPlaying().getGame().getAudioPlayer().playBigExplosion();
 		}
 		if (Math.abs(xSpeed) < TETRIS_TILE_MIN_EXPLOSION_X_SPEED)
 			xSpeed = TETRIS_TILE_MIN_EXPLOSION_X_SPEED*Math.signum(xSpeed);
@@ -356,7 +360,7 @@ public class TetrisTile extends Entity {
 		
 		int oldTileIndex = tileIndex;
 		Random random = new Random();
-		tileIndex = random.nextInt(0, NUM_TETRIS_TILES);
+		tileIndex = GetRandomTetrisTileIndex(random);
 		if (tileIndex == oldTileIndex)
 			tileIndex = (tileIndex + 1) %(NUM_TETRIS_TILES);
 

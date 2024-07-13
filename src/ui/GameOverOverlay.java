@@ -27,11 +27,10 @@ public class GameOverOverlay implements Statemethods{
 	private void loadImages() {
 		victoryImg = LoadSave.GetSpriteAtlas(LoadSave.VICTORY_IMG);
 		defeatImg = LoadSave.GetSpriteAtlas(LoadSave.DEFEAT_IMG);
-		float heightFactor = 1.0f, widthFactor = 1.0f;
 	}
 	
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID);
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, playing.getGame());
 	}
 	
 	@Override

@@ -7,11 +7,14 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.glfw.GLFW;
 
+import audio.AudioPlayer;
 import gamestates.Gamestate;
+import gamestates.State;
+import main.Game;
 import utilz.LoadSave;
 import static utilz.Constants.UI.Buttons.*;
 
-public class MenuButton {
+public class MenuButton extends State{
 	private int xPos, yPos, rowIndex, index;
 	private int xOffsetCenter = B_WIDTH / 2;
 	private Gamestate state;
@@ -20,7 +23,8 @@ public class MenuButton {
 	private Rectangle bounds;
 	private int controllerButtonId;
 
-	public MenuButton(int xPos, int yPos, int rowIndex, Gamestate state, int controllerButtonId) {
+	public MenuButton(int xPos, int yPos, int rowIndex, Gamestate state, int controllerButtonId, Game game) {
+		super(game);
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.rowIndex = rowIndex;
@@ -67,7 +71,7 @@ public class MenuButton {
 	}
  
 	public void applyGamestate() {
-		Gamestate.state = state;
+		setGamestate(state);
 	}
 
 	public void resetBools() {
@@ -76,6 +80,10 @@ public class MenuButton {
 	}
 	
 	public Gamestate getState() {
+		switch (state) {
+			case MENU -> game.getAudioPlayer().playSong(AudioPlayer.MENU);
+			case PLAYING -> game.getAudioPlayer().playSong(AudioPlayer.WIND);
+		}
 		return state;
 	}
 

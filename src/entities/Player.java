@@ -59,7 +59,7 @@ public class Player extends Entity {
 	
 	private int windsockWidth = (int) (Game.GAME_WIDTH/20);
 	private int windsockHeight = (int) (Game.GAME_WIDTH/20);
-	private int windsockY = (int) (Game.GAME_HEIGHT/2);
+	private int windsockY = (int) (30*Game.SCALE);
 	
 	private int statusBarWidth = (int) (128 * Game.SCALE);
 	private int statusBarHeight = (int) (64 * Game.SCALE);
@@ -165,7 +165,6 @@ public class Player extends Entity {
 				state = DEAD;
 				aniTick = 0;
 				aniIndex = 0;
-				playing.getGame().getAudioPlayer().playEffect(AudioPlayer.DIE);
 
 				// Check if player died in air
 				if (!IsEntityOnFloor(hitbox, lvlData)) {
@@ -175,7 +174,6 @@ public class Player extends Entity {
 			} else if (aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANI_SPEED - 1) {
 				//playing.getGame().getAudioPlayer().stopSong();
 				resetAtDeath();
-				playing.getGame().getAudioPlayer().playEffect(AudioPlayer.GAMEOVER);
 			} else {
 				updateAnimationTick();
 
@@ -231,7 +229,10 @@ public class Player extends Entity {
 		if (controllerIsPresent) {
 			ByteBuffer buttons = GLFW.glfwGetJoystickButtons(controllerID);
 			for (int i = 0; i<NUM_BUTTONS; i+=1) {
+				controllerIsPresent = GLFW.glfwJoystickPresent(controllerID);
 				prevButtonStates[i] = buttonStates[i];
+				if (!controllerIsPresent)
+					return;
 				buttonStates[i] = buttons.get(i);
 				if (buttonStates[i] == GLFW.GLFW_PRESS && prevButtonStates[i] == GLFW.GLFW_RELEASE) {
 		        	pushDownStartTimes[i] = playing.getGameTimeInSeconds();
@@ -316,6 +317,8 @@ public class Player extends Entity {
 			pauseControllerState = buttons.get(CONTROLLER_H_BUTTON_ID);
 	        if (pauseControllerState == GLFW.GLFW_RELEASE && prevPauseControllerState == GLFW.GLFW_PRESS) {
 	        	playing.setPaused(!playing.getPaused());
+	        	if (playing.getPaused())
+	        		playing.getGame().getAudioPlayer().stopSong();
 	        }
 		}
 	}
@@ -365,7 +368,6 @@ public class Player extends Entity {
 
 		playing.checkEnemyPlayerHit(isPlayer1);
 		playing.checkEnemyHit(attackBox);
-		playing.getGame().getAudioPlayer().playAttackSound();
 	}
 	
 	public float[] calcThrowSpeed() {
@@ -515,9 +517,11 @@ public class Player extends Entity {
 		// Background ui
 		int xDrawOffset = 0;
 		int xStatusBarOffset = statusBarX;
+		int windsockXOffset = (int) (xStatusBarOffset + statusBarWidth + 20*Game.SCALE);
 		if (!isPlayer1) {
 			xDrawOffset = -Game.GAME_WIDTH/2;
 			xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH/2 - statusBarWidth);
+			windsockXOffset = (int) (Game.GAME_WIDTH/2 - xStatusBarOffset - statusBarWidth - 20*Game.SCALE);
 		}
 		
 		// temperature
@@ -562,7 +566,8 @@ public class Player extends Entity {
 		else
 			wsImg = windsockImg3;
 			
-		g.drawImage(wsImg, Game.GAME_WIDTH/2-flip*windsockWidth/2 + xDrawOffset, windsockY, flip*windsockWidth, windsockHeight, null);
+		int windsockX = 50;
+		g.drawImage(wsImg, windsockX  + xStatusBarOffset-flip*windsockWidth/2, windsockY, flip*windsockWidth, windsockHeight, null);
 		
 		
 	}
@@ -692,7 +697,6 @@ public class Player extends Entity {
 	private void jump() {
 		boolean jumping = (airSpeed < 0);
 		if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < TIME_TO_JUMP_WHEN_ALREADY_IN_AIR))) {
-			playing.getGame().getAudioPlayer().playEffect(AudioPlayer.JUMP);
 			inAir = true;
 			airSpeed = jumpSpeed;
 		}

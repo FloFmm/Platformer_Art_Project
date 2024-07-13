@@ -14,39 +14,37 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AudioPlayer {
 
-	public static int MENU_1 = 0;
-	public static int LEVEL_1 = 1;
-	public static int LEVEL_2 = 2;
-
-	public static int DIE = 0;
-	public static int JUMP = 1;
-	public static int GAMEOVER = 2;
-	public static int LVL_COMPLETED = 3;
-	public static int ATTACK_ONE = 4;
-	public static int ATTACK_TWO = 5;
-	public static int ATTACK_THREE = 6;
+	
+	public static int WIND = 0;
+	public static int MENU = 1;
+	public float windFactor = MIN_WIND_VOLUME_FACTOR;
+	public static final float MIN_WIND_VOLUME_FACTOR = 0.7f;
+	public static final float MAX_WIND_VOLUME_FACTOR = 1.0f;
+	
+	public static final int SMALL_EXPLOSION = 0;
+	public static final int BIG_EXPLOSION = 1;
+	public static final float SMALL_EXPLOSION_VOLUME = 0.5f;
+	public static final float BIG_EXPLOSION_VOLUME = 0.6f;
 
 	private Clip[] songs, effects;
 	private int currentSongId;
-	private float volume = 0.5f;
-	private boolean songMute, effectMute;
-	private Random rand = new Random();
+	private float volume = 1.0f;
 
 	public AudioPlayer() {
 		loadSongs();
 		loadEffects();
-		playSong(MENU_1);
+		playSong(MENU);
 	}
 
 	private void loadSongs() {
-		String[] names = { "menu", "level1", "level2" };
+		String[] names = { "wind" };
 		songs = new Clip[names.length];
 		for (int i = 0; i < songs.length; i++)
 			songs[i] = getClip(names[i]);
 	}
 
 	private void loadEffects() {
-		String[] effectNames = { "die", "jump", "gameover", "lvlcompleted", "attack1", "attack2", "attack3" };
+		String[] effectNames = { "small_explosion", "big_explosion" };
 		effects = new Clip[effectNames.length];
 		for (int i = 0; i < effects.length; i++)
 			effects[i] = getClip(effectNames[i]);
@@ -83,26 +81,20 @@ public class AudioPlayer {
 	}
 
 	public void stopSong() {
+		if (currentSongId >= songs.length || currentSongId < 0 || songs[currentSongId] == null)
+			return;
+		
 		if (songs[currentSongId].isActive())
 			songs[currentSongId].stop();
 	}
 
-	public void setLevelSong(int lvlIndex) {
-		if (lvlIndex % 2 == 0)
-			playSong(LEVEL_1);
-		else
-			playSong(LEVEL_2);
-	}
 
-	public void lvlCompleted() {
-		stopSong();
-		playEffect(LVL_COMPLETED);
+	public void playSmallExplosion() {
+		playEffect(SMALL_EXPLOSION);
 	}
-
-	public void playAttackSound() {
-		int start = 4;
-		start += rand.nextInt(3);
-		playEffect(start);
+	
+	public void playBigExplosion() {
+		playEffect(BIG_EXPLOSION);
 	}
 
 	public void playEffect(int effect) {
@@ -116,44 +108,43 @@ public class AudioPlayer {
 
 		currentSongId = song;
 		updateSongVolume();
+		if (currentSongId >= songs.length || currentSongId < 0 || songs[currentSongId] == null)
+			return;
+		
 		songs[currentSongId].setMicrosecondPosition(0);
 		songs[currentSongId].loop(Clip.LOOP_CONTINUOUSLY);
 	}
 
-	public void toggleSongMute() {
-		this.songMute = !songMute;
-		for (Clip c : songs) {
-			BooleanControl booleanControl = (BooleanControl) c.getControl(BooleanControl.Type.MUTE);
-			booleanControl.setValue(songMute);
-		}
-	}
 
-	public void toggleEffectMute() {
-		this.effectMute = !effectMute;
-		for (Clip c : effects) {
-			BooleanControl booleanControl = (BooleanControl) c.getControl(BooleanControl.Type.MUTE);
-			booleanControl.setValue(effectMute);
-		}
-		if (!effectMute)
-			playEffect(JUMP);
-	}
-
-	private void updateSongVolume() {
-
+	public void updateSongVolume() {
+		if (currentSongId >= songs.length || currentSongId < 0 || songs[currentSongId] == null)
+			return;
 		FloatControl gainControl = (FloatControl) songs[currentSongId].getControl(FloatControl.Type.MASTER_GAIN);
 		float range = gainControl.getMaximum() - gainControl.getMinimum();
-		float gain = (range * volume) + gainControl.getMinimum();
+		float gain = (range * volume * windFactor) + gainControl.getMinimum();
 		gainControl.setValue(gain);
 
 	}
 
 	private void updateEffectsVolume() {
-		for (Clip c : effects) {
+		
+		for (int i=0; i < effects.length; i +=1) {
+			float factor = 1.0f;
+			switch(i) {
+				case(SMALL_EXPLOSION):
+					factor = SMALL_EXPLOSION_VOLUME;
+					break;
+				case(BIG_EXPLOSION):
+					factor = BIG_EXPLOSION_VOLUME;
+					break;
+			}
+			Clip c = effects[i];
 			FloatControl gainControl = (FloatControl) c.getControl(FloatControl.Type.MASTER_GAIN);
 			float range = gainControl.getMaximum() - gainControl.getMinimum();
-			float gain = (range * volume) + gainControl.getMinimum();
+			float gain = (range * volume * factor) + gainControl.getMinimum();
 			gainControl.setValue(gain);
 		}
 	}
+	
 
 }

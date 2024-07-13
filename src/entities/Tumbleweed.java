@@ -42,7 +42,6 @@ public class Tumbleweed extends Enemy {
 				state = DEAD;
 				aniTick = 0;
 				aniIndex = 0;
-				playing.getGame().getAudioPlayer().playEffect(AudioPlayer.DIE);
 
 				// Check if died in air
 				if (!IsEntityOnFloor(hitbox, lvlData)) {

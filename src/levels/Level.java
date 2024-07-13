@@ -47,14 +47,15 @@ public class Level {
 	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
 	private int lvlId;
 	private LevelManager levelManager;
+	private boolean isTutorial;
 	
 	public Level(BufferedImage img, boolean tutorial, int lvlId, LevelManager levelManager) {
 		this.img = img;
 		this.levelManager = levelManager;
 		lvlData = new int[img.getHeight()][img.getWidth()];
 		if (tutorial) {
-			this.drawForeground = false;
-			this.drawPolygons = true;
+			this.drawForeground = true;
+			this.drawPolygons = false;
 			this.drawSky = true;
 			this.drawBackground = false;
 			this.drawClouds = false;
@@ -70,6 +71,7 @@ public class Level {
 			this.drawWater = true;
 			this.drawDarkness=true;
 		}
+		this.isTutorial = tutorial;
 		this.lvlId = lvlId;
 		loadLevel();
 		calcLvlOffsets();
@@ -208,7 +210,7 @@ public class Level {
 		switch (greenValue) {
 		case TUMBLE_WEED -> crabs.add(new Tumbleweed(x * Game.TILES_SIZE, y * Game.TILES_SIZE, tumbleWeedSizeFactor, lvlData));
 		case TETRIS_TILE_GREEN_VALUE -> tetrisTiles.add(new TetrisTile(x * Game.TILES_SIZE, y * Game.TILES_SIZE, 
-				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, random.nextInt(0, NUM_TETRIS_TILES), lvlData, false));
+				TETRIS_TILE_WIDTH, TETRIS_TILE_HEIGHT, GetRandomTetrisTileIndex(random), lvlData, false));
 		case PLAYER_GREEN_VALUE -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
 		}
 	}
@@ -341,6 +343,10 @@ public class Level {
 
 	public int getLvlId() {
 		return lvlId;
+	}
+
+	public boolean getIsTutorial() {
+		return isTutorial;
 	}
 
 }
