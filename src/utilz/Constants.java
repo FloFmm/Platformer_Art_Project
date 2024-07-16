@@ -196,8 +196,8 @@ public class Constants {
 		public static final float MAX_TEMP = 100.0f;
 		public static final float TIME_TO_REACH_MAX_TEMP = 10*60;//15.0f * 60;
 		public static final float TEMP_FROM_FINISHED_WINDMILL = -30.0f;
-		public static final float TEMP_FROM_ROCKET_EXPLOSION = 2.5f;
-		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 1.0f;
+		public static final float TEMP_FROM_ROCKET_EXPLOSION = 5.0f;
+		public static final float TEMP_FROM_WINDMILL_EXPLOSION = 2.0f;
 		
 		// wind
 		public static final float WEAK_WIND_TH = 0.25f*Game.SCALE;

@@ -347,6 +347,7 @@ public class Playing extends State implements Statemethods {
 		paused = false;
 		gameTimeInSeconds = 0;
 		gameUpdates = 0;
+		windSpeed = 0.0f;
 		
 		player1.resetAll();
 		player2.resetAll();

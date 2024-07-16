@@ -18,13 +18,13 @@ public class AudioPlayer {
 	public static int WIND = 0;
 	public static int MENU = 1;
 	public float windFactor = MIN_WIND_VOLUME_FACTOR;
-	public static final float MIN_WIND_VOLUME_FACTOR = 0.7f;
+	public static final float MIN_WIND_VOLUME_FACTOR = 0.6f;
 	public static final float MAX_WIND_VOLUME_FACTOR = 1.0f;
 	
 	public static final int SMALL_EXPLOSION = 0;
 	public static final int BIG_EXPLOSION = 1;
-	public static final float SMALL_EXPLOSION_VOLUME = 0.5f;
-	public static final float BIG_EXPLOSION_VOLUME = 0.6f;
+	public static final float SMALL_EXPLOSION_VOLUME = 0.7f;
+	public static final float BIG_EXPLOSION_VOLUME = 0.8f;
 
 	private Clip[] songs, effects;
 	private int currentSongId;
@@ -123,7 +123,7 @@ public class AudioPlayer {
 		float range = gainControl.getMaximum() - gainControl.getMinimum();
 		float gain = (range * volume * windFactor) + gainControl.getMinimum();
 		gainControl.setValue(gain);
-
+		//System.out.println(volume * windFactor);
 	}
 
 	private void updateEffectsVolume() {
