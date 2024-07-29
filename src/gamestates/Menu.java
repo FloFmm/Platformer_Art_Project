@@ -1,7 +1,10 @@
 package gamestates;
 
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static utilz.Constants.ControllerConstants.*;
 import static utilz.Constants.UI.VolumeButtons.SLIDER_WIDTH;
 import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
@@ -60,7 +63,7 @@ public class Menu extends State implements Statemethods {
 					game.getPlaying().loadLevel(rowId, true);
 					game.getAudioPlayer().playSong(AudioPlayer.WIND);
 				}
-				resetButtons();
+				selectButton(mb.getRowIndex());
 			}
 		}
 		if (useVolumeButton)
@@ -89,8 +92,13 @@ public class Menu extends State implements Statemethods {
 			g.drawImage(controllerOfflineImg, (int) (Game.GAME_WIDTH*0.9 + xDrawOffset), 
 					(int) (Game.GAME_WIDTH*0.01), (int) (Game.GAME_WIDTH*0.1), (int) (Game.GAME_HEIGHT*0.1), null);
 	
-		for (MenuButton mb : buttons)
+		for (MenuButton mb : buttons){
 			mb.draw(g, xDrawOffset);
+			if (mb.isMouseOver()) {
+				g.setColor(Color.YELLOW);
+				g.drawRect(mb.getBounds().x + xDrawOffset, mb.getBounds().y, mb.getBounds().width, mb.getBounds().height);
+			}
+		}
 		if (useVolumeButton)
 			volumeButton.draw(g, xDrawOffset);
 	}
@@ -98,6 +106,55 @@ public class Menu extends State implements Statemethods {
 	private void resetButtons() {
 		for (MenuButton mb : buttons)
 			mb.resetBools();
-
 	}
+
+	public void keyPressed(int key) {
+		switch (key) {
+			case GLFW_KEY_UP:
+				changeSelection(-1);
+				break;
+			case GLFW_KEY_DOWN:
+				changeSelection(1);
+				break;
+			case GLFW_KEY_ENTER:
+				if (getSelectedButton() != -1) {
+					selectButton(getSelectedButton());
+				}
+				break;
+		}
+	}
+
+	public void keyReleased(int key) {
+		// You can add specific behavior for key releases if needed
+	}
+
+	private void changeSelection(int direction) {
+		int currentSelection = getSelectedButton();
+		int newSelection = (currentSelection + direction + buttons.length) % buttons.length;
+		setSelectedButton(newSelection);
+	}
+
+	private int getSelectedButton() {
+		for (int i = 0; i < buttons.length; i++) {
+			if (buttons[i].isMouseOver())
+				return i;
+		}
+		return -1;
+	}
+
+	private void setSelectedButton(int index) {
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].setMouseOver(i == index);
+		}
+	}
+
+	private void selectButton(int index) {
+		buttons[index].applyGamestate();
+		if (buttons[index].getState() == Gamestate.PLAYING) {
+			game.getPlaying().loadLevel(buttons[index].getRowIndex(), true);
+			game.getAudioPlayer().playSong(AudioPlayer.WIND);
+		}
+		resetButtons();
+	}
+
 }

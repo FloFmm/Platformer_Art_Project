@@ -9,6 +9,8 @@ import org.lwjgl.glfw.GLFW;
 import main.Game;
 import ui.MenuButton;
 import utilz.LoadSave;
+
+import static org.lwjgl.glfw.GLFW.*;
 import static utilz.Constants.ControllerConstants.*;
 
 public class Credits extends State implements Statemethods {
@@ -51,5 +53,10 @@ public class Credits extends State implements Statemethods {
 	private void resetButtons() {
 		for (MenuButton mb : buttons)
 			mb.resetBools();
+	}
+
+	public void keyPressed(int key) {
+		int a = 1;
+		int b = 1+2 + a;
 	}
 }

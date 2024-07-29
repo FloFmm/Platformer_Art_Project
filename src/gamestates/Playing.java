@@ -11,7 +11,6 @@ import entities.EnemyManager;
 import entities.Entity;
 import entities.Player;
 import entities.TetrisTileManager;
-import levels.Level;
 import levels.LevelManager;
 import main.Game;
 import objects.ObjectManager;
@@ -24,6 +23,7 @@ import static utilz.Constants.PlayerConstants.*;
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.UPS_SET;
 import static utilz.HelpMethods.*;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Playing extends State implements Statemethods {
 
@@ -59,7 +59,7 @@ public class Playing extends State implements Statemethods {
 
 	private float windSpeed = 0.0f;
 	public boolean useController = true;
-	
+
 	
 	public Playing(Game game) {
 		super(game);
@@ -73,6 +73,29 @@ public class Playing extends State implements Statemethods {
 		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentDarknessAlpha = 0;
 		loadImgs();
+	}
+
+	public void keyPressed(int key) {
+		switch (key) {
+			case GLFW_KEY_W -> player1.setJump(true);
+			case GLFW_KEY_A -> player1.setLeft(true);
+			case GLFW_KEY_D -> player1.setRight(true);
+			case GLFW_KEY_UP -> player2.setJump(true);
+			case GLFW_KEY_LEFT -> player2.setLeft(true);
+			case GLFW_KEY_RIGHT -> player2.setRight(true);
+			case GLFW_KEY_ENTER -> this.setLoading(false);
+		}
+	}
+
+	public void keyReleased(int key) {
+		switch (key) {
+			case GLFW_KEY_W -> player1.setJump(false);
+			case GLFW_KEY_A -> player1.setLeft(false);
+			case GLFW_KEY_D -> player1.setRight(false);
+			case GLFW_KEY_UP -> player2.setJump(false);
+			case GLFW_KEY_LEFT -> player2.setLeft(false);
+			case GLFW_KEY_RIGHT -> player2.setRight(false);
+		}
 	}
 
 	public void loadLevel(int lvlIndex, boolean resetAll) {
@@ -115,7 +138,7 @@ public class Playing extends State implements Statemethods {
 		tetrisTileManager = new TetrisTileManager(this);
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager = new BuildingZoneManager(this);
-		player1 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
+		player1 = new Player(1, 20, (int) (PLAYER_BASE_WIDTH * Game.SCALE),
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, true);
 		player2 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, false);
