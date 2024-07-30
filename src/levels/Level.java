@@ -102,7 +102,7 @@ public class Level {
 		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_water.png") != null) {
 			waterImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_water.png");
 		}
-		else {
+		else if (lvlId == 1){
 			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_water.png");
 			waterImg = levelManager.getLevelByIndex(lvlId-1).getWaterImg();
 		}
@@ -110,7 +110,7 @@ public class Level {
 		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_sky.png")!=null) {
 			skyImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_sky.png");
 		}
-		else {
+		else if (lvlId == 1) {
 			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_sky.png");
 			skyImg = levelManager.getLevelByIndex(lvlId-1).getSkyImg();
 		}
@@ -118,7 +118,7 @@ public class Level {
 		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_cloud1.png")!=null) {
 			cloudImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud1.png");
 		}
-		else {
+		else if (lvlId == 1) {
 			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_cloud1.png");
 			cloudImg1 = levelManager.getLevelByIndex(lvlId-1).getCloudImg1();
 		}
@@ -126,7 +126,7 @@ public class Level {
 		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_cloud2.png")!=null) {
 			cloudImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud2.png");
 		}
-		else {
+		else if (lvlId == 1) {
 			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_cloud2.png");
 			cloudImg2 = levelManager.getLevelByIndex(lvlId-1).getCloudImg2();
 		}
@@ -134,7 +134,7 @@ public class Level {
 		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_background1.png")!=null) {
 			backgroundImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background1.png");
 		}
-		else {
+		else if (lvlId == 1) {
 			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_background1.png");
 			backgroundImg1 = levelManager.getLevelByIndex(lvlId-1).getBackgroundImg1();
 		}
@@ -142,7 +142,7 @@ public class Level {
 		if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_background2.png")!=null) {
 			backgroundImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background2.png");
 		}
-		else {
+		else if (lvlId == 1) {
 			System.out.println("file does not exist: " + "layers/" + (lvlId) + "_background2.png");
 			backgroundImg2 = levelManager.getLevelByIndex(lvlId-1).getBackgroundImg2();
 		}

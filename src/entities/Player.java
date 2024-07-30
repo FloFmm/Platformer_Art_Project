@@ -816,7 +816,7 @@ public class Player extends Entity {
 			for (int i = 0; i < animations[j].length; i++) {
 				if (i<GetSpriteAmount(j)) {
 					if (Thread.currentThread().getContextClassLoader().getResource(baseDir + "/" + fileName + i + ".png")!=null) {
-						
+
 						animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/" + fileName + i + ".png");
 					}
 					else {
@@ -824,8 +824,7 @@ public class Player extends Entity {
 				            animations[j][i] = replaceColors(playing.getPlayer1().getAnimations()[j][i], COLOR_MAP, PLAYER_COLOR_TOLERANCE, PLAYER_DEFAULT_COLOR);
 				            LoadSave.SaveImage(animations[j][i], "png", "res/" + baseDir + "/" + fileName + i + ".png");
 				            System.out.println("file: " + "res/" + baseDir + "/" + fileName + i + ".png" + " was created by repalcing colors");
-						}
-						else {
+						} else if (!fileName.contains("hit") && !fileName.contains("dead")) {
 							animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
 							System.out.println("file does not exist: " + baseDir + "/" + fileName + i + ".png");
 						}
