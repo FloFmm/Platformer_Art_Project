@@ -142,6 +142,14 @@ public class Player extends Entity {
 		hitbox.y = y;
 	}
 
+	public float getX(){
+		return this.x;
+	}
+
+	public float getY(){
+		return this.y;
+	}
+
 
 	private void initAttackBox(int width, int height) {
 		attackBox = new Rectangle2D.Float(x, y, (int) (width * Game.SCALE), (int) (height * Game.SCALE));
@@ -341,6 +349,25 @@ public class Player extends Entity {
 		}
 	}
 
+	public void changeThrowDirectionKeyboardLeft(){
+		throwWidthInSmallTiles = Math.max(throwWidthInSmallTiles-1, -TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES);
+	}
+
+	public void changeThrowDirectionKeyboardRight(){
+		throwWidthInSmallTiles = Math.min(throwWidthInSmallTiles+1, TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES);
+	}
+	public void changeThrowDirectionKeyboardDown(){
+		throwHeightInSmallTiles = Math.max(throwHeightInSmallTiles-1, 1);
+	}
+
+	public void changeThrowDirectionKeyboardUp(){
+		throwHeightInSmallTiles = Math.min(throwHeightInSmallTiles+1, TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES);
+	}
+
+
+
+
+
 	
 	private void checkInsideWater() {
 		if (hitbox.y > playing.getCurrentWaterYPos() + WATER_HEIGHT*0.1f) {
@@ -424,23 +451,24 @@ public class Player extends Entity {
 			aniStateOffset = NUM_ANIMATIONS;		
 		g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
 				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
-		//drawHitbox(g, xLvlOffset, yLvlOffset);
-		//drawGrabBox(g, xLvlOffset, yLvlOffset);
-		//drawAttackBox(g, xLvlOffset, yLvlOffset);
-		if ((playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_X_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
+//		drawHitbox(g, xLvlOffset, yLvlOffset);
+//		drawGrabBox(g, xLvlOffset, yLvlOffset);
+//		drawAttackBox(g, xLvlOffset, yLvlOffset);
+		/*if ((playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_X_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
 			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_RIGHT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
 			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_LEFT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
 			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_UP_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
 			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_DOWN_BUTTON_ID] < THROW_ARC_SHOW_TIME)
 			&& (isCarrying != null) && throwHeightInSmallTiles > 0) {
-			drawThrowArc(g, xLvlOffset, yLvlOffset);
-			drawThrowArc = true;
-		}
-		drawThrowArc = false;
+
+		}*/
+		drawThrowArc(g, xLvlOffset, yLvlOffset);
+		drawGrabBox(g, 0,0);
+		drawThrowArc = true;
 			
 	}
-	
-	protected void drawGrabBox(Graphics g, int xLvlOffset, int yLvlOffset) {
+
+	public void drawGrabBox(Graphics g, int xLvlOffset, int yLvlOffset) {
 		g.setColor(Color.BLACK);
 		g.drawRect((int) grabBox.x - xLvlOffset, (int) grabBox.y - yLvlOffset, (int) grabBox.width, (int) grabBox.height);
 	}
@@ -487,7 +515,6 @@ public class Player extends Entity {
 	}
 	
 	protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset) {
-		
 		Graphics2D g2 = (Graphics2D) g;
 		g.setColor(THROW_ARC_COLOR_PLAYER2);
 		int pIndex = 1;

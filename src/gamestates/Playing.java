@@ -8,10 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import audio.AudioPlayer;
-import entities.EnemyManager;
-import entities.Entity;
-import entities.Player;
-import entities.TetrisTileManager;
+import entities.*;
 import levels.LevelManager;
 import main.Game;
 import objects.ObjectManager;
@@ -77,16 +74,24 @@ public class Playing extends State implements Statemethods {
 	}
 
 	public void keyPressed(int key) {
+
 		switch (key) {
 			case KeyEvent.VK_W -> player1.setJump(true);
 			case KeyEvent.VK_A -> player1.setLeft(true);
 			case KeyEvent.VK_D -> player1.setRight(true);
-			case KeyEvent.VK_E -> player1.setGrabOrThrow(true);
+			case KeyEvent.VK_E -> player1.powerAttack();
+			case KeyEvent.VK_R -> player1.grabOrThrow();
+			case KeyEvent.VK_Q -> player1.changePower(200);
+			case KeyEvent.VK_T -> this.objectManager.addExplosion((int) player1.getX(), (int) player1.getY(), 10, 10);
+			case KeyEvent.VK_J -> player1.changeThrowDirectionKeyboardLeft();
+			case KeyEvent.VK_L -> player1.changeThrowDirectionKeyboardRight();
+			case KeyEvent.VK_K -> player1.changeThrowDirectionKeyboardDown();
+			case KeyEvent.VK_I -> player1.changeThrowDirectionKeyboardUp();
 
 			case KeyEvent.VK_UP -> player2.setJump(true);
 			case KeyEvent.VK_LEFT-> player2.setLeft(true);
 			case KeyEvent.VK_RIGHT -> player2.setRight(true);
-			case KeyEvent.VK_ENTER -> player2.setGrabOrThrow(true);
+			case KeyEvent.VK_ENTER -> player2.grabOrThrow();
 			case KeyEvent.VK_SPACE -> this.setLoading(false);
 		}
 	}
