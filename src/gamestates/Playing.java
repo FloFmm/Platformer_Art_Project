@@ -2,6 +2,7 @@ package gamestates;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -77,28 +78,34 @@ public class Playing extends State implements Statemethods {
 
 	public void keyPressed(int key) {
 		switch (key) {
-			case GLFW_KEY_W -> player1.setJump(true);
-			case GLFW_KEY_A -> player1.setLeft(true);
-			case GLFW_KEY_D -> player1.setRight(true);
-			case GLFW_KEY_UP -> player2.setJump(true);
-			case GLFW_KEY_LEFT -> player2.setLeft(true);
-			case GLFW_KEY_RIGHT -> player2.setRight(true);
-			case GLFW_KEY_ENTER -> this.setLoading(false);
+			case KeyEvent.VK_W -> player1.setJump(true);
+			case KeyEvent.VK_A -> player1.setLeft(true);
+			case KeyEvent.VK_D -> player1.setRight(true);
+			case KeyEvent.VK_E -> player1.setGrabOrThrow(true);
+
+			case KeyEvent.VK_UP -> player2.setJump(true);
+			case KeyEvent.VK_LEFT-> player2.setLeft(true);
+			case KeyEvent.VK_RIGHT -> player2.setRight(true);
+			case KeyEvent.VK_ENTER -> player2.setGrabOrThrow(true);
+			case KeyEvent.VK_SPACE -> this.setLoading(false);
 		}
 	}
 
 	public void keyReleased(int key) {
 		switch (key) {
-			case GLFW_KEY_W -> player1.setJump(false);
-			case GLFW_KEY_A -> player1.setLeft(false);
-			case GLFW_KEY_D -> player1.setRight(false);
-			case GLFW_KEY_UP -> player2.setJump(false);
-			case GLFW_KEY_LEFT -> player2.setLeft(false);
-			case GLFW_KEY_RIGHT -> player2.setRight(false);
+			case KeyEvent.VK_W -> player1.setJump(false);
+			case KeyEvent.VK_A -> player1.setLeft(false);
+			case KeyEvent.VK_D -> player1.setRight(false);
+			case KeyEvent.VK_E -> player1.setGrabOrThrow(false);
+			case KeyEvent.VK_UP -> player2.setJump(false);
+			case KeyEvent.VK_LEFT-> player2.setLeft(false);
+			case KeyEvent.VK_RIGHT -> player2.setRight(false);
+			case KeyEvent.VK_ENTER -> player2.setGrabOrThrow(false);
 		}
 	}
 
 	public void loadLevel(int lvlIndex, boolean resetAll) {
+		System.out.println("Loading level: " + lvlIndex + " game state is " + Gamestate.state);
 		levelManager.setLevelIndex(lvlIndex);
 		if (resetAll)
 			resetAll();

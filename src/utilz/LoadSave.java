@@ -45,7 +45,8 @@ public class LoadSave {
 		BufferedImage img = null;
 		InputStream is = LoadSave.class.getResourceAsStream("/" + fileName);
 		try {
-			img = ImageIO.read(is);
+            assert is != null;
+            img = ImageIO.read(is);
 
 		} catch (Exception e) {
 			e.printStackTrace();

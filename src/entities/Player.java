@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWKeyCallback;
 
 
 public class Player extends Entity {
@@ -111,32 +110,7 @@ public class Player extends Entity {
 	private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
 	private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
 
-	public int[] keyStates = new int[GLFW.GLFW_KEY_LAST + 1];
-	public int[] prevKeyStates = new int[GLFW.GLFW_KEY_LAST + 1];
-	public double[] keyPushDownStartTimes = new double[GLFW.GLFW_KEY_LAST + 1];
-
-	public int dashKeyState, prevDashKeyState;
-	public int grabOrThrowKeyState, prevGrabOrThrowKeyState;
-	public int rotateKeyState, prevRotateKeyState;
-	public int pauseKeyState, prevPauseKeyState;
-
 	private final boolean isPlayer1;
-
-	public class KeyboardHandler extends GLFWKeyCallback {
-
-		private static boolean[] keys = new boolean[GLFW.GLFW_KEY_LAST];
-
-		@Override
-		public void invoke(long window, int key, int scancode, int action, int mods) {
-			if (key >= 0 && key < keys.length) {
-				keys[key] = action != GLFW.GLFW_RELEASE;
-			}
-		}
-
-		public static boolean isKeyDown(int key) {
-			return keys[key];
-		}
-	}
 
 	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
 		super(x, y, width, height);
@@ -662,7 +636,6 @@ public class Player extends Entity {
 
 	private void updatePos() {
 		moving = false;
-		//System.out.println(jump);
 		if (jump)
 			jump();
 

@@ -56,7 +56,8 @@ public class MenuButton {
 		}
 		if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_2)) {
 			ByteBuffer buttons2 = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_2);
-			if (buttons2.get(controllerButtonId) == GLFW.GLFW_PRESS)
+            assert buttons2 != null;
+            if (buttons2.get(controllerButtonId) == GLFW.GLFW_PRESS)
 				buttonState = GLFW.GLFW_PRESS;
 		}
 		index = 0;

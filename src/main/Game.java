@@ -1,10 +1,10 @@
 package main;
 
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWJoystickCallback;
-import org.lwjgl.glfw.GLFWKeyCallback;
 
 import audio.AudioPlayer;
 import gamestates.Credits;
@@ -21,7 +21,6 @@ public class Game implements Runnable {
     private GamePanel gamePanel2;
     private Thread gameThread;
     private long windowHandle;
-    private GLFWKeyCallback keyCallback;
 
     private Playing playing;
     private Menu menu;
@@ -37,14 +36,13 @@ public class Game implements Runnable {
 
     private final boolean SHOW_FPS_UPS = false;
     private static GLFWJoystickCallback joystickCallback;
+    public GameWindow gameWindow;
 
     public Game() {
 
         System.out.println("size: " + GAME_WIDTH + " : " + GAME_HEIGHT);
         initClasses();
         initControllerInput();
-        initGLFW();
-        initKeyCallback();
         gamePanel1 = new GamePanel(this, true);
         gamePanel2 = new GamePanel(this, false);
         new GameWindow(gamePanel1, gamePanel2);
@@ -82,41 +80,14 @@ public class Game implements Runnable {
         GLFW.glfwSetJoystickCallback(joystickCallback);
     }
 
-    private void initGLFW() {
-        if (!GLFW.glfwInit()) {
-            throw new IllegalStateException("Unable to initialize GLFW");
-        }
-        windowHandle = GLFW.glfwCreateWindow(GAME_WIDTH, GAME_HEIGHT, "Your Game Title", 0, 0);
-        if (windowHandle == 0) {
-            throw new RuntimeException("Failed to create the GLFW window");
-        }
-        GLFW.glfwMakeContextCurrent(windowHandle);
-        GLFW.glfwShowWindow(windowHandle);
-    }
-
-    private void initKeyCallback() {
-        keyCallback = new GLFWKeyCallback() {
-            @Override
-            public void invoke(long window, int key, int scancode, int action, int mods) {
-                if (action == GLFW.GLFW_PRESS) {
-                    keyPressed(key);
-                } else if (action == GLFW.GLFW_RELEASE) {
-                    keyReleased(key);
-                }
-            }
-        };
-        GLFW.glfwSetKeyCallback(windowHandle, keyCallback);
-    }
-
-
-    private void keyPressed(int key) {
+    public void keyPressed(int key) {
         switch (Gamestate.state) {
             case MENU -> menu.keyPressed(key);
             case PLAYING -> playing.keyPressed(key);
         }
     }
 
-    private void keyReleased(int key) {
+    public void keyReleased(int key) {
         switch (Gamestate.state) {
             case MENU -> menu.keyReleased(key);
             case PLAYING -> playing.keyReleased(key);
@@ -140,74 +111,57 @@ public class Game implements Runnable {
     }
 
 
-    @SuppressWarnings("incomplete-switch")
     public void render(Graphics g, boolean isPlayer1) {
         switch (Gamestate.state) {
-            case MENU -> menu.draw(g, isPlayer1);
+            case MENU -> {
+                menu.draw(g, isPlayer1);
+            }
             case PLAYING -> {
                 playing.draw(g, isPlayer1);
             }
-            case CREDITS -> credits.draw(g, isPlayer1);
+            case CREDITS -> {
+                credits.draw(g, isPlayer1);
+            }
+            default -> System.out.println("Unknown state: " + Gamestate.state);
         }
     }
 
 
     @Override
     public void run() {
-        double timePerFrame = 1000000000.0 / FPS_SET;
-        double timePerUpdate = 1000000000.0 / UPS_SET;
+        double timePerFrame = 1000000000.0 / 60;  // FPS_SET assumed as 60
+        double timePerUpdate = 1000000000.0 / 60; // UPS_SET assumed as 60
 
         long previousTime = System.nanoTime();
-
-        int frames = 0;
-        int updates = 0;
-        long lastCheck = System.currentTimeMillis();
-
         double deltaU = 0;
         double deltaF = 0;
-        while (!GLFW.glfwWindowShouldClose(windowHandle)) {
-            GLFW.glfwPollEvents();
-            long currentTime = System.nanoTime();
 
+        while (true) {
+            long currentTime = System.nanoTime();
             deltaU += (currentTime - previousTime) / timePerUpdate;
             deltaF += (currentTime - previousTime) / timePerFrame;
             previousTime = currentTime;
 
             if (deltaU >= 1) {
-
                 update();
-                updates++;
                 deltaU--;
-
             }
 
             if (deltaF >= 1) {
-
                 gamePanel1.repaint();
                 gamePanel2.repaint();
-                frames++;
                 deltaF--;
-
             }
 
-            if (SHOW_FPS_UPS)
-                if (System.currentTimeMillis() - lastCheck >= 1000) {
-
-                    lastCheck = System.currentTimeMillis();
-                    System.out.println("FPS: " + frames + " | UPS: " + updates);
-                    frames = 0;
-                    updates = 0;
-
-                }
-            gamePanel1.repaint();
-            gamePanel2.repaint();
-            GLFW.glfwSwapBuffers(windowHandle);
+            try {
+                Thread.sleep(1); // Small sleep to prevent 100% CPU usage
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        cleanup();
     }
 
     public void cleanup() {
-        keyCallback.free();
         GLFW.glfwDestroyWindow(windowHandle);
         GLFW.glfwTerminate();
     }

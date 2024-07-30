@@ -1,6 +1,7 @@
 package gamestates;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -24,6 +25,7 @@ public class Menu extends State implements Statemethods {
 	private int menuX, menuY, menuWidth, menuHeight;
 	private VolumeButton volumeButton;
 	private boolean useVolumeButton = false;
+	private int selectedButtonIndex = 0;
 	
 	public Menu(Game game) {
 		super(game);
@@ -56,7 +58,9 @@ public class Menu extends State implements Statemethods {
 	public void update() {
 		for (MenuButton mb : buttons) {
 			mb.update();
+
 			if (mb.getButtonState() == GLFW.GLFW_RELEASE && mb.getPrevButtonState() == GLFW.GLFW_PRESS) {
+				activateButton(mb.getRowIndex());
 				mb.applyGamestate();
 				if (mb.getState() == Gamestate.PLAYING) {
 					int rowId = mb.getRowIndex();
@@ -65,7 +69,9 @@ public class Menu extends State implements Statemethods {
 				}
 				selectButton(mb.getRowIndex());
 			}
+
 		}
+		updateButtonSelection();
 		if (useVolumeButton)
 			volumeButton.update();
 	}
@@ -91,12 +97,16 @@ public class Menu extends State implements Statemethods {
 		else
 			g.drawImage(controllerOfflineImg, (int) (Game.GAME_WIDTH*0.9 + xDrawOffset), 
 					(int) (Game.GAME_WIDTH*0.01), (int) (Game.GAME_WIDTH*0.1), (int) (Game.GAME_HEIGHT*0.1), null);
-	
-		for (MenuButton mb : buttons){
-			mb.draw(g, xDrawOffset);
-			if (mb.isMouseOver()) {
+
+
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].draw(g, xDrawOffset);
+			if (i == selectedButtonIndex) {
+				// Draw a highlight around the selected button
 				g.setColor(Color.YELLOW);
-				g.drawRect(mb.getBounds().x + xDrawOffset, mb.getBounds().y, mb.getBounds().width, mb.getBounds().height);
+				Rectangle bounds = buttons[i].getBounds();
+				g.drawRect(bounds.x + xDrawOffset - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
+
 			}
 		}
 		if (useVolumeButton)
@@ -110,16 +120,32 @@ public class Menu extends State implements Statemethods {
 
 	public void keyPressed(int key) {
 		switch (key) {
-			case GLFW_KEY_UP:
-				changeSelection(-1);
+			case KeyEvent.VK_UP:
+				selectNextButton();
 				break;
-			case GLFW_KEY_DOWN:
-				changeSelection(1);
+			case KeyEvent.VK_DOWN:
+				selectPreviousButton();
 				break;
-			case GLFW_KEY_ENTER:
+			case KeyEvent.VK_ENTER:
 				if (getSelectedButton() != -1) {
-					selectButton(getSelectedButton());
+					activateButton(getSelectedButton());
 				}
+				break;
+			case KeyEvent.VK_1:
+			case KeyEvent.VK_NUMPAD1:
+				activateButton(0);
+				break;
+			case KeyEvent.VK_2:
+			case KeyEvent.VK_NUMPAD2:
+				activateButton(1);
+				break;
+			case KeyEvent.VK_3:
+			case KeyEvent.VK_NUMPAD3:
+				activateButton(2);
+				break;
+			case KeyEvent.VK_4:
+			case KeyEvent.VK_NUMPAD4:
+				activateButton(3);
 				break;
 		}
 	}
@@ -128,10 +154,37 @@ public class Menu extends State implements Statemethods {
 		// You can add specific behavior for key releases if needed
 	}
 
-	private void changeSelection(int direction) {
-		int currentSelection = getSelectedButton();
-		int newSelection = (currentSelection + direction + buttons.length) % buttons.length;
-		setSelectedButton(newSelection);
+	private void activateButton(int index) {
+		if (index >= 0 && index < buttons.length) {
+			if (buttons[index].getState() == Gamestate.PLAYING) {
+				setGamestate(Gamestate.PLAYING);
+				game.getPlaying().loadLevel(index, true);
+				game.getPlaying().setLoading(true);
+				game.getPlaying().update();
+				//game.getAudioPlayer().playSong(AudioPlayer.MENU);
+				buttons[index].applyGamestate();
+			}
+		}
+	}
+
+	private void selectNextButton() {
+		selectedButtonIndex = (selectedButtonIndex + 1) % buttons.length;
+		updateButtonSelection();
+	}
+
+	private void selectPreviousButton() {
+		selectedButtonIndex = (selectedButtonIndex - 1 + buttons.length) % buttons.length;
+		updateButtonSelection();
+	}
+
+	private void updateButtonSelection() {
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].setMouseOver(i == selectedButtonIndex);
+		}
+	}
+
+	private int getSelectedButtonIndex() {
+		return selectedButtonIndex;
 	}
 
 	private int getSelectedButton() {
@@ -140,12 +193,6 @@ public class Menu extends State implements Statemethods {
 				return i;
 		}
 		return -1;
-	}
-
-	private void setSelectedButton(int index) {
-		for (int i = 0; i < buttons.length; i++) {
-			buttons[i].setMouseOver(i == index);
-		}
 	}
 
 	private void selectButton(int index) {

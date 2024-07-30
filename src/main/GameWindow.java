@@ -14,7 +14,7 @@ public class GameWindow {
 	public GameWindow(GamePanel gamePanel1, GamePanel gamePanel2) {
 
 		jframe = new JFrame();
-		jframe.setUndecorated(true);
+		//jframe.setUndecorated(true);
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// Set Layout for the content pane of the frame
