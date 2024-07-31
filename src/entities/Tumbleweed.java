@@ -7,10 +7,6 @@ import static utilz.HelpMethods.CanMoveHere;
 import static utilz.HelpMethods.GetEntityXPosNextToWall;
 import static utilz.HelpMethods.IsEntityOnFloor;
 
-import java.util.Random;
-
-import audio.AudioPlayer;
-
 import static utilz.Constants.GRAVITY;
 import static utilz.Constants.UPS_SET;
 
@@ -76,10 +72,10 @@ public class Tumbleweed extends Enemy {
 		updateAnimationTick();
 		setAnimation(lvlData, playing);
 		
-		if (!friendly && !playing.getPlayer1().getPowerAttackActive()) 
+		if (!friendly && playing.getPlayer1().getPowerAttackNotActive())
 			checkPlayerHit(attackBox, playing.getPlayer1());
 		
-		if (!friendly && !playing.getPlayer1().getPowerAttackActive()) 
+		if (!friendly && playing.getPlayer1().getPowerAttackNotActive())
 			checkPlayerHit(attackBox, playing.getPlayer2());
 	}
 

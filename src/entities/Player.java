@@ -43,69 +43,50 @@ public class Player extends Entity {
 	
 	// Jumping / Gravity
 	private float jumpSpeed = PLAYER_JUMP_SPEED;
-	private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
 
-	// StatusBarUI
+    // StatusBarUI
 	private BufferedImage statusBarImg, windsockImg1, windsockImg2, windsockImg3, tempScaleImg;
 	
-	private Color tempScaleBackgroundColor = BACKGROUND_GREY;
-	private int tempScaleWidth = (int) (20*Game.SCALE);
-	private int tempBarWidth = (int) (10*Game.SCALE);
-	private int tempBarMaxHeight = (int) (108*Game.SCALE);
-	private int tempBarY = (int) (25*Game.SCALE);
-	
-	private int windsockWidth = (int) (Game.GAME_WIDTH/17);
-	private int windsockHeight = (int) (Game.GAME_WIDTH/17);
-	private int windsockY = (int) (3*Game.SCALE);
-	
-	private int statusBarWidth = (int) (128 * Game.SCALE);
-	private int statusBarHeight = (int) (64 * Game.SCALE);
-	private int statusBarX = (int) (10 * Game.SCALE);
-	private int statusBarY = (int) (0 * Game.SCALE);
+	private final Color tempScaleBackgroundColor = BACKGROUND_GREY;
 
-	private Color healthBarBackgroundColor = BACKGROUND_GREY;
-	private Color healthBarColor = BASE_GREY;
-	private int healthBarWidth = (int) (statusBarWidth*800/1024);
-	private int healthBarHeight = (int) (statusBarHeight*100/512);
-	private int healthBarXStart = (int) (statusBarWidth*180/1024);
-	private int healthBarYStart = (int) (statusBarHeight*80/512);
-	private int healthWidth = healthBarWidth;
+    private final int statusBarWidth = (int) (128 * Game.SCALE);
 
-	private Color powerBarBackgroundColor = BACKGROUND_GREY;
-	private Color powerBarColor = BASE_GREY;
-	private int powerBarWidth = (int) (statusBarWidth*800/1024);
-	private int powerBarHeight = (int) (statusBarHeight*100/512);
-	private int powerBarXStart = (int) (statusBarWidth*180/1024);
-	private int powerBarYStart = (int) (statusBarHeight*270/512);
-	private int powerWidth = powerBarWidth;
-	private int powerMaxValue = 200;
+    private final Color healthBarBackgroundColor = BACKGROUND_GREY;
+	private final Color healthBarColor = BASE_GREY;
+	private final int healthBarWidth = statusBarWidth*800/1024;
+    private int healthWidth = healthBarWidth;
+
+	private final Color powerBarBackgroundColor = BACKGROUND_GREY;
+	private final Color powerBarColor = BASE_GREY;
+	private final int powerBarWidth = statusBarWidth*800/1024;
+    private int powerWidth = powerBarWidth;
+	private final int powerMaxValue = 200;
 	private int powerValue = powerMaxValue;
 
 	private int flipX = 0;
 	private int flipW = 1;
 	private boolean attackChecked;
-	private Playing playing;
+	private final Playing playing;
 	private int tileY = 0;
 
 	private boolean powerAttackActive=false, selfHurt = false;
 	private int powerAttackTick;
-	private int powerGrowSpeed = 15;
-	private int powerGrowTick;
+    private int powerGrowTick;
 	
 	// grab and throw
-	private float throwHeightInSmallTiles = TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES/2, throwWidthInSmallTiles = TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES/2;
+	private float throwHeightInSmallTiles = (float) TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES /2, throwWidthInSmallTiles = (float) TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES /2;
 	private boolean throwActive=false;
 	private boolean drawThrowArc = false;
 	//controller
-	private int[] buttonStates = new int[NUM_BUTTONS];
-	private int[] prevButtonStates = new int[NUM_BUTTONS];
-	private float[] pushDownStartTimes = new float[NUM_BUTTONS];
-	private float[] buttonLastPressed = new float[NUM_BUTTONS];
-	private int controllerID; 
-	private int prevGrabOrThrowControllerState = GLFW.GLFW_RELEASE, grabOrThrowControllerState = GLFW.GLFW_RELEASE;
-	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
-	private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
-	private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
+	private final int[] buttonStates = new int[NUM_BUTTONS];
+	private final int[] prevButtonStates = new int[NUM_BUTTONS];
+	private final float[] pushDownStartTimes = new float[NUM_BUTTONS];
+	private final float[] buttonLastPressed = new float[NUM_BUTTONS];
+	private final int controllerID;
+    private int grabOrThrowControllerState = GLFW.GLFW_RELEASE;
+    private int rotateControllerState = GLFW.GLFW_RELEASE;
+    private int pauseControllerState = GLFW.GLFW_RELEASE;
+    private int dashControllerState = GLFW.GLFW_RELEASE;
 	private boolean keyboardRotatedTile = false;
 
 	private final boolean isPlayer1;
@@ -264,14 +245,14 @@ public class Player extends Entity {
 	        }
 	        
 	        // dash
-	        prevDashControllerState = dashControllerState;
+            int prevDashControllerState = dashControllerState;
 	        dashControllerState = buttons.get(CONTROLLER_L_BUTTON_ID);
 	        if (dashControllerState == GLFW.GLFW_RELEASE && prevDashControllerState == GLFW.GLFW_PRESS) {
 	        	powerAttack();
 	        }
 	        
 	        // grab or throw
-	        prevGrabOrThrowControllerState = grabOrThrowControllerState;
+            int prevGrabOrThrowControllerState = grabOrThrowControllerState;
 	        grabOrThrowControllerState = buttons.get(CONTROLLER_X_BUTTON_ID);
 	        if (grabOrThrowControllerState == GLFW.GLFW_RELEASE && prevGrabOrThrowControllerState == GLFW.GLFW_PRESS) {
 				grabOrThrow = false;
@@ -293,7 +274,7 @@ public class Player extends Entity {
 	        }
 	        
 	        // rotate tetris tile
-	        prevRotateControllerState = rotateControllerState;
+            int prevRotateControllerState = rotateControllerState;
 	        rotateControllerState = buttons.get(CONTROLLER_Y_BUTTON_ID);
 	        if (rotateControllerState == GLFW.GLFW_RELEASE && prevRotateControllerState == GLFW.GLFW_PRESS) {
 	        	if (isCarrying != null) {
@@ -320,7 +301,7 @@ public class Player extends Entity {
 			}
 			
 			// pause menu
-			prevPauseControllerState = pauseControllerState;
+            int prevPauseControllerState = pauseControllerState;
 			pauseControllerState = buttons.get(CONTROLLER_H_BUTTON_ID);
 	        if (pauseControllerState == GLFW.GLFW_RELEASE && prevPauseControllerState == GLFW.GLFW_PRESS) {
 	        	playing.setPaused(!playing.getPaused());
@@ -398,10 +379,8 @@ public class Player extends Entity {
 	private void checkAttack() {
 		if (attackChecked || aniIndex != 1)
 			return;
-		attackChecked = true;
 
-		if (powerAttackActive)
-			attackChecked = false;
+        attackChecked = !powerAttackActive;
 
 		playing.checkEnemyPlayerHit(isPlayer1);
 		playing.checkEnemyHit(attackBox);
@@ -447,7 +426,8 @@ public class Player extends Entity {
 		powerWidth = (int) ((powerValue / (float) powerMaxValue) * powerBarWidth);
 
 		powerGrowTick++;
-		if (powerGrowTick >= powerGrowSpeed) {
+        int powerGrowSpeed = 15;
+        if (powerGrowTick >= powerGrowSpeed) {
 			powerGrowTick = 0;
 			changePower(1);
 		}
@@ -510,10 +490,10 @@ public class Player extends Entity {
 			xDistanceTraveled = xDistanceDueStartSpeed + xDistanceDueWind;
 			
 			radius = (int)(minRadius + i/((float) numArcPoints) * (maxRadius-minRadius));
-			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - radius/2 + xDistanceTraveled); 
+			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - (float) radius /2 + xDistanceTraveled);
 			
 			if (isCarrying != null) {
-				circle_y = (int) (hitbox.y - yLvlOffset - radius/2 - isCarrying.hitbox.height/2 -
+				circle_y = (int) (hitbox.y - yLvlOffset - (float) radius /2 - isCarrying.hitbox.height/2 -
 						calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
 				if (lastPointExists) {
 	                g2.setStroke(new BasicStroke((int) radius));
@@ -556,38 +536,51 @@ public class Player extends Entity {
 	public void drawUI(Graphics g) {
 		// Background ui
 		int xDrawOffset = 0;
-		int xStatusBarOffset = statusBarX;
+        int statusBarX = (int) (10 * Game.SCALE);
+        int xStatusBarOffset = statusBarX;
 		int xWindsockOffset = (int) (statusBarX + statusBarWidth + 30*Game.SCALE);
 		if (!isPlayer1) {
 			xDrawOffset = -Game.GAME_WIDTH/2;
 			xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH/2 - statusBarWidth);
-			xWindsockOffset = (int) (Game.GAME_WIDTH/2 - statusBarX - statusBarWidth - 30*Game.SCALE);
+			xWindsockOffset = (int) ((float) Game.GAME_WIDTH /2 - statusBarX - statusBarWidth - 30*Game.SCALE);
 		}
 		
 		// temperature
 		g.setColor(tempScaleBackgroundColor);
-		g.fillRect(Game.GAME_WIDTH/2-tempBarWidth/2 + xDrawOffset, 
-				tempBarY, 
-				tempBarWidth, 
-				tempBarMaxHeight);
+        int tempBarWidth = (int) (10 * Game.SCALE);
+        int tempBarMaxHeight = (int) (108 * Game.SCALE);
+        int tempBarY = (int) (25 * Game.SCALE);
+        g.fillRect(Game.GAME_WIDTH/2- tempBarWidth /2 + xDrawOffset,
+                tempBarY,
+                tempBarWidth,
+                tempBarMaxHeight);
 		Color tempColor = new Color((int) (playing.getTemperature()*255/MAX_TEMP),0,(int) (255-playing.getTemperature()*255/MAX_TEMP));
 		g.setColor(tempColor);
 		int tempBarHeight = (int) (tempBarMaxHeight * playing.getTemperature() / MAX_TEMP);
-		g.fillRect(Game.GAME_WIDTH/2-tempBarWidth/2 + xDrawOffset, 
-				tempBarY + tempBarMaxHeight - tempBarHeight, 
-				tempBarWidth, 
+		g.fillRect(Game.GAME_WIDTH/2- tempBarWidth /2 + xDrawOffset,
+				tempBarY + tempBarMaxHeight - tempBarHeight,
+                tempBarWidth,
 				(int) (tempBarHeight+20*Game.SCALE));
-		g.drawImage(tempScaleImg, Game.GAME_WIDTH/2-tempScaleWidth/2 + xDrawOffset, 0, tempScaleWidth, Game.GAME_HEIGHT, null);
+        int tempScaleWidth = (int) (20 * Game.SCALE);
+        g.drawImage(tempScaleImg, Game.GAME_WIDTH/2- tempScaleWidth /2 + xDrawOffset, 0, tempScaleWidth, Game.GAME_HEIGHT, null);
 		
 		// Health bar
 		g.setColor(healthBarBackgroundColor);
-		g.fillRect(healthBarXStart + xStatusBarOffset, healthBarYStart + statusBarY, healthBarWidth, healthBarHeight);
+        int statusBarY = 0; //(int) (0 * Game.SCALE);
+        int statusBarHeight = (int) (64 * Game.SCALE);
+        int healthBarHeight = statusBarHeight * 100 / 512;
+        int healthBarXStart = statusBarWidth * 180 / 1024;
+        int healthBarYStart = statusBarHeight * 80 / 512;
+        g.fillRect(healthBarXStart + xStatusBarOffset, healthBarYStart + statusBarY, healthBarWidth, healthBarHeight);
 		g.setColor(healthBarColor);
 		g.fillRect(healthBarXStart + xStatusBarOffset, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
 
 		// Power Bar
 		g.setColor(powerBarBackgroundColor);
-		g.fillRect(powerBarXStart + xStatusBarOffset, powerBarYStart + statusBarY, powerBarWidth, powerBarHeight);
+        int powerBarHeight = statusBarHeight * 100 / 512;
+        int powerBarXStart = statusBarWidth * 180 / 1024;
+        int powerBarYStart = statusBarHeight * 270 / 512;
+        g.fillRect(powerBarXStart + xStatusBarOffset, powerBarYStart + statusBarY, powerBarWidth, powerBarHeight);
 		g.setColor(powerBarColor);
 		g.fillRect(powerBarXStart + xStatusBarOffset, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
 		g.drawImage(statusBarImg, xStatusBarOffset, statusBarY, statusBarWidth, statusBarHeight, null);
@@ -607,7 +600,10 @@ public class Player extends Entity {
 			wsImg = windsockImg3;
 			
 		int windsockX = 50;
-		g.drawImage(wsImg, xWindsockOffset-flip*windsockWidth/2, windsockY, flip*windsockWidth, windsockHeight, null);
+        int windsockWidth = Game.GAME_WIDTH / 17;
+        int windsockHeight = Game.GAME_WIDTH / 17;
+        int windsockY = (int) (3 * Game.SCALE);
+        g.drawImage(wsImg, xWindsockOffset-flip* windsockWidth /2, windsockY, flip* windsockWidth, windsockHeight, null);
 		
 		
 	}
@@ -715,7 +711,8 @@ public class Player extends Entity {
 				airSpeed += GRAVITY;
 				updateXPos(xSpeed, lvlData);
 			} else {
-				if (airSpeed > 0)
+                float fallSpeedAfterCollision = 0.5f * Game.SCALE;
+                if (airSpeed > 0)
 					resetInAir();
 				else
 					airSpeed = fallSpeedAfterCollision;
@@ -799,32 +796,17 @@ public class Player extends Entity {
 			baseDir = "animation/player" + 2;
 		
 		for (int j = 0; j < NUM_ANIMATIONS; j++) {
-			switch(j) {
-				case IDLE:
-					fileName = "idle";
-					break;
-				case RUNNING:
-					fileName = "running";
-					break;
-				case JUMP:
-					fileName = "jump";
-					break;
-				case FALLING:
-					fileName = "falling";
-					break;
-				case ATTACK:
-					fileName = "jump";
-					break;
-				case HIT:
-					fileName = "hit";
-					break;
-				case DEAD:
-					fileName = "dead";
-					break;
-				case THROW:
-					fileName = "throw";
-					break;
-			}
+            fileName = switch (j) {
+                case IDLE -> "idle";
+                case RUNNING -> "running";
+                case JUMP -> "jump";
+                case FALLING -> "falling";
+                case ATTACK -> "jump";
+                case HIT -> "hit";
+                case DEAD -> "dead";
+                case THROW -> "throw";
+                default -> fileName;
+            };
 			for (int i = 0; i < animations[j].length; i++) {
 				if (i<GetSpriteAmount(j)) {
 					if (Thread.currentThread().getContextClassLoader().getResource(baseDir + "/" + fileName + i + ".png")!=null) {
@@ -941,8 +923,8 @@ public class Player extends Entity {
 //		else {
 //			xLvlOffset = 0;//- Game.GAME_WIDTH/2 + 1;
 //		}
-		yLvlOffset = (int)(hitbox.y - Game.GAME_HEIGHT/2); 
-		xLvlOffset = (int)(hitbox.x - Game.GAME_WIDTH/4); 
+		yLvlOffset = (int)(hitbox.y - (float) Game.GAME_HEIGHT /2);
+		xLvlOffset = (int)(hitbox.x - (float) Game.GAME_WIDTH /4);
 	}
 
 	public void resetAtDeath() {
@@ -964,9 +946,8 @@ public class Player extends Entity {
 
 		hitbox.x = x;
 		hitbox.y = y;
-		throwHeightInSmallTiles = TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES/2;
-		throwWidthInSmallTiles = TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES/2;
-		throwActive=false;
+		throwHeightInSmallTiles = (float) TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES /2;
+		throwWidthInSmallTiles = (float) TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES /2;
 		if (!IsEntityOnFloor(hitbox, lvlData))
 			inAir = true;
 	}
@@ -1007,8 +988,8 @@ public class Player extends Entity {
 		this.yLvlOffset = yLvlOffset;
 	}
 
-	public boolean getPowerAttackActive() {
-		return powerAttackActive;
+	public boolean getPowerAttackNotActive() {
+		return !powerAttackActive;
 	}
 	
 	public BufferedImage[][] getAnimations() {

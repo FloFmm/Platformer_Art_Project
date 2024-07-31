@@ -140,7 +140,7 @@ public class Menu extends State implements Statemethods {
 			game.getPlaying().loadLevel(index, true);
 			game.getPlaying().setLoading(true);
 			game.getPlaying().update();
-			//game.getAudioPlayer().playSong(AudioPlayer.MENU);
+			game.getAudioPlayer().playSong(AudioPlayer.WIND);
 			buttons[index].applyGamestate();
 		}
 	}
