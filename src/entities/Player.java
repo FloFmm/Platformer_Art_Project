@@ -18,15 +18,12 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
 import utilz.LoadSave;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -109,6 +106,7 @@ public class Player extends Entity {
 	private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
 	private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
 	private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
+	private boolean keyboardRotatedTile = false;
 
 	private final boolean isPlayer1;
 
@@ -302,7 +300,7 @@ public class Player extends Entity {
 					int old_rotation_player1 = isCarrying.getRotation();
 					isCarrying.setRotation((old_rotation_player1 + 1) % 4);
 				}
-	        } 
+	        }
 	        
 	        // joysticks
 	        FloatBuffer axes = GLFW.glfwGetJoystickAxes(controllerID);
@@ -330,6 +328,17 @@ public class Player extends Entity {
 	        		playing.getGame().getAudioPlayer().stopSong();
 	        }
 		}
+	}
+
+	public void rotateTile(boolean is_pressed){
+		if (!keyboardRotatedTile && is_pressed && isCarrying != null) {
+				int old_rotation_player1 = isCarrying.getRotation();
+				isCarrying.setRotation((old_rotation_player1 + 1) % 4);
+		}
+
+		// should be activated on each release -> reset rotating on
+		keyboardRotatedTile = is_pressed;
+		System.out.println("krt: " + keyboardRotatedTile + " is pressed: " + is_pressed);
 	}
 
 	private void changeThrowDirection(int buttonId) {
@@ -462,9 +471,12 @@ public class Player extends Entity {
 			&& (isCarrying != null) && throwHeightInSmallTiles > 0) {
 
 		}*/
-		drawThrowArc(g, xLvlOffset, yLvlOffset);
-		drawGrabBox(g, 0,0);
-		drawThrowArc = true;
+		if (isCarrying != null){
+			drawThrowArc(g, xLvlOffset, yLvlOffset);
+			drawGrabBox(g, 0,0);
+			drawThrowArc = true;
+		}
+
 			
 	}
 
@@ -897,6 +909,12 @@ public class Player extends Entity {
 
 	public void setJump(boolean jump) {
 		this.jump = jump;
+	}
+
+	public void stopMovement(){
+		this.left = false;
+		this.right = false;
+		this.jump = false;
 	}
 	
 	public void setGrabOrThrow(boolean grabOrThrow) {

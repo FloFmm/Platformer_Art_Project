@@ -120,33 +120,10 @@ public class Menu extends State implements Statemethods {
 
 	public void keyPressed(int key) {
 		switch (key) {
-			case KeyEvent.VK_UP:
-				selectNextButton();
-				break;
-			case KeyEvent.VK_DOWN:
-				selectPreviousButton();
-				break;
-			case KeyEvent.VK_ENTER:
-				if (getSelectedButton() != -1) {
-					activateButton(getSelectedButton());
-				}
-				break;
-			case KeyEvent.VK_1:
-			case KeyEvent.VK_NUMPAD1:
-				activateButton(0);
-				break;
-			case KeyEvent.VK_2:
-			case KeyEvent.VK_NUMPAD2:
-				activateButton(1);
-				break;
-			case KeyEvent.VK_3:
-			case KeyEvent.VK_NUMPAD3:
-				activateButton(2);
-				break;
-			case KeyEvent.VK_4:
-			case KeyEvent.VK_NUMPAD4:
-				activateButton(3);
-				break;
+			case KeyEvent.VK_DOWN -> {selectNextButton();}
+			case KeyEvent.VK_UP -> {selectPreviousButton();}
+			case KeyEvent.VK_ENTER -> {if (getSelectedButton() != -1) activateButton(getSelectedButton());}
+			case KeyEvent.VK_ESCAPE -> {Gamestate.state = Gamestate.PLAYING;}
 		}
 	}
 
@@ -156,14 +133,15 @@ public class Menu extends State implements Statemethods {
 
 	private void activateButton(int index) {
 		if (index >= 0 && index < buttons.length) {
-			if (buttons[index].getState() == Gamestate.PLAYING) {
-				setGamestate(Gamestate.PLAYING);
-				game.getPlaying().loadLevel(index, true);
-				game.getPlaying().setLoading(true);
-				game.getPlaying().update();
-				//game.getAudioPlayer().playSong(AudioPlayer.MENU);
-				buttons[index].applyGamestate();
+			setGamestate(buttons[index].getState());
+			if (buttons[index].getState() == Gamestate.QUIT){
+				System.exit(0);
 			}
+			game.getPlaying().loadLevel(index, true);
+			game.getPlaying().setLoading(true);
+			game.getPlaying().update();
+			//game.getAudioPlayer().playSong(AudioPlayer.MENU);
+			buttons[index].applyGamestate();
 		}
 	}
 

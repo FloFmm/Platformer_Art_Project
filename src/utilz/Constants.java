@@ -10,7 +10,7 @@ import java.util.Random;
 public class Constants {
 	public static final int FPS_SET = 120;
 	public static final int UPS_SET = 200;
-	public static final float GRAVITY = 0.04f * Game.SCALE;
+	public static final float GRAVITY = 0.08f * Game.SCALE;
 	public static final int ANI_SPEED = 13;//25;
 
 	public static class Dialogue {
