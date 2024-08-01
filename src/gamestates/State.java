@@ -6,7 +6,7 @@ import audio.AudioPlayer;
 import main.Game;
 import ui.MenuButton;
 
-public class State {
+public abstract class State {
 
 	protected Game game;
 
@@ -32,4 +32,5 @@ public class State {
 		Gamestate.state = state;
 	}
 
+    public abstract void mouseMoved(MouseEvent e);
 }

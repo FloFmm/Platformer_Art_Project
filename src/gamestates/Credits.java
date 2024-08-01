@@ -2,6 +2,7 @@ package gamestates;
 
 
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import org.lwjgl.glfw.GLFW;
@@ -22,7 +23,12 @@ public class Credits extends State implements Statemethods {
 		creditsImg = LoadSave.GetSpriteAtlas(LoadSave.CREDITS);
 		loadButtons();
 	}
-	
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+
+	}
+
 	private void loadButtons() {
 		buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT*0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, game);
 	}

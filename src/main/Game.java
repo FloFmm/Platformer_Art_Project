@@ -1,7 +1,8 @@
 package main;
 
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWJoystickCallback;
@@ -12,7 +13,6 @@ import gamestates.Gamestate;
 import gamestates.Menu;
 import gamestates.Playing;
 
-import static utilz.Constants.*;
 
 
 public class Game implements Runnable {
@@ -20,7 +20,6 @@ public class Game implements Runnable {
     private GamePanel gamePanel1;
     private GamePanel gamePanel2;
     private Thread gameThread;
-    private long windowHandle;
 
     private Playing playing;
     private Menu menu;
@@ -99,14 +98,14 @@ public class Game implements Runnable {
         gameThread.start();
     }
 
-    public void update() {
+    public void update() throws IOException {
         // joystick listener
         GLFW.glfwPollEvents();
         switch (Gamestate.state) {
             case MENU -> menu.update();
             case PLAYING -> playing.update();
             case CREDITS -> credits.update();
-            case QUIT -> System.exit(0);
+            case QUIT -> {audioPlayer.stopAudio(); gameThread.interrupt(); System.exit(0);}
         }
     }
 
@@ -143,7 +142,11 @@ public class Game implements Runnable {
             previousTime = currentTime;
 
             if (deltaU >= 1) {
-                update();
+                try {
+                    update();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 deltaU--;
             }
 
@@ -154,16 +157,18 @@ public class Game implements Runnable {
             }
 
             try {
+                if (Gamestate.state == Gamestate.QUIT){
+                    System.out.println("stopping Audio");
+                    audioPlayer.stopAudio();
+                    Thread.sleep(20); // Small sleep to prevent 100% CPU usage
+                }
                 Thread.sleep(1); // Small sleep to prevent 100% CPU usage
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-    }
-
-    public void cleanup() {
-        GLFW.glfwDestroyWindow(windowHandle);
-        GLFW.glfwTerminate();
     }
 
     public void windowFocusLost() {
@@ -174,21 +179,16 @@ public class Game implements Runnable {
         }
     }
 
-    public Menu getMenu() {
-        return menu;
-    }
-
     public Playing getPlaying() {
         return playing;
     }
 
-    public Credits getCredits() {
-        return credits;
-    }
-
-
     public AudioPlayer getAudioPlayer() {
         return audioPlayer;
+    }
+
+    public Menu getMenu(){
+        return menu;
     }
 
 }

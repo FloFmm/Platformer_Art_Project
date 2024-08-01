@@ -3,6 +3,7 @@ package gamestates;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -71,6 +72,11 @@ public class Playing extends State implements Statemethods {
 		currentCloudYPos = CLOUD_START_OFFSET_FACTOR*levelManager.getCurrentLevel().getLvlHeight();
 		currentDarknessAlpha = 0;
 		loadImgs();
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+
 	}
 
 	private void becomeOP(Player player){

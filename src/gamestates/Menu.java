@@ -2,10 +2,11 @@ package gamestates;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import static utilz.Constants.ControllerConstants.*;
 import static utilz.Constants.UI.VolumeButtons.SLIDER_WIDTH;
 import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
@@ -18,8 +19,7 @@ import ui.MenuButton;
 import ui.VolumeButton;
 import utilz.LoadSave;
 
-public class Menu extends State implements Statemethods {
-
+public class Menu extends State implements Statemethods, MouseListener, MouseMotionListener {
 	private MenuButton[] buttons = new MenuButton[4];
 	private BufferedImage backgroundImg, backgroundImgPink, controllerOnlineImg, controllerOfflineImg;
 	private int menuX, menuY, menuWidth, menuHeight;
@@ -134,8 +134,11 @@ public class Menu extends State implements Statemethods {
 	private void activateButton(int index) {
 		if (index >= 0 && index < buttons.length) {
 			setGamestate(buttons[index].getState());
-			if (buttons[index].getState() == Gamestate.QUIT){
-				System.exit(0);
+			if (buttons[index].getState() == Gamestate.MENU) {
+				Gamestate.state = Gamestate.QUIT;
+				return;
+			} else if (buttons[index].getState() == Gamestate.QUIT) {
+				return;
 			}
 			game.getPlaying().loadLevel(index, true);
 			game.getPlaying().setLoading(true);
@@ -181,5 +184,55 @@ public class Menu extends State implements Statemethods {
 		}
 		resetButtons();
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// This method is called when a mouse button is clicked
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// This method is called when a mouse button is pressed
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// This method is called when a mouse button is released
+		for (MenuButton mb : buttons) {
+			if (mb.getBounds().contains(e.getX(), e.getY())) {
+				activateButton(mb.getRowIndex());
+				return;
+			}
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// This method is called when the mouse enters the component
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// This method is called when the mouse exits the component
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		// This method is called when the mouse is moved
+		for (MenuButton mb : buttons) {
+			mb.setMouseOver(false);
+			if (mb.getBounds().contains(e.getX(), e.getY())) {
+				mb.setMouseOver(true);
+				selectedButtonIndex = mb.getRowIndex();
+				break;
+			}
+		}
+	}
+
 
 }
