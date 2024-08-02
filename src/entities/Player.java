@@ -89,6 +89,10 @@ public class Player extends Entity {
     private int dashControllerState = GLFW.GLFW_RELEASE;
 	private boolean keyboardRotatedTile = false;
 
+	private int jumpsDone = 0;
+	private boolean resetJump = true;
+	private boolean fasterFall = false;
+
 	private final boolean isPlayer1;
 
 	public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
@@ -138,16 +142,7 @@ public class Player extends Entity {
 		grabBox = new Rectangle2D.Float(x, y, (int) (width * Game.SCALE), (int) (height * Game.SCALE));
 	}
 
-	public void update() {
-		boolean startInAir = inAir;
-		
-		updateControllerInputs();
-
-		if(playing.getLoading())
-			return;
-		updateHealthBar();
-		updatePowerBar();
-
+	private boolean handleDeadBody(){
 		if (currentHealth <= 0) {
 			if (state != DEAD) {
 				state = DEAD;
@@ -172,12 +167,21 @@ public class Player extends Entity {
 						airSpeed += GRAVITY;
 					} else
 						inAir = false;
-
 			}
-
-			return;
+			return true;
 		}
+		return false;
+	}
 
+	public void update() {
+		if(playing.getLoading()){return;}
+		updateHealthBar();
+		if (handleDeadBody()){return;};
+
+		boolean startInAir = inAir;
+		updateControllerInputs();
+
+		updatePowerBar();
 		updateAttackBox();
 		updateGrabBox();
 
@@ -185,10 +189,10 @@ public class Player extends Entity {
 			if (aniIndex <= GetSpriteAmount(state) - 3)
 				pushBack(pushBackDir, lvlData, 1.25f);
 			updatePushBackDrawOffset();
-		} else
+		} else{
 			updatePos();
+		}
 
-		
 		checkSpikesTouched();
 		checkInsideWater();
 		if (moving) {
@@ -202,14 +206,16 @@ public class Player extends Entity {
 			}
 		}
 
-		if (attacking || powerAttackActive)
+		if (attacking || powerAttackActive){
 			checkAttack();
+		}
 
 		updateAnimationTick();
 		setAnimation();
 		
-		if (!startInAir && inAir)
-			startTimeInAir = playing.getGameTimeInSeconds();
+		if (!startInAir && inAir){
+			startTimeInAir = playing.getGameTimeInSeconds(); // if air status changed in this update loop then start timer
+		}
 	}
 	
 	private void updateControllerInputs() {
@@ -353,11 +359,6 @@ public class Player extends Entity {
 	public void changeThrowDirectionKeyboardUp(){
 		throwHeightInSmallTiles = Math.min(throwHeightInSmallTiles+1, TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES);
 	}
-
-
-
-
-
 	
 	private void checkInsideWater() {
 		if (hitbox.y > playing.getCurrentWaterYPos() + WATER_HEIGHT*0.1f) {
@@ -671,13 +672,24 @@ public class Player extends Entity {
 
 	private void updatePos() {
 		moving = false;
-		if (jump)
-			jump();
+		if (jump){
+			if (resetJump && jumpsDone < 2){
+				jump();
+				jumpsDone++;
+				resetJump = false;
+			}else {
+				jump = false;
+			}
+		}
 
-		if (!inAir)
+		if (!inAir){
+			jumpsDone = 0;
+			resetJump = true;
 			if (!powerAttackActive)
 				if ((!left && !right) || (right && left))
 					return;
+		}
+
 
 		float xSpeed = 0;
 		if (left && !right) {
@@ -708,7 +720,7 @@ public class Player extends Entity {
 		if (inAir && !powerAttackActive) {
 			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
 				hitbox.y += airSpeed;
-				airSpeed += GRAVITY;
+				airSpeed += GRAVITY * (isFastFall() ? 5 : 1);
 				updateXPos(xSpeed, lvlData);
 			} else {
                 float fallSpeedAfterCollision = 0.5f * Game.SCALE;
@@ -731,10 +743,16 @@ public class Player extends Entity {
 	}
 
 	private void jump() {
-		boolean jumping = (airSpeed < 0);
-		if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < TIME_TO_JUMP_WHEN_ALREADY_IN_AIR))) {
+		boolean jumping = airSpeed < 0;
+		if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < COYOTE_TIME) || jumpsDone < 2)) {
 			inAir = true;
-			airSpeed = jumpSpeed;
+			startTimeInAir = playing.getGameTimeInSeconds();
+			if (jumpsDone == 0) {
+				airSpeed = jumpSpeed;
+			}else {
+				airSpeed = 2 * jumpSpeed - airSpeed;
+			}
+			System.out.println("in jump");
 		}
 	}
 
@@ -890,7 +908,20 @@ public class Player extends Entity {
 	}
 
 	public void setJump(boolean jump) {
-		this.jump = jump;
+		//this.jump = jump;
+		if (!jump && jumpsDone < 2){
+			resetJump = true;
+		}else {
+			this.jump = true;
+		}
+	}
+
+	public void fastFall(boolean doSpeedup){
+		this.fasterFall = doSpeedup;
+	}
+
+	public boolean isFastFall(){
+		return fasterFall;
 	}
 
 	public void stopMovement(){

@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 
@@ -44,7 +45,7 @@ public class Game implements Runnable {
         initControllerInput();
         gamePanel1 = new GamePanel(this, true);
         gamePanel2 = new GamePanel(this, false);
-        new GameWindow(gamePanel1, gamePanel2);
+        gameWindow = new GameWindow(gamePanel1, gamePanel2);
         gamePanel1.requestFocusInWindow();
         gamePanel2.requestFocusInWindow();
         startGameLoop();
@@ -83,6 +84,7 @@ public class Game implements Runnable {
         switch (Gamestate.state) {
             case MENU -> menu.keyPressed(key);
             case PLAYING -> playing.keyPressed(key);
+            case CREDITS -> credits.keyPressed(key);
         }
     }
 
@@ -90,6 +92,7 @@ public class Game implements Runnable {
         switch (Gamestate.state) {
             case MENU -> menu.keyReleased(key);
             case PLAYING -> playing.keyReleased(key);
+            case CREDITS -> credits.keyReleased(key);
         }
     }
 
@@ -160,7 +163,7 @@ public class Game implements Runnable {
                 if (Gamestate.state == Gamestate.QUIT){
                     System.out.println("stopping Audio");
                     audioPlayer.stopAudio();
-                    Thread.sleep(20); // Small sleep to prevent 100% CPU usage
+                    Thread.sleep(500); // Small sleep to prevent 100% CPU usage
                 }
                 Thread.sleep(1); // Small sleep to prevent 100% CPU usage
             } catch (InterruptedException e) {

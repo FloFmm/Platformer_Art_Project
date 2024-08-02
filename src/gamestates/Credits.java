@@ -2,7 +2,10 @@ package gamestates;
 
 
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import org.lwjgl.glfw.GLFW;
@@ -62,7 +65,12 @@ public class Credits extends State implements Statemethods {
 	}
 
 	public void keyPressed(int key) {
-		int a = 1;
-		int b = 1+2 + a;
+		switch (key) {
+			case KeyEvent.VK_ESCAPE -> {Gamestate.state = Gamestate.MENU;}
+		}
+	}
+
+	public void keyReleased(int key) {
+
 	}
 }

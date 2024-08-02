@@ -1,7 +1,6 @@
 package gamestates;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -89,6 +88,7 @@ public class Playing extends State implements Statemethods {
 		switch (key) {
 			case KeyEvent.VK_W -> player1.setJump(true);
 			case KeyEvent.VK_A -> player1.setLeft(true);
+			case KeyEvent.VK_S -> player1.fastFall(true);
 			case KeyEvent.VK_D -> player1.setRight(true);
 			case KeyEvent.VK_F -> becomeOP(player1);
 			case KeyEvent.VK_E -> player1.grabOrThrow();
@@ -114,6 +114,7 @@ public class Playing extends State implements Statemethods {
 		switch (key) {
 			case KeyEvent.VK_W -> player1.setJump(false);
 			case KeyEvent.VK_A -> player1.setLeft(false);
+			case KeyEvent.VK_S -> player1.fastFall(false);
 			case KeyEvent.VK_D -> player1.setRight(false);
 			case KeyEvent.VK_E -> player1.setGrabOrThrow(false);
 			case KeyEvent.VK_R -> player1.rotateTile(false);
@@ -165,9 +166,9 @@ public class Playing extends State implements Statemethods {
 		tetrisTileManager = new TetrisTileManager(this);
 		tetrisTileManager.loadTetrisTiles(levelManager.getCurrentLevel());
 		buildingZoneManager = new BuildingZoneManager(this);
-		player1 = new Player(1, 20, (int) (PLAYER_BASE_WIDTH * Game.SCALE),
+		player1 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE),
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, true);
-		player2 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE), 
+		player2 = new Player(1, 1, (int) (PLAYER_BASE_WIDTH * Game.SCALE),
 				(int) (PLAYER_BASE_HEIGHT * Game.SCALE), this, false);
 		player1.loadLvlData(levelManager.getCurrentLevel().getLevelData());
 		player2.loadLvlData(levelManager.getCurrentLevel().getLevelData());

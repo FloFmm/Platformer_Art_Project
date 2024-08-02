@@ -278,7 +278,7 @@ public class Constants {
 	public static class PlayerConstants {
 		public static final float PLAYER_WALKSPEED = Game.SCALE * 1.0f;
 		public static final float PLAYER_JUMP_SPEED = -2.25f * Game.SCALE;
-		public static final float TIME_TO_JUMP_WHEN_ALREADY_IN_AIR = 0.25f;
+		public static final float COYOTE_TIME = 0.25f;
 		
 		
 		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
