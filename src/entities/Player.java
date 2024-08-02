@@ -615,7 +615,7 @@ public class Player extends Entity {
 			aniTick = 0;
 			aniIndex++;
 			if (aniIndex >= GetSpriteAmount(state)) {
-				if (state == JUMP || state == FALLING || state == ATTACK)
+				if (state == JUMP || state == FALLING || state == FASTFALLING || state == ATTACK)
 					aniIndex--;
 				else
 					aniIndex = 0;
@@ -646,8 +646,11 @@ public class Player extends Entity {
 		if (inAir) {
 			if (airSpeed < 0)
 				state = JUMP;
-			else if ((playing.getGameTimeInSeconds()-startTimeInAir) > 0.2f)
+			else if ((playing.getGameTimeInSeconds()-startTimeInAir) > 0.2f && !fasterFall){
 				state = FALLING;
+			} else if (((playing.getGameTimeInSeconds()-startTimeInAir) > 0.2f) && fasterFall) {
+				state = FASTFALLING;
+			}
 		}
 
 		if (powerAttackActive) {
@@ -818,6 +821,7 @@ public class Player extends Entity {
                 case RUNNING -> "running";
                 case JUMP -> "jump";
                 case FALLING -> "falling";
+				case FASTFALLING -> "fastfalling";
                 case ATTACK -> "jump";
                 case HIT -> "hit";
                 case DEAD -> "dead";
@@ -842,7 +846,7 @@ public class Player extends Entity {
 						
 					}
 					
-					if (j == IDLE || j == RUNNING || j == JUMP || j == FALLING || j==ATTACK) {
+					if (j == IDLE || j == RUNNING || j == JUMP || j == FALLING || j==FASTFALLING || j==ATTACK) {
 						// carry animations
 						if (Thread.currentThread().getContextClassLoader().getResource(baseDir + "/carry" + fileName + i + ".png")!=null) {
 							animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/carry" + fileName + i + ".png");

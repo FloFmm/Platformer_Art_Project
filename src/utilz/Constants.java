@@ -305,8 +305,9 @@ public class Constants {
 		public static final int HIT = 5;
 		public static final int DEAD = 6;
 		public static final int THROW = 7;
+		public static final int FASTFALLING = 8;
 		
-		public static final int NUM_ANIMATIONS = 8;
+		public static final int NUM_ANIMATIONS = 9;
 		public static final int MAX_ANIMATION_LENGTH = 12;
 		
 		public static int GetSpriteAmount(int player_action) {
@@ -324,6 +325,8 @@ public class Constants {
 			case ATTACK:
 				return 5;
 			case FALLING:
+				return 4;
+				case FASTFALLING:
 				return 4;
 			case THROW:
 				return 4;
