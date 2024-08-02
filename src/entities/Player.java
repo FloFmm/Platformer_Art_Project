@@ -752,7 +752,6 @@ public class Player extends Entity {
 			}else {
 				airSpeed = 2 * jumpSpeed - airSpeed;
 			}
-			System.out.println("in jump");
 		}
 	}
 

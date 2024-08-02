@@ -105,6 +105,10 @@ public class Playing extends State implements Statemethods {
 			case KeyEvent.VK_LEFT-> player2.setLeft(true);
 			case KeyEvent.VK_RIGHT -> player2.setRight(true);
 			case KeyEvent.VK_ENTER -> player2.grabOrThrow();
+			case KeyEvent.VK_NUMPAD4 -> player2.changeThrowDirectionKeyboardLeft();
+			case KeyEvent.VK_NUMPAD5 -> player2.changeThrowDirectionKeyboardDown();
+			case KeyEvent.VK_NUMPAD6 -> player2.changeThrowDirectionKeyboardRight();
+			case KeyEvent.VK_NUMPAD8 -> player2.changeThrowDirectionKeyboardUp();
 			case KeyEvent.VK_SPACE -> this.setLoading(false);
 			case KeyEvent.VK_ESCAPE -> {Gamestate.state = Gamestate.MENU; player1.stopMovement(); player2.stopMovement();}
 		}
