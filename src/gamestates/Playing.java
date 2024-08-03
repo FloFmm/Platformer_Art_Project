@@ -37,7 +37,7 @@ public class Playing extends State implements Statemethods {
 	// timed events
 	private boolean loading=true;
 	private int imgID = 0;
-	private Random random;
+	private final Random random;
 	private int gameUpdates = 0;
 	private float gameTimeInSeconds = 0;
 	private float timeOfLastWindChange = 0;
@@ -90,7 +90,6 @@ public class Playing extends State implements Statemethods {
 			case KeyEvent.VK_A -> player1.setLeft(true);
 			case KeyEvent.VK_S -> player1.fastFall(true);
 			case KeyEvent.VK_D -> player1.setRight(true);
-			case KeyEvent.VK_F -> becomeOP(player1);
 			case KeyEvent.VK_E -> player1.grabOrThrow();
 			case KeyEvent.VK_R -> player1.rotateTile(true);
 			case KeyEvent.VK_T -> this.objectManager.addExplosion((int) player1.getX(), (int) player1.getY(), 10, 10);
@@ -104,11 +103,14 @@ public class Playing extends State implements Statemethods {
 			case KeyEvent.VK_UP -> player2.setJump(true);
 			case KeyEvent.VK_LEFT-> player2.setLeft(true);
 			case KeyEvent.VK_RIGHT -> player2.setRight(true);
+			case KeyEvent.VK_DOWN -> player2.fastFall(true);
 			case KeyEvent.VK_ENTER -> player2.grabOrThrow();
 			case KeyEvent.VK_NUMPAD4 -> player2.changeThrowDirectionKeyboardLeft();
 			case KeyEvent.VK_NUMPAD5 -> player2.changeThrowDirectionKeyboardDown();
 			case KeyEvent.VK_NUMPAD6 -> player2.changeThrowDirectionKeyboardRight();
 			case KeyEvent.VK_NUMPAD8 -> player2.changeThrowDirectionKeyboardUp();
+			case KeyEvent.VK_SHIFT -> player2.rotateTile(true);
+			case KeyEvent.VK_NUMPAD0 -> becomeOP(player2);
 			case KeyEvent.VK_SPACE -> this.setLoading(false);
 			case KeyEvent.VK_ESCAPE -> {Gamestate.state = Gamestate.MENU; player1.stopMovement(); player2.stopMovement();}
 		}
@@ -122,10 +124,12 @@ public class Playing extends State implements Statemethods {
 			case KeyEvent.VK_D -> player1.setRight(false);
 			case KeyEvent.VK_E -> player1.setGrabOrThrow(false);
 			case KeyEvent.VK_R -> player1.rotateTile(false);
+			case KeyEvent.VK_SHIFT -> player2.rotateTile(false);
 			case KeyEvent.VK_UP -> player2.setJump(false);
 			case KeyEvent.VK_LEFT-> player2.setLeft(false);
 			case KeyEvent.VK_RIGHT -> player2.setRight(false);
 			case KeyEvent.VK_ENTER -> player2.setGrabOrThrow(false);
+			case KeyEvent.VK_DOWN -> player2.fastFall(false);
 		}
 	}
 
@@ -242,6 +246,7 @@ public class Playing extends State implements Statemethods {
 		int yLvlOffset = player.getYLvlOffset();
 		int playerX = (int) player.getHitbox().x;
 		int playerY = (int) player.getHitbox().y;
+
 		int xDiff = playerX - xLvlOffset;
 		int yDiff = playerY - yLvlOffset;
 		
@@ -260,7 +265,6 @@ public class Playing extends State implements Statemethods {
 		yLvlOffset = Math.max(Math.min(yLvlOffset, maxLvlOffsetY), 0);
 		player.setXLvlOffset(xLvlOffset);
 		player.setYLvlOffset(yLvlOffset);
-		
 	}
 
 

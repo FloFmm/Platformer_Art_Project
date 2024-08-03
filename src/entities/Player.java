@@ -676,7 +676,7 @@ public class Player extends Entity {
 	private void updatePos() {
 		moving = false;
 		if (jump){
-			if (resetJump && jumpsDone < 2){
+			if (resetJump && jumpsDone < MAX_ALLOWED_JUMPS){
 				jump();
 				jumpsDone++;
 				resetJump = false;
@@ -747,7 +747,7 @@ public class Player extends Entity {
 
 	private void jump() {
 		boolean jumping = airSpeed < 0;
-		if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < COYOTE_TIME) || jumpsDone < 2)) {
+		if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < COYOTE_TIME) || jumpsDone < MAX_ALLOWED_JUMPS)) {
 			inAir = true;
 			startTimeInAir = playing.getGameTimeInSeconds();
 			if (jumpsDone == 0) {
@@ -912,7 +912,7 @@ public class Player extends Entity {
 
 	public void setJump(boolean jump) {
 		//this.jump = jump;
-		if (!jump && jumpsDone < 2){
+		if (!jump && jumpsDone < MAX_ALLOWED_JUMPS){
 			resetJump = true;
 		}else {
 			this.jump = true;

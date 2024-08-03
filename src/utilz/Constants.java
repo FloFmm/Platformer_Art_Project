@@ -276,15 +276,16 @@ public class Constants {
 	}
 
 	public static class PlayerConstants {
-		public static final float PLAYER_WALKSPEED = Game.SCALE * 1.0f;
+		public static final float PLAYER_WALKSPEED = Game.SCALE * 2.0f;
 		public static final float PLAYER_JUMP_SPEED = -2.25f * Game.SCALE;
 		public static final float COYOTE_TIME = 0.25f;
 		
 		
 		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
 		public static final float CLOSE_TO_BORDER_VERTICAL = 0.6f;
-		public static final float MAX_X_LVL_OFFSET_STEP_HORIZONTAL = 0.002f*Game.GAME_WIDTH;
+		public static final float MAX_X_LVL_OFFSET_STEP_HORIZONTAL = 0.004f*Game.GAME_WIDTH;
 		public static final float MAX_X_LVL_OFFSET_STEP_VERTICAL = 0.02f*Game.GAME_HEIGHT;
+		public static final int MAX_ALLOWED_JUMPS = 3;
 		
 		public static final int PLAYER_GREEN_VALUE = 100;
 		public static final int HITBOX_BASE_WIDTH = 16;
