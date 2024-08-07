@@ -1,4 +1,5 @@
 package utilz;
+import gamestates.Gamestate;
 import main.Game;
 import static utilz.HelpMethods.*;
 
@@ -434,6 +435,13 @@ public class Constants {
 		public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 1.0f;
 		public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.1f;
 		public static final int TETRIS_GRID_SIZE = Game.TILES_SIZE/4;
+		public enum Direction {
+			LEFT, RIGHT
+		}
+
+		public enum DashState {
+			NOTHING, ACTIVATE1, RELEASE1, ACTIVATE2, DASHING
+		}
 		
 		public static final int[][] ROCKET_GOAL_MATRIX = new int[][] {
 			{0,0,0,0, 0,0,0,0, 0,0,0,0},

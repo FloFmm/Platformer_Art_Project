@@ -20,6 +20,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import gamestates.Playing;
 import main.Game;
+import utilz.Constants;
 import utilz.LoadSave;
 
 import java.nio.ByteBuffer;
@@ -92,6 +93,9 @@ public class Player extends Entity {
 	private int jumpsDone = 0;
 	private boolean resetJump = true;
 	private boolean fasterFall = false;
+	private Direction lastDirection = Direction.LEFT;
+	private DashState dashState = DashState.NOTHING;
+	private long dashStartTime;
 
 	private final boolean isPlayer1;
 
@@ -688,22 +692,48 @@ public class Player extends Entity {
 		if (!inAir){
 			jumpsDone = 0;
 			resetJump = true;
+			xSpeed = 0;
+			dashState = DashState.NOTHING;
 			if (!powerAttackActive)
 				if ((!left && !right) || (right && left))
 					return;
+			return;
 		}
+		if (dashState != DashState.NOTHING)
+			System.out.println(dashState);
 
 
-		float xSpeed = 0;
-		if (left && !right) {
-			xSpeed -= walkSpeed;
-			flipX = width;
-			flipW = -1;
+		if (dashState == DashState.DASHING){
+			xSpeed = 0;
+			if (left && !right){
+				flipX = width;
+				flipW = -1;
+			}else {
+				flipX = 0;
+				flipW = 1;
+			}
+		}else {
+			if (left && !right) {
+				xSpeed = -walkSpeed;
+				flipX = width;
+				flipW = -1;
+			}
+			if (right && !left) {
+				xSpeed = walkSpeed;
+				flipX = 0;
+				flipW = 1;
+			}
 		}
-		if (right && !left) {
-			xSpeed += walkSpeed;
-			flipX = 0;
-			flipW = 1;
+
+		if (dashState == DashState.ACTIVATE2){
+			dashStartTime = System.currentTimeMillis();
+			xSpeed *= 10;
+			dashState = DashState.DASHING;
+		}else if (dashState == DashState.DASHING){
+			if ((System.currentTimeMillis() - dashStartTime) >= 1000){
+				dashState = DashState.NOTHING;
+				xSpeed = 0;
+			}
 		}
 
 		if (powerAttackActive) {
@@ -719,7 +749,8 @@ public class Player extends Entity {
 		if (!inAir)
 			if (!IsEntityOnFloor(hitbox, lvlData))
 				inAir = true;
- 
+
+		// power attack
 		if (inAir && !powerAttackActive) {
 			if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
 				hitbox.y += airSpeed;
@@ -736,6 +767,7 @@ public class Player extends Entity {
 			}
 
 		} else {
+			// execute x pos update
 			updateXPos(xSpeed, lvlData);
 			if (powerAttackActive && !CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)) {
 				powerAttackActive = false;
@@ -900,6 +932,8 @@ public class Player extends Entity {
 
 	public void setLeft(boolean left) {
 		this.left = left;
+
+		moveHorizontal(left);
 	}
 
 	public boolean isRight() {
@@ -908,6 +942,23 @@ public class Player extends Entity {
 
 	public void setRight(boolean right) {
 		this.right = right;
+
+		moveHorizontal(right);
+	}
+
+	private void moveHorizontal(boolean active) {
+		if (this.lastDirection == Direction.LEFT){
+			if (this.dashState == DashState.NOTHING && active){
+				this.dashState = DashState.ACTIVATE1;
+			} else if (this.dashState == DashState.ACTIVATE1 && !active) {
+				this.dashState = DashState.RELEASE1;
+			} else if (this.dashState == DashState.RELEASE1 && active) {
+				// perform dash
+				this.dashState = DashState.ACTIVATE2;
+			}
+		}else {
+			this.dashState = DashState.NOTHING;
+		}
 	}
 
 	public void setJump(boolean jump) {
