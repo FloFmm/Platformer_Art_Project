@@ -7,12 +7,10 @@ import java.awt.event.WindowFocusListener;
 import javax.swing.JFrame;
 
 public class GameWindow {
-    private JFrame jframe;
 
     public GameWindow(GamePanel gamePanel1, GamePanel gamePanel2) {
 
-        jframe = new JFrame();
-        //jframe.setUndecorated(true);
+        JFrame jframe = new JFrame();
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Set Layout for the content pane of the frame

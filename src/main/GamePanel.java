@@ -29,10 +29,6 @@ public class GamePanel extends JPanel implements KeyListener, MouseMotionListene
 		setPreferredSize(size);
 	}
 
-	public void updateGame() {
-
-	}
-
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		game.render(g, isPlayer1);

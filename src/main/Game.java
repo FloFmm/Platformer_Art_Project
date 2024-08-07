@@ -1,8 +1,6 @@
 package main;
 
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 
 import org.lwjgl.glfw.GLFW;
@@ -18,8 +16,8 @@ import gamestates.Playing;
 
 public class Game implements Runnable {
 
-    private GamePanel gamePanel1;
-    private GamePanel gamePanel2;
+    private final GamePanel gamePanel1;
+    private final GamePanel gamePanel2;
     private Thread gameThread;
 
     private Playing playing;
@@ -28,14 +26,10 @@ public class Game implements Runnable {
     private AudioPlayer audioPlayer;
     public final static int TILES_DEFAULT_SIZE = 32;
     public final static float SCALE = 2f;
-    //public final static int TILES_IN_WIDTH = 15;//30;//26;
-    //public final static int TILES_IN_HEIGHT = 16;//16;//14;
     public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
     public final static int GAME_WIDTH = 1920;//TILES_SIZE * TILES_IN_WIDTH;
     public final static int GAME_HEIGHT = 1080;//TILES_SIZE * TILES_IN_HEIGHT;
 
-    private final boolean SHOW_FPS_UPS = false;
-    private static GLFWJoystickCallback joystickCallback;
     public GameWindow gameWindow;
 
     public Game() {
@@ -67,7 +61,7 @@ public class Game implements Runnable {
         }
 
         // Set the joystick callback
-        joystickCallback = new GLFWJoystickCallback() {
+        GLFWJoystickCallback joystickCallback = new GLFWJoystickCallback() {
             @Override
             public void invoke(int jid, int event) {
                 if (event == GLFW.GLFW_CONNECTED) {
@@ -163,7 +157,7 @@ public class Game implements Runnable {
                 if (Gamestate.state == Gamestate.QUIT){
                     System.out.println("stopping Audio");
                     audioPlayer.stopAudio();
-                    Thread.sleep(500); // Small sleep to prevent 100% CPU usage
+                    Thread.sleep(500);
                 }
                 Thread.sleep(1); // Small sleep to prevent 100% CPU usage
             } catch (InterruptedException e) {

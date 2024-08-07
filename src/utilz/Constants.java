@@ -1,5 +1,4 @@
 package utilz;
-import gamestates.Gamestate;
 import main.Game;
 import static utilz.HelpMethods.*;
 
@@ -31,24 +30,10 @@ public class Constants {
 		}
 	}
 
-	public static class Projectiles {
-		public static final int CANNON_BALL_DEFAULT_WIDTH = 15;
-		public static final int CANNON_BALL_DEFAULT_HEIGHT = 15;
-
-		public static final int CANNON_BALL_WIDTH = (int) (Game.SCALE * CANNON_BALL_DEFAULT_WIDTH);
-		public static final int CANNON_BALL_HEIGHT = (int) (Game.SCALE * CANNON_BALL_DEFAULT_HEIGHT);
-		public static final float SPEED = 0.75f * Game.SCALE;
-	}
-
 	public static class ObjectConstants {
 
 		public static final int EXPLOSION = 0;
-		public static final int BLUE_POTION = 1;
-		public static final int BARREL = 2;
-		public static final int BOX = 3;
 		public static final int SPIKE = 4;
-		public static final int CANNON_LEFT = 5;
-		public static final int CANNON_RIGHT = 6;
 		public static final int TREE_ONE = 7;
 		public static final int TREE_TWO = 8;
 		public static final int TREE_THREE = 9;
@@ -59,71 +44,12 @@ public class Constants {
 		public static final int WINDMILL_EXPLOSION_HEIGHT = (int) (100*Game.SCALE);
 		public static final float MAX_DISTANCE_FOR_FOLOWUP_EXPLOSION = 4.0f*Game.TILES_SIZE/4.0f;
 		
-		public static final int SPIKE_WIDTH_DEFAULT = 32;
-		public static final int SPIKE_HEIGHT_DEFAULT = 32;
-		public static final int SPIKE_WIDTH = (int) (Game.SCALE * SPIKE_WIDTH_DEFAULT);
-		public static final int SPIKE_HEIGHT = (int) (Game.SCALE * SPIKE_HEIGHT_DEFAULT);
-
-		public static final int CANNON_WIDTH_DEFAULT = 40;
-		public static final int CANNON_HEIGHT_DEFAULT = 26;
-		public static final int CANNON_WIDTH = (int) (CANNON_WIDTH_DEFAULT * Game.SCALE);
-		public static final int CANNON_HEIGHT = (int) (CANNON_HEIGHT_DEFAULT * Game.SCALE);
-
 		public static int GetSpriteAmount(int object_type) {
 			switch (object_type) {
 			case EXPLOSION:
 				return 12;
 			}
 			return 1;
-		}
-
-		public static int GetTreeOffsetX(int treeType) {
-			switch (treeType) {
-			case TREE_ONE:
-				return (Game.TILES_SIZE / 2) - (GetTreeWidth(treeType) / 2);
-			case TREE_TWO:
-				return (int) (Game.TILES_SIZE / 2.5f);
-			case TREE_THREE:
-				return (int) (Game.TILES_SIZE / 1.65f);
-			}
-
-			return 0;
-		}
-
-		public static int GetTreeOffsetY(int treeType) {
-
-			switch (treeType) {
-			case TREE_ONE:
-				return -GetTreeHeight(treeType) + Game.TILES_SIZE * 2;
-			case TREE_TWO, TREE_THREE:
-				return -GetTreeHeight(treeType) + (int) (Game.TILES_SIZE / 1.25f);
-			}
-			return 0;
-
-		}
-
-		public static int GetTreeWidth(int treeType) {
-			switch (treeType) {
-			case TREE_ONE:
-				return (int) (39 * Game.SCALE);
-			case TREE_TWO:
-				return (int) (62 * Game.SCALE);
-			case TREE_THREE:
-				return -(int) (62 * Game.SCALE);
-
-			}
-			return 0;
-		}
-
-		public static int GetTreeHeight(int treeType) {
-			switch (treeType) {
-			case TREE_ONE:
-				return (int) (int) (92 * Game.SCALE);
-			case TREE_TWO, TREE_THREE:
-				return (int) (54 * Game.SCALE);
-
-			}
-			return 0;
 		}
 	}
 
@@ -174,22 +100,18 @@ public class Constants {
 		}
 
 		public static int GetMaxHealth(int enemy_type) {
-			switch (enemy_type) {
-			case TUMBLE_WEED:
-				return 20;
-			default:
-				return 1;
-			}
-		}
+            if (enemy_type == TUMBLE_WEED) {
+                return 20;
+            }
+            return 1;
+        }
 
 		public static int GetEnemyDmg(int enemy_type) {
-			switch (enemy_type) {
-			case TUMBLE_WEED:
-				return 10;
-			default:
-				return 0;
-			}
-		}
+            if (enemy_type == TUMBLE_WEED) {
+                return 10;
+            }
+            return 0;
+        }
 	}
 
 	public static class Environment {
@@ -249,13 +171,6 @@ public class Constants {
 
 		public static class PauseButtons {
 			public static final int SOUND_SIZE_DEFAULT = 42;
-			public static final int SOUND_SIZE = (int) (SOUND_SIZE_DEFAULT * Game.SCALE);
-		}
-
-		public static class URMButtons {
-			public static final int URM_DEFAULT_SIZE = 56;
-			public static final int URM_SIZE = (int) (URM_DEFAULT_SIZE * Game.SCALE);
-
 		}
 
 		public static class VolumeButtons {
@@ -285,7 +200,6 @@ public class Constants {
 		public static final float CLOSE_TO_BORDER_HORIZONTAL = 0.6f;
 		public static final float CLOSE_TO_BORDER_VERTICAL = 0.6f;
 		public static final float MAX_X_LVL_OFFSET_STEP_HORIZONTAL = 0.004f*Game.GAME_WIDTH;
-		public static final float MAX_X_LVL_OFFSET_STEP_VERTICAL = 0.02f*Game.GAME_HEIGHT;
 		public static final int MAX_ALLOWED_JUMPS = 3;
 		
 		public static final int PLAYER_GREEN_VALUE = 100;
@@ -357,9 +271,6 @@ public class Constants {
 	public static class TetrisTileConstants {
 		public static final Color THROW_ARC_COLOR_PLAYER1 = new Color(233,38,28,100);
 		public static final Color THROW_ARC_COLOR_PLAYER2 = new Color(252,191,43,100);
-		public static final Color TETRIS_TILE_PLAYER1_DEFAULT_COLOR = THROW_ARC_COLOR_PLAYER1;
-		public static final Color TETRIS_TILE_PLAYER2_DEFAULT_COLOR = THROW_ARC_COLOR_PLAYER2;
-		public static final int TETRIS_TILE_COLOR_TOLERANCE = 8;	
 		public static final int TETRIS_TILE_GREEN_VALUE = 255;
 		
 		public static final int TETRIS_TILE_WIDTH_DEFAULT = 32;
@@ -419,7 +330,6 @@ public class Constants {
 		public static final int FINAL_PREDICTION_POINT = -1;
 		public static final float THROW_ARC_PREDICTION_TIME = 1.5f;
 		public static final int NUM_THROW_ARC_PREDICTION_POINTS = 30;
-		public static final float THROW_ARC_SHOW_TIME = 4.0f;
 		public static final float TIME_BETWEEN_THROW_CHANGES = 0.06f;
 		public static final float TIME_FOR_FIRST_THROW_ARC_CHANGE = 0.15f;
 		public static final int TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES = 6*4;
@@ -637,89 +547,62 @@ public class Constants {
 		
 		
 		public static int[][] GetTetrisTileShape (int tileIndex, int rotation) {
-			int[][] matrix;
-			switch (tileIndex) {
-			case STAIRS_TILE:
-				matrix = new int[][] {{0,0,0,1}, 
-									 {0,0,1,1},
-									 {0,1,1,0},
-									 {1,1,0,0}};
-				break;		
-			case L_TILE:
-				matrix = new int[][] {{0,1,0,0}, 
-									 {0,1,0,0},
-									 {0,1,1,0},
-									 {0,0,0,0}};
-				break;		
-			case J_TILE:
-				matrix = new int[][] {{0,0,1,0}, 
-									{0,0,1,0},
-									{0,1,1,0},
-									{0,0,0,0}};
-				break;				
-			case O_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{0,1,1,0},
-									{0,1,1,0},
-									{0,0,0,0}};
-				break;		
-			case LONG_T_TILE:
-				matrix = new int[][] {{0,1,0,0}, 
-									{0,1,0,0},
-									{1,1,1,0},
-									{0,0,0,0}};
-				break;	
-			case Q_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{0,1,1,0},
-									{1,1,1,0},
-									{0,0,0,0}};
-				break;	
-			case LONG_Z_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{1,1,0,0},
-									{0,1,1,1},
-									{0,0,0,0}};
-				break;	
-			case LONG_S_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{0,1,1,1},
-									{1,1,0,0},
-									{0,0,0,0}};
-				break;	
-			case I_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{0,1,0,0},
-									{0,1,0,0},
-									{0,1,0,0}};
-				break;
-			case LONG_I_TILE:
-				matrix = new int[][] {{0,1,0,0}, 
-									{0,1,0,0},
-									{0,1,0,0},
-									{0,1,0,0}};
-				break;
-			case SINGLE_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{0,0,0,0},
-									{0,1,0,0},
-									{0,0,0,0}};
-				break;
-			case DOUBLE_TILE:
-				matrix = new int[][] {{0,0,0,0}, 
-									{0,0,0,0},
-									{0,1,1,0},
-									{0,0,0,0}};
-				break;
-			default:
-				matrix = new int[][] {{1,1,1,1}, 
-									{1,1,1,1},
-									{1,1,1,1},
-									{1,1,1,1}};
-				break;
-			}
-			
-			for (int i = 0; i < rotation; i++) {
+			int[][] matrix = switch (tileIndex) {
+                case STAIRS_TILE -> new int[][]{{0, 0, 0, 1},
+                        {0, 0, 1, 1},
+                        {0, 1, 1, 0},
+                        {1, 1, 0, 0}};
+                case L_TILE -> new int[][]{{0, 1, 0, 0},
+                        {0, 1, 0, 0},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0}};
+                case J_TILE -> new int[][]{{0, 0, 1, 0},
+                        {0, 0, 1, 0},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0}};
+                case O_TILE -> new int[][]{{0, 0, 0, 0},
+                        {0, 1, 1, 0},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0}};
+                case LONG_T_TILE -> new int[][]{{0, 1, 0, 0},
+                        {0, 1, 0, 0},
+                        {1, 1, 1, 0},
+                        {0, 0, 0, 0}};
+                case Q_TILE -> new int[][]{{0, 0, 0, 0},
+                        {0, 1, 1, 0},
+                        {1, 1, 1, 0},
+                        {0, 0, 0, 0}};
+                case LONG_Z_TILE -> new int[][]{{0, 0, 0, 0},
+                        {1, 1, 0, 0},
+                        {0, 1, 1, 1},
+                        {0, 0, 0, 0}};
+                case LONG_S_TILE -> new int[][]{{0, 0, 0, 0},
+                        {0, 1, 1, 1},
+                        {1, 1, 0, 0},
+                        {0, 0, 0, 0}};
+                case I_TILE -> new int[][]{{0, 0, 0, 0},
+                        {0, 1, 0, 0},
+                        {0, 1, 0, 0},
+                        {0, 1, 0, 0}};
+                case LONG_I_TILE -> new int[][]{{0, 1, 0, 0},
+                        {0, 1, 0, 0},
+                        {0, 1, 0, 0},
+                        {0, 1, 0, 0}};
+                case SINGLE_TILE -> new int[][]{{0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                        {0, 1, 0, 0},
+                        {0, 0, 0, 0}};
+                case DOUBLE_TILE -> new int[][]{{0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                        {0, 1, 1, 0},
+                        {0, 0, 0, 0}};
+                default -> new int[][]{{1, 1, 1, 1},
+                        {1, 1, 1, 1},
+                        {1, 1, 1, 1},
+                        {1, 1, 1, 1}};
+            };
+
+            for (int i = 0; i < rotation; i++) {
 				matrix = rotateMatrixBy90Degree(matrix);
 			}
 			return matrix;

@@ -20,11 +20,11 @@ import ui.VolumeButton;
 import utilz.LoadSave;
 
 public class Menu extends State implements Statemethods, MouseListener, MouseMotionListener {
-	private MenuButton[] buttons = new MenuButton[4];
+	private final MenuButton[] buttons = new MenuButton[4];
 	private BufferedImage backgroundImg, backgroundImgPink, controllerOnlineImg, controllerOfflineImg;
 	private int menuX, menuY, menuWidth, menuHeight;
 	private VolumeButton volumeButton;
-	private boolean useVolumeButton = false;
+	private final boolean useVolumeButton = false;
 	private int selectedButtonIndex = 0;
 	
 	public Menu(Game game) {

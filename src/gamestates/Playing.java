@@ -21,7 +21,6 @@ import static utilz.Constants.PlayerConstants.*;
 import static utilz.Constants.Environment.*;
 import static utilz.Constants.UPS_SET;
 import static utilz.HelpMethods.*;
-import static org.lwjgl.glfw.GLFW.*;
 
 public class Playing extends State implements Statemethods {
 
@@ -45,18 +44,13 @@ public class Playing extends State implements Statemethods {
 	private boolean paused = false;
 	private float currentCloudYPos, currentWaterYPos, currentDarknessAlpha;
 
-	private int leftBorder = (int) ((1-CLOSE_TO_BORDER_HORIZONTAL) * Game.GAME_WIDTH/2);
-	private int rightBorder = (int) (CLOSE_TO_BORDER_HORIZONTAL * Game.GAME_WIDTH/2);
-	private int upperBorder = (int) ((1-CLOSE_TO_BORDER_VERTICAL) * Game.GAME_HEIGHT/2);
-	private int lowerBorder = (int) (CLOSE_TO_BORDER_VERTICAL * Game.GAME_HEIGHT/2);
-	private int maxLvlOffsetX, maxLvlOffsetY;
+    private int maxLvlOffsetX, maxLvlOffsetY;
 
 	private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg, loadingImg;
 
 	private boolean gameOver=false, player1Won=false, player2Won=false;
 
 	private float windSpeed = 0.0f;
-	public boolean useController = true;
 
 	
 	public Playing(Game game) {
@@ -232,7 +226,7 @@ public class Playing extends State implements Statemethods {
 			timeOfLastWindChange = gameTimeInSeconds;
 			windSpeed = random.nextFloat(2 * currentMaxWindSpeed) - currentMaxWindSpeed;
 			AudioPlayer ap = game.getAudioPlayer();
-			ap.windFactor = linear(Math.abs(windSpeed), 0.0f, MAX_WIND_SPEED_END, ap.MIN_WIND_VOLUME_FACTOR, ap.MAX_WIND_VOLUME_FACTOR);
+			ap.windFactor = linear(Math.abs(windSpeed), 0.0f, MAX_WIND_SPEED_END, AudioPlayer.MIN_WIND_VOLUME_FACTOR, AudioPlayer.MAX_WIND_VOLUME_FACTOR);
 			ap.updateSongVolume();
 		}
 		
@@ -249,17 +243,21 @@ public class Playing extends State implements Statemethods {
 
 		int xDiff = playerX - xLvlOffset;
 		int yDiff = playerY - yLvlOffset;
-		
 
-		if (xDiff > rightBorder)
-			xLvlOffset += Math.min(xDiff - rightBorder, MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
+
+        int leftBorder = (int) ((1 - CLOSE_TO_BORDER_HORIZONTAL) * Game.GAME_WIDTH / 2);
+        int rightBorder = (int) (CLOSE_TO_BORDER_HORIZONTAL * Game.GAME_WIDTH / 2);
+        if (xDiff > rightBorder)
+			xLvlOffset += (int) Math.min(xDiff - rightBorder, MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
 		else if (xDiff < leftBorder)
-			xLvlOffset += Math.max(xDiff - leftBorder, -MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
-		
-		if (yDiff > lowerBorder)
-			yLvlOffset += Math.min(yDiff - lowerBorder, MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
+			xLvlOffset += (int) Math.max(xDiff - leftBorder, -MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
+
+        int upperBorder = (int) ((1 - CLOSE_TO_BORDER_VERTICAL) * Game.GAME_HEIGHT / 2);
+        int lowerBorder = (int) (CLOSE_TO_BORDER_VERTICAL * Game.GAME_HEIGHT / 2);
+        if (yDiff > lowerBorder)
+			yLvlOffset += (int) Math.min(yDiff - lowerBorder, MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
 		else if (yDiff < upperBorder)
-			yLvlOffset += Math.max(yDiff - upperBorder, -MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
+			yLvlOffset += (int) Math.max(yDiff - upperBorder, -MAX_X_LVL_OFFSET_STEP_HORIZONTAL);
 
 		xLvlOffset = Math.max(Math.min(xLvlOffset, maxLvlOffsetX), 0);
 		yLvlOffset = Math.max(Math.min(yLvlOffset, maxLvlOffsetY), 0);
@@ -468,22 +466,9 @@ public class Playing extends State implements Statemethods {
 	public void setMaxLvlOffsetY(int lvlOffset) {
 		this.maxLvlOffsetY = lvlOffset;
 	}
-
-	public int getMaxLvlOffsetX() {
-		return maxLvlOffsetX;
-	}
-	
-	public int getMaxLvlOffsetY() {
-		return maxLvlOffsetY;
-	}
 	
 	public void unpauseGame() {
 		paused = false;
-	}
-
-	public void windowFocusLost() {
-		player1.resetDirBooleans();
-		player2.resetDirBooleans();
 	}
 
 	public Player getPlayer1() {
@@ -546,18 +531,6 @@ public class Playing extends State implements Statemethods {
 
 	public float getTemperature() {
 		return temperature;
-	}
-
-	public void setTemperature(float temperature) {
-		this.temperature = temperature;
-	}
-
-	public float getTempFromTime() {
-		return tempFromTime;
-	}
-
-	public void setTempFromTime(float tempFromTime) {
-		this.tempFromTime = tempFromTime;
 	}
 
 	public float getTempFromExplosion() {

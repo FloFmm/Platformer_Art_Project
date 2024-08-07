@@ -20,7 +20,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import gamestates.Playing;
 import main.Game;
-import utilz.Constants;
 import utilz.LoadSave;
 
 import java.nio.ByteBuffer;
@@ -38,8 +37,8 @@ public class Player extends Entity {
 	private TetrisTile isCarrying;
 	private float startTimeInAir;
 	private int[][] lvlData;
-	private float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
-	private float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
+	private final float xDrawOffset = (width-HITBOX_BASE_WIDTH*Game.SCALE)/2;//21 * Game.SCALE;
+	private final float yDrawOffset = (height-HITBOX_BASE_HEIGHT*Game.SCALE)/2;//4 * Game.SCALE;
 	private int xLvlOffset, yLvlOffset;
 	
 	// Jumping / Gravity
@@ -68,7 +67,6 @@ public class Player extends Entity {
 	private int flipW = 1;
 	private boolean attackChecked;
 	private final Playing playing;
-	private int tileY = 0;
 
 	private boolean powerAttackActive=false, selfHurt = false;
 	private int powerAttackTick;
@@ -77,7 +75,6 @@ public class Player extends Entity {
 	// grab and throw
 	private float throwHeightInSmallTiles = (float) TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES /2, throwWidthInSmallTiles = (float) TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES /2;
 	private boolean throwActive=false;
-	private boolean drawThrowArc = false;
 	//controller
 	private final int[] buttonStates = new int[NUM_BUTTONS];
 	private final int[] prevButtonStates = new int[NUM_BUTTONS];
@@ -93,7 +90,7 @@ public class Player extends Entity {
 	private int jumpsDone = 0;
 	private boolean resetJump = true;
 	private boolean fasterFall = false;
-	private Direction lastDirection = Direction.LEFT;
+	private final Direction lastDirection = Direction.LEFT;
 	private DashState dashState = DashState.NOTHING;
 	private long dashStartTime;
 
@@ -180,9 +177,9 @@ public class Player extends Entity {
 	public void update() {
 		if(playing.getLoading()){return;}
 		updateHealthBar();
-		if (handleDeadBody()){return;};
+		if (handleDeadBody()){return;}
 
-		boolean startInAir = inAir;
+        boolean startInAir = inAir;
 		updateControllerInputs();
 
 		updatePowerBar();
@@ -200,7 +197,6 @@ public class Player extends Entity {
 		checkSpikesTouched();
 		checkInsideWater();
 		if (moving) {
-			tileY = (int) (hitbox.y / Game.TILES_SIZE);
 			if (powerAttackActive) {
 				powerAttackTick++;
 				if (powerAttackTick >= 35) {
@@ -231,7 +227,8 @@ public class Player extends Entity {
 				prevButtonStates[i] = buttonStates[i];
 				if (!controllerIsPresent)
 					return;
-				buttonStates[i] = buttons.get(i);
+                assert buttons != null;
+                buttonStates[i] = buttons.get(i);
 				if (buttonStates[i] == GLFW.GLFW_PRESS && prevButtonStates[i] == GLFW.GLFW_RELEASE) {
 		        	pushDownStartTimes[i] = playing.getGameTimeInSeconds();
 		        }
@@ -295,7 +292,8 @@ public class Player extends Entity {
 	        
 	        // joysticks
 	        FloatBuffer axes = GLFW.glfwGetJoystickAxes(controllerID);
-	        float left_js_x = axes.get(0);
+            assert axes != null;
+            float left_js_x = axes.get(0);
 	        // left joystick for running
 			if (left_js_x > JOYSTICK_DEAD_ZONE) {
 				setRight(true);
@@ -393,7 +391,7 @@ public class Player extends Entity {
 	
 	public float[] calcThrowSpeed() {
 		float tileAirSpeed = (float) Math.sqrt(2.0f * GRAVITY * throwHeightInSmallTiles*Game.TILES_SIZE/4.0f); 
-		float tileXSpeed = (float) ((throwWidthInSmallTiles*Game.TILES_SIZE/4.0f)/(2.0f*tileAirSpeed/GRAVITY));
+		float tileXSpeed = (throwWidthInSmallTiles*Game.TILES_SIZE/4.0f)/(2.0f*tileAirSpeed/GRAVITY);
 		return new float[] {tileXSpeed, tileAirSpeed};
 	}
 	
@@ -445,21 +443,9 @@ public class Player extends Entity {
 			aniStateOffset = NUM_ANIMATIONS;		
 		g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, 
 				(int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
-//		drawHitbox(g, xLvlOffset, yLvlOffset);
-//		drawGrabBox(g, xLvlOffset, yLvlOffset);
-//		drawAttackBox(g, xLvlOffset, yLvlOffset);
-		/*if ((playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_X_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_RIGHT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_LEFT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_UP_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-			playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_DOWN_BUTTON_ID] < THROW_ARC_SHOW_TIME)
-			&& (isCarrying != null) && throwHeightInSmallTiles > 0) {
-
-		}*/
 		if (isCarrying != null){
 			drawThrowArc(g, xLvlOffset, yLvlOffset);
 			drawGrabBox(g, 0,0);
-			drawThrowArc = true;
 		}
 
 			
@@ -470,47 +456,6 @@ public class Player extends Entity {
 		g.drawRect((int) grabBox.x - xLvlOffset, (int) grabBox.y - yLvlOffset, (int) grabBox.width, (int) grabBox.height);
 	}
 
-	protected void drawThrowArcOld(Graphics g, int xLvlOffset, int yLvlOffset, int numArcPoints) {
-		Graphics2D g2 = (Graphics2D) g;
-		float[] throwSpeed = calcThrowSpeed();
-		float tileXSpeed = throwSpeed[0];
-		float tileAirSpeed = throwSpeed[1];
-		if (isPlayer1)
-			g.setColor(THROW_ARC_COLOR_PLAYER1);
-		else
-			g.setColor(THROW_ARC_COLOR_PLAYER2);
-		int circle_x , circle_y, lastX=0, lastY=0;
-		int radius, maxRadius = 15, minRadius = 6;
-		float maxThrowTime = tileAirSpeed / GRAVITY * 2;
-		float xDistanceTraveled, xDistanceDueStartSpeed, xDistanceDueWind, time;
-		boolean lastPointExists=false;
-		for (int i=0; i < numArcPoints+1; i++) {
-			time = i/(numArcPoints-1.0f)*maxThrowTime;
-			xDistanceDueStartSpeed = time * tileXSpeed;
-			if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET)
-				xDistanceDueWind = playing.getWindSpeed()/(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f * time * time;
-			else
-				xDistanceDueWind = playing.getWindSpeed()*(TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET) * 0.5f + 
-						playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED*UPS_SET);
-			xDistanceTraveled = xDistanceDueStartSpeed + xDistanceDueWind;
-			
-			radius = (int)(minRadius + i/((float) numArcPoints) * (maxRadius-minRadius));
-			circle_x = (int) (hitbox.x + hitbox.width/2 - xLvlOffset - (float) radius /2 + xDistanceTraveled);
-			
-			if (isCarrying != null) {
-				circle_y = (int) (hitbox.y - yLvlOffset - (float) radius /2 - isCarrying.hitbox.height/2 -
-						calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
-				if (lastPointExists) {
-	                g2.setStroke(new BasicStroke((int) radius));
-					g2.drawLine(lastX, lastY, circle_x, circle_y);
-				}
-				lastX = circle_x;
-				lastY = circle_y;
-				lastPointExists = true;
-			}
-		}
-	}
-	
 	protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset) {
 		Graphics2D g2 = (Graphics2D) g;
 		g.setColor(THROW_ARC_COLOR_PLAYER2);
@@ -530,7 +475,7 @@ public class Player extends Entity {
 				return;
 			}
 			if (i!=0) {
-                g2.setStroke(new BasicStroke((int) radius));
+                g2.setStroke(new BasicStroke(radius));
 				g2.drawLine(lastX, lastY, circle_x, circle_y);
 			}
 			lastX = circle_x;
@@ -546,7 +491,7 @@ public class Player extends Entity {
 		int xWindsockOffset = (int) (statusBarX + statusBarWidth + 30*Game.SCALE);
 		if (!isPlayer1) {
 			xDrawOffset = -Game.GAME_WIDTH/2;
-			xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH/2 - statusBarWidth);
+			xStatusBarOffset = -statusBarX + Game.GAME_WIDTH/2 - statusBarWidth;
 			xWindsockOffset = (int) ((float) Game.GAME_WIDTH /2 - statusBarX - statusBarWidth - 30*Game.SCALE);
 		}
 		
@@ -604,7 +549,6 @@ public class Player extends Entity {
 		else
 			wsImg = windsockImg3;
 			
-		int windsockX = 50;
         int windsockWidth = Game.GAME_WIDTH / 17;
         int windsockHeight = Game.GAME_WIDTH / 17;
         int windsockY = (int) (3 * Game.SCALE);
@@ -839,7 +783,7 @@ public class Player extends Entity {
 	}
 
 	private void loadAnimations() {
-		String fileName="", baseDir="";
+		String fileName="", baseDir;
 		animations = new BufferedImage[NUM_ANIMATIONS*2][MAX_ANIMATION_LENGTH];
 		
 		if (isPlayer1)
@@ -851,10 +795,9 @@ public class Player extends Entity {
             fileName = switch (j) {
                 case IDLE -> "idle";
                 case RUNNING -> "running";
-                case JUMP -> "jump";
+                case JUMP, ATTACK -> "jump";
                 case FALLING -> "falling";
 				case FASTFALLING -> "fastfalling";
-                case ATTACK -> "jump";
                 case HIT -> "hit";
                 case DEAD -> "dead";
                 case THROW -> "throw";
@@ -870,7 +813,7 @@ public class Player extends Entity {
 						if (!isPlayer1) {
 				            animations[j][i] = replaceColors(playing.getPlayer1().getAnimations()[j][i], COLOR_MAP, PLAYER_COLOR_TOLERANCE, PLAYER_DEFAULT_COLOR);
 				            LoadSave.SaveImage(animations[j][i], "png", "res/" + baseDir + "/" + fileName + i + ".png");
-				            System.out.println("file: " + "res/" + baseDir + "/" + fileName + i + ".png" + " was created by repalcing colors");
+				            System.out.println("file: " + "res/" + baseDir + "/" + fileName + i + ".png" + " was created by replacing colors");
 						} else if (!fileName.contains("hit") && !fileName.contains("dead")) {
 							animations[j][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
 							System.out.println("file does not exist: " + baseDir + "/" + fileName + i + ".png");
@@ -887,7 +830,7 @@ public class Player extends Entity {
 							if (!isPlayer1) {
 					            animations[j+NUM_ANIMATIONS][i] = replaceColors(playing.getPlayer1().getAnimations()[j+NUM_ANIMATIONS][i], COLOR_MAP, PLAYER_COLOR_TOLERANCE, PLAYER_DEFAULT_COLOR);
 					            LoadSave.SaveImage(animations[j+NUM_ANIMATIONS][i], "png", "res/" + baseDir + "/carry" + fileName + i + ".png");
-					            System.out.println("file: " + "res/" + baseDir + "/carry" + fileName + i + ".png" + " was created by repalcing colors");
+					            System.out.println("file: " + "res/" + baseDir + "/carry" + fileName + i + ".png" + " was created by replacing colors");
 							}
 							else {
 								animations[j+NUM_ANIMATIONS][i] = LoadSave.GetSpriteAtlas(baseDir + "/idle0.png");
@@ -922,22 +865,10 @@ public class Player extends Entity {
 		right = false;
 	}
 
-	public void setAttacking(boolean attacking) {
-		this.attacking = attacking;
-	}
-
-	public boolean isLeft() {
-		return left;
-	}
-
 	public void setLeft(boolean left) {
 		this.left = left;
 
 		moveHorizontal(left);
-	}
-
-	public boolean isRight() {
-		return right;
 	}
 
 	public void setRight(boolean right) {
@@ -1002,12 +933,6 @@ public class Player extends Entity {
 	}
 	
 	public void resetLvlOffsets() {
-//		if (!isPlayer1) {
-//			xLvlOffset = playing.getMaxLvlOffsetX();//(int)(hitbox.x - Game.GAME_WIDTH/4);
-//		}
-//		else {
-//			xLvlOffset = 0;//- Game.GAME_WIDTH/2 + 1;
-//		}
 		yLvlOffset = (int)(hitbox.y - (float) Game.GAME_HEIGHT /2);
 		xLvlOffset = (int)(hitbox.x - (float) Game.GAME_WIDTH /4);
 	}
@@ -1036,10 +961,6 @@ public class Player extends Entity {
 		if (!IsEntityOnFloor(hitbox, lvlData))
 			inAir = true;
 	}
-
-	public int getTileY() {
-		return tileY;
-	}
 	
 
 	public void powerAttack() {
@@ -1061,10 +982,6 @@ public class Player extends Entity {
 		return yLvlOffset;
 	}
 	
-	public boolean getGrabOrThrow() {
-		return grabOrThrow;
-	}
-	
 	public void setXLvlOffset(int xLvlOffset) {
 		this.xLvlOffset = xLvlOffset;
 	}
@@ -1083,10 +1000,6 @@ public class Player extends Entity {
 
 	public boolean getIsPlayer1() {
 		return isPlayer1;
-	}
-
-	public boolean getDrawThrowArc() {
-		return drawThrowArc;
 	}
 
 }
