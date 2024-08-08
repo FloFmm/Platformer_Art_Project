@@ -1,16 +1,8 @@
 package audio;
 
+import javax.sound.sampled.*;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Random;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.Mixer;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AudioPlayer {
 
@@ -92,7 +84,7 @@ public class AudioPlayer {
 
     public void stopAudio() throws IOException {
         stopSong();
-        for (Clip c : songs){
+        for (Clip c : songs) {
             c.stop();
             c.close();
         }

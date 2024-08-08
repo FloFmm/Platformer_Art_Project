@@ -13,7 +13,6 @@ import gamestates.Menu;
 import gamestates.Playing;
 
 
-
 public class Game implements Runnable {
 
     private final GamePanel gamePanel1;
@@ -102,7 +101,11 @@ public class Game implements Runnable {
             case MENU -> menu.update();
             case PLAYING -> playing.update();
             case CREDITS -> credits.update();
-            case QUIT -> {audioPlayer.stopAudio(); gameThread.interrupt(); System.exit(0);}
+            case QUIT -> {
+                audioPlayer.stopAudio();
+                gameThread.interrupt();
+                System.exit(0);
+            }
         }
     }
 
@@ -154,7 +157,7 @@ public class Game implements Runnable {
             }
 
             try {
-                if (Gamestate.state == Gamestate.QUIT){
+                if (Gamestate.state == Gamestate.QUIT) {
                     System.out.println("stopping Audio");
                     audioPlayer.stopAudio();
                     Thread.sleep(500);
@@ -184,7 +187,7 @@ public class Game implements Runnable {
         return audioPlayer;
     }
 
-    public Menu getMenu(){
+    public Menu getMenu() {
         return menu;
     }
 
