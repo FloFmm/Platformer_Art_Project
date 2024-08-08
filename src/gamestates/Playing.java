@@ -83,7 +83,7 @@ public class Playing extends State implements Statemethods {
     public void keyPressed(int key) {
 
         switch (key) {
-            case KeyEvent.VK_W -> player1.setJump(true);
+            case KeyEvent.VK_W -> player1.setJumpRequest(true);
             case KeyEvent.VK_A -> player1.setLeft(true);
             case KeyEvent.VK_S -> player1.fastFall(true);
             case KeyEvent.VK_D -> player1.setRight(true);
@@ -97,7 +97,7 @@ public class Playing extends State implements Statemethods {
 
             case KeyEvent.VK_CIRCUMFLEX -> becomeOP(player1);
 
-            case KeyEvent.VK_UP -> player2.setJump(true);
+            case KeyEvent.VK_UP -> player2.setJumpRequest(true);
             case KeyEvent.VK_LEFT -> player2.setLeft(true);
             case KeyEvent.VK_RIGHT -> player2.setRight(true);
             case KeyEvent.VK_DOWN -> player2.fastFall(true);
@@ -119,14 +119,14 @@ public class Playing extends State implements Statemethods {
 
     public void keyReleased(int key) {
         switch (key) {
-            case KeyEvent.VK_W -> player1.setJump(false);
+            case KeyEvent.VK_W -> player1.setJumpRequest(false);
             case KeyEvent.VK_A -> player1.setLeft(false);
             case KeyEvent.VK_S -> player1.fastFall(false);
             case KeyEvent.VK_D -> player1.setRight(false);
             case KeyEvent.VK_E -> player1.setGrabOrThrow(false);
             case KeyEvent.VK_R -> player1.rotateTile(false);
             case KeyEvent.VK_SHIFT -> player2.rotateTile(false);
-            case KeyEvent.VK_UP -> player2.setJump(false);
+            case KeyEvent.VK_UP -> player2.setJumpRequest(false);
             case KeyEvent.VK_LEFT -> player2.setLeft(false);
             case KeyEvent.VK_RIGHT -> player2.setRight(false);
             case KeyEvent.VK_ENTER -> player2.setGrabOrThrow(false);

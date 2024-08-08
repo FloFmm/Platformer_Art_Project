@@ -152,6 +152,10 @@ public class Game implements Runnable {
 
             if (deltaF >= 1) {
                 gamePanel1.repaint();
+                gamePanel1.setDebugText("x-speed:" + String.format(java.util.Locale.US,"%.2f", playing.getPlayer1().getSpeedX()), 0);
+                gamePanel1.setDebugText("dashstate:" + playing.getPlayer1().getDashState(), 1);
+                gamePanel1.setDebugText("y-speed:" + String.format(java.util.Locale.US,"%.2f", playing.getPlayer1().getSpeedY()), 2);
+                //gamePanel1.setDebugText("x-speed:" + String.format(java.util.Locale.US,"%.2f", playing.getPlayer1().getSpeedX()), 3);
                 gamePanel2.repaint();
                 deltaF--;
             }

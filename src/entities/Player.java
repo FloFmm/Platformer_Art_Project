@@ -33,7 +33,6 @@ public class Player extends Entity {
 
     private BufferedImage[][] animations;
 
-
     // lvl layout
     private int[][] lvlData;
     private final float xDrawOffset = (width - HITBOX_BASE_WIDTH * Game.SCALE) / 2;//21 * Game.SCALE;
@@ -88,21 +87,60 @@ public class Player extends Entity {
     private boolean keyboardRotatedTile = false;
 
     // player control
-    private boolean moving = false, attacking = false;
+
+    private boolean attacking = false;
+    /**
+     * requesting to go left
+     */
     private boolean left;
+
+    /**
+     * requesting to go right
+     */
     private boolean right;
-    private boolean jump;
+
+    /**
+     * requesting to jump
+     */
+    private boolean jumpRequest;
+
+    /**
+     * request to fall down faster
+     */
+    private boolean fasterFall = false;
     protected Rectangle2D.Float grabBox;
     private TetrisTile isCarrying;
+
+    /**
+     * counting time in the air for jumping acceleration
+     */
     private float startTimeInAir;
     private boolean attackChecked;
 
     // player control ++
     private int jumpsDone = 0;
+    /**
+     * handle keyboard press/release cycle for double jump
+     */
     private boolean resetJump = true;
-    private boolean fasterFall = false;
+
+    /**
+     * used to reset double dash counter on turning to the other side
+     */
     private final Direction lastDirection = Direction.LEFT;
+
+    /**
+     * starting with <b>NOTHING</b> -> ACTIVATE1 (left or right, resets dash counter) <p>
+     * <b>RELEASE1</b> (required since holding down a key fires continuous press events) <p>
+     * <b>ACTIVATE2</b> (second movement input, reset dash counter if opposite direction) <p>
+     * <b>DASHING</b> (is automatically applied if ACTIVATE2 -> start dash timer and give burst of movement)
+     */
     private DashState dashState = DashState.NOTHING;
+
+    /**
+     * if state is <b>DASHING</b> start timer <p>
+     * if timer exceeds maximum reset dashState to <b>NOTHING</b>
+     */
     private long dashStartTime;
 
     private final boolean isPlayer1;
@@ -145,6 +183,24 @@ public class Player extends Entity {
         return this.y;
     }
 
+    public float getSpeedX(){
+        return this.xSpeed;
+    }
+
+    public float getSpeedY(){
+        return this.airSpeed;
+    }
+
+    public String getDashState(){
+        return switch (this.dashState) {
+            case NOTHING -> "NOTHING";
+            case ACTIVATE1 -> "ACTIVATE1";
+            case RELEASE1 -> "RELEASE1";
+            case ACTIVATE2 -> "ACTIVATE2";
+            case DASHING -> "DASHING";
+        };
+    }
+
 
     private void initAttackBox(int width, int height) {
         attackBox = new Rectangle2D.Float(x, y, (int) (width * Game.SCALE), (int) (height * Game.SCALE));
@@ -185,6 +241,15 @@ public class Player extends Entity {
         return false;
     }
 
+    /**
+     * 1. handle loading
+     * 2. handle health
+     * 3. handle death
+     * 4. update controller
+     * 5. update power, update hit boxes
+     * 6. if not in combat update position
+     * 7. check for environmental damage
+     */
     public void update() {
         if (playing.getLoading()) {
             return;
@@ -194,6 +259,7 @@ public class Player extends Entity {
             return;
         }
 
+        // store pre input airborne status
         boolean startInAir = inAir;
         updateControllerInputs();
 
@@ -211,13 +277,11 @@ public class Player extends Entity {
 
         checkSpikesTouched();
         checkInsideWater();
-        if (moving) {
-            if (powerAttackActive) {
-                powerAttackTick++;
-                if (powerAttackTick >= 35) {
-                    powerAttackTick = 0;
-                    powerAttackActive = false;
-                }
+        if (powerAttackActive) {
+            powerAttackTick++;
+            if (powerAttackTick >= 35) {
+                powerAttackTick = 0;
+                powerAttackActive = false;
             }
         }
 
@@ -230,6 +294,128 @@ public class Player extends Entity {
 
         if (!startInAir && inAir) {
             startTimeInAir = playing.getGameTimeInSeconds(); // if air status changed in this update loop then start timer
+        }
+    }
+
+    private void turnDirection(float speed) {
+        if (left && !right) {
+            xSpeed = -speed;
+            flipX = width;
+            flipW = -1;
+        }else if (right && !left){
+            xSpeed = speed;
+            flipX = 0;
+            flipW = 1;
+        }else {
+            if (dashState.equals(DashState.NOTHING)) {
+                xSpeed = 0;
+            }
+        }
+    }
+
+    /**
+     * 1. check for input actions
+     * - jumping
+     * - fast fall
+     * - left, right
+     * <p>
+     * 2.
+     */
+    private void updatePos() {
+
+        // working fine for keyboard
+        if (jumpRequest) {
+            // only apply jump once per button press - for keyboard
+            if (resetJump && jumpsDone < MAX_ALLOWED_JUMPS) {
+                // TODO: jump using qLERP
+                jump();
+                jumpsDone++;
+                resetJump = false;
+            } else {
+                jumpRequest = false;
+            }
+        }
+
+        // on the ground
+        if (!inAir) {
+            jumpsDone = 0;
+            resetJump = true;
+            xSpeed = 0;
+            dashState = DashState.NOTHING;
+
+            // stop movement if left and right pressed
+            if (!powerAttackActive)
+                if ((!left && !right) || (right && left))
+                    return;
+        }
+
+        // set  direction and animation
+        switch (dashState){
+            case NOTHING, ACTIVATE1, RELEASE1 -> {
+                turnDirection(walkSpeed);
+            }
+            case ACTIVATE2 -> {
+                dashStartTime = System.currentTimeMillis();
+                dashState = DashState.DASHING;
+            }
+            case DASHING -> {
+                turnDirection(walkSpeed*5);
+                if ((System.currentTimeMillis() - dashStartTime) >= 200) {
+                    dashState = DashState.NOTHING;
+                }
+            }
+        }
+
+        if (powerAttackActive) {
+            if ((!left && !right) || (left && right)) {
+                if (flipW == -1)
+                    xSpeed = -walkSpeed;
+                else
+                    xSpeed = walkSpeed;
+            }
+            xSpeed *= 3;
+        }
+
+        if (!inAir)
+            if (!IsEntityOnFloor(hitbox, lvlData))
+                inAir = true;
+
+        // normal airborne
+        if (inAir && !powerAttackActive) {
+            if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
+                hitbox.y += airSpeed;
+                airSpeed += GRAVITY * (isFastFall() ? 5 : 1);
+                updateXPos(xSpeed, lvlData);
+            } else {
+                float fallSpeedAfterCollision = 0.5f * Game.SCALE;
+                if (airSpeed > 0)
+                    resetInAir();
+                else
+                    airSpeed = fallSpeedAfterCollision;
+                // TODO
+                updateXPos(xSpeed, lvlData);
+            }
+
+        } else {
+            // execute x pos update
+            updateXPos(xSpeed, lvlData);
+            if (powerAttackActive && !CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)) {
+                powerAttackActive = false;
+                powerAttackTick = 0;
+            }
+        }
+    }
+
+    private void jump() {
+        boolean jumping = airSpeed < 0;
+        if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < COYOTE_TIME) || jumpsDone < MAX_ALLOWED_JUMPS)) {
+            inAir = true;
+            startTimeInAir = playing.getGameTimeInSeconds();
+            if (jumpsDone == 0) {
+                airSpeed = jumpSpeed;
+            } else {
+                airSpeed = 2 * jumpSpeed - airSpeed;
+            }
         }
     }
 
@@ -259,11 +445,10 @@ public class Player extends Entity {
 
             // jump
             if (buttonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_PRESS) {
-                jump = true;
+                jumpRequest = true;
             }
             if (buttonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_RELEASE) {
-                jump = false;
-
+                jumpRequest = false;
             }
 
             // dash
@@ -338,7 +523,6 @@ public class Player extends Entity {
 
         // should be activated on each release -> reset rotating on
         keyboardRotatedTile = is_pressed;
-        System.out.println("krt: " + keyboardRotatedTile + " is pressed: " + is_pressed);
     }
 
     private void changeThrowDirection(int buttonId) {
@@ -457,8 +641,6 @@ public class Player extends Entity {
             drawThrowArc(g, xLvlOffset, yLvlOffset);
             drawGrabBox(g, 0, 0);
         }
-
-
     }
 
     public void drawGrabBox(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -596,7 +778,7 @@ public class Player extends Entity {
         if (state == HIT)
             return;
 
-        if (moving)
+        if (!inAir && xSpeed > 0)
             state = RUNNING;
         else
             state = IDLE;
@@ -631,117 +813,7 @@ public class Player extends Entity {
         aniIndex = 0;
     }
 
-    private void updatePos() {
-        moving = false;
-        if (jump) {
-            if (resetJump && jumpsDone < MAX_ALLOWED_JUMPS) {
-                jump();
-                jumpsDone++;
-                resetJump = false;
-            } else {
-                jump = false;
-            }
-        }
 
-        if (!inAir) {
-            jumpsDone = 0;
-            resetJump = true;
-            xSpeed = 0;
-            dashState = DashState.NOTHING;
-            if (!powerAttackActive)
-                if ((!left && !right) || (right && left))
-                    return;
-            return;
-        }
-        if (dashState != DashState.NOTHING)
-            System.out.println(dashState);
-
-
-        if (dashState == DashState.DASHING) {
-            if (left && !right) {
-                flipX = width;
-                flipW = -1;
-            } else {
-                flipX = 0;
-                flipW = 1;
-            }
-        } else {
-            if (left && !right) {
-                xSpeed = -walkSpeed;
-                flipX = width;
-                flipW = -1;
-            }
-            if (right && !left) {
-                xSpeed = walkSpeed;
-                flipX = 0;
-                flipW = 1;
-            }
-        }
-
-        if (dashState == DashState.ACTIVATE2) {
-            dashStartTime = System.currentTimeMillis();
-            xSpeed *= 2;
-            dashState = DashState.DASHING;
-        } else if (dashState == DashState.DASHING) {
-            if ((System.currentTimeMillis() - dashStartTime) >= 1000) {
-                dashState = DashState.NOTHING;
-                xSpeed = 0;
-            }
-        }
-
-        if (powerAttackActive) {
-            if ((!left && !right) || (left && right)) {
-                if (flipW == -1)
-                    xSpeed = -walkSpeed;
-                else
-                    xSpeed = walkSpeed;
-            }
-            xSpeed *= 3;
-        }
-
-        if (!inAir)
-            if (!IsEntityOnFloor(hitbox, lvlData))
-                inAir = true;
-
-        // power attack
-        if (inAir && !powerAttackActive) {
-            if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
-                hitbox.y += airSpeed;
-                airSpeed += GRAVITY * (isFastFall() ? 5 : 1);
-                updateXPos(xSpeed, lvlData);
-            } else {
-                float fallSpeedAfterCollision = 0.5f * Game.SCALE;
-                if (airSpeed > 0)
-                    resetInAir();
-                else
-                    airSpeed = fallSpeedAfterCollision;
-                // TODO
-                updateXPos(xSpeed, lvlData);
-            }
-
-        } else {
-            // execute x pos update
-            updateXPos(xSpeed, lvlData);
-            if (powerAttackActive && !CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)) {
-                powerAttackActive = false;
-                powerAttackTick = 0;
-            }
-        }
-        moving = true;
-    }
-
-    private void jump() {
-        boolean jumping = airSpeed < 0;
-        if (!inAir || (!jumping && (playing.getGameTimeInSeconds() - startTimeInAir < COYOTE_TIME) || jumpsDone < MAX_ALLOWED_JUMPS)) {
-            inAir = true;
-            startTimeInAir = playing.getGameTimeInSeconds();
-            if (jumpsDone == 0) {
-                airSpeed = jumpSpeed;
-            } else {
-                airSpeed = 2 * jumpSpeed - airSpeed;
-            }
-        }
-    }
 
     private void resetInAir() {
         inAir = false;
@@ -896,12 +968,12 @@ public class Player extends Entity {
         }
     }
 
-    public void setJump(boolean jump) {
+    public void setJumpRequest(boolean jumpRequest) {
         //this.jump = jump;
-        if (!jump && jumpsDone < MAX_ALLOWED_JUMPS) {
+        if (!jumpRequest && jumpsDone < MAX_ALLOWED_JUMPS) {
             resetJump = true;
         } else {
-            this.jump = true;
+            this.jumpRequest = true;
         }
     }
 
@@ -916,7 +988,7 @@ public class Player extends Entity {
     public void stopMovement() {
         this.left = false;
         this.right = false;
-        this.jump = false;
+        this.jumpRequest = false;
     }
 
     public void setGrabOrThrow(boolean grabOrThrow) {
@@ -948,7 +1020,6 @@ public class Player extends Entity {
         }
         inAir = false;
         attacking = false;
-        moving = false;
         airSpeed = 0f;
         state = IDLE;
         currentHealth = maxHealth;
