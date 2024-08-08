@@ -1,35 +1,36 @@
 package gamestates;
 
-import java.awt.event.MouseEvent;
-
 import audio.AudioPlayer;
 import main.Game;
 import ui.MenuButton;
 
-public class State {
+import java.awt.event.MouseEvent;
 
-	protected Game game;
+public abstract class State {
 
-	public State(Game game) {
-		this.game = game;
-	}
+    protected Game game;
 
-	public boolean isIn(MouseEvent e, MenuButton mb) {
-		return mb.getBounds().contains(e.getX(), e.getY());
-	}
+    public State(Game game) {
+        this.game = game;
+    }
 
-	public Game getGame() {
-		return game;
-	}
+    public boolean isIn(MouseEvent e, MenuButton mb) {
+        return mb.getBounds().contains(e.getX(), e.getY());
+    }
 
-	@SuppressWarnings("incomplete-switch")
-	public void setGamestate(Gamestate state) {
-		switch (state) {
-		case MENU -> game.getAudioPlayer().playSong(AudioPlayer.MENU);
-		case PLAYING -> game.getAudioPlayer().playSong(AudioPlayer.WIND);
-		}
+    public Game getGame() {
+        return game;
+    }
 
-		Gamestate.state = state;
-	}
+    @SuppressWarnings("incomplete-switch")
+    public void setGamestate(Gamestate state) {
+        switch (state) {
+            case MENU -> game.getAudioPlayer().playSong(AudioPlayer.MENU);
+            case PLAYING -> game.getAudioPlayer().playSong(AudioPlayer.WIND);
+        }
 
+        Gamestate.state = state;
+    }
+
+    public abstract void mouseMoved(MouseEvent e);
 }
