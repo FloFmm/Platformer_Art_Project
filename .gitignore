@@ -11,7 +11,7 @@ local.properties
 .recommenders
 .project
 .classpath
-
+.idea
 res/animation/player2
 
 /target/
