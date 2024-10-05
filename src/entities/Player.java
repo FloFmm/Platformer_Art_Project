@@ -640,7 +640,6 @@ public class Player extends Entity {
         if (jumpRequest) {
             // only apply jump once per button press - for keyboard
             if (resetJump && jumpsDone < MAX_ALLOWED_JUMPS) {
-                // TODO: jump using qLERP
                 jump();
                 jumpsDone++;
                 resetJump = false;
