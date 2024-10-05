@@ -2,6 +2,8 @@ package gamestates;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -73,6 +75,70 @@ public class Playing extends State implements Statemethods {
         currentCloudYPos = CLOUD_START_OFFSET_FACTOR * levelManager.getCurrentLevel().getLvlHeight();
         currentDarknessAlpha = 0;
         loadImgs();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
+
+    private void becomeOP(Player player) {
+        player.powerAttack();
+        player.changePower(200);
+    }
+
+    public void keyPressed(int key) {
+
+        switch (key) {
+            case KeyEvent.VK_W -> player1.setJumpRequest(true);
+            case KeyEvent.VK_A -> player1.setLeft(true);
+            case KeyEvent.VK_S -> player1.fastFall(true);
+            case KeyEvent.VK_D -> player1.setRight(true);
+            case KeyEvent.VK_E -> player1.grabOrThrow();
+            case KeyEvent.VK_R -> player1.rotateTile(true);
+            case KeyEvent.VK_T -> this.objectManager.addExplosion((int) player1.getX(), (int) player1.getY(), 10, 10);
+            case KeyEvent.VK_J -> player1.changeThrowDirectionKeyboardLeft();
+            case KeyEvent.VK_L -> player1.changeThrowDirectionKeyboardRight();
+            case KeyEvent.VK_K -> player1.changeThrowDirectionKeyboardDown();
+            case KeyEvent.VK_I -> player1.changeThrowDirectionKeyboardUp();
+
+            case KeyEvent.VK_CIRCUMFLEX -> becomeOP(player1);
+
+            case KeyEvent.VK_UP -> player2.setJumpRequest(true);
+            case KeyEvent.VK_LEFT -> player2.setLeft(true);
+            case KeyEvent.VK_RIGHT -> player2.setRight(true);
+            case KeyEvent.VK_DOWN -> player2.fastFall(true);
+            case KeyEvent.VK_ENTER -> player2.grabOrThrow();
+            case KeyEvent.VK_NUMPAD4 -> player2.changeThrowDirectionKeyboardLeft();
+            case KeyEvent.VK_NUMPAD5 -> player2.changeThrowDirectionKeyboardDown();
+            case KeyEvent.VK_NUMPAD6 -> player2.changeThrowDirectionKeyboardRight();
+            case KeyEvent.VK_NUMPAD8 -> player2.changeThrowDirectionKeyboardUp();
+            case KeyEvent.VK_SHIFT -> player2.rotateTile(true);
+            case KeyEvent.VK_NUMPAD0 -> becomeOP(player2);
+            case KeyEvent.VK_SPACE -> this.setLoading(false);
+            case KeyEvent.VK_ESCAPE -> {
+                Gamestate.state = Gamestate.MENU;
+                player1.stopMovement();
+                player2.stopMovement();
+            }
+        }
+    }
+
+    public void keyReleased(int key) {
+        switch (key) {
+            case KeyEvent.VK_W -> player1.setJumpRequest(false);
+            case KeyEvent.VK_A -> player1.setLeft(false);
+            case KeyEvent.VK_S -> player1.fastFall(false);
+            case KeyEvent.VK_D -> player1.setRight(false);
+            case KeyEvent.VK_E -> player1.setGrabOrThrow(false);
+            case KeyEvent.VK_R -> player1.rotateTile(false);
+            case KeyEvent.VK_SHIFT -> player2.rotateTile(false);
+            case KeyEvent.VK_UP -> player2.setJumpRequest(false);
+            case KeyEvent.VK_LEFT -> player2.setLeft(false);
+            case KeyEvent.VK_RIGHT -> player2.setRight(false);
+            case KeyEvent.VK_ENTER -> player2.setGrabOrThrow(false);
+            case KeyEvent.VK_DOWN -> player2.fastFall(false);
+        }
     }
 
     public void loadLevel(int lvlIndex, boolean resetAll) {

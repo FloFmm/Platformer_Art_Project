@@ -278,6 +278,20 @@ public class Constants {
         public static final int DOWN = 3;
     }
 
+    public enum Direction {
+        LEFT, RIGHT
+    }
+
+    public enum DashState {
+        NOTHING, ACTIVATE1, RELEASE1, ACTIVATE2, DASHING
+    }
+
+    public enum PlayerState {
+        IDLE, RUNNING, JUMP, FALLING, ATTACK, HIT, DEAD, THROW, FASTFALLING
+    }
+
+    public static final int MAX_ALLOWED_JUMPS = 3;
+
     public static class PlayerConstants {
         public static final float PLAYER_WALKSPEED = Game.SCALE * 1.0f;
         public static final float PLAYER_JUMP_SPEED = -2.25f * Game.SCALE;

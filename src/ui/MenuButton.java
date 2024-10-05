@@ -9,13 +9,12 @@ import org.lwjgl.glfw.GLFW;
 
 import audio.AudioPlayer;
 import gamestates.Gamestate;
-import gamestates.State;
 import main.Game;
 import utilz.LoadSave;
 
 import static utilz.Constants.UI.Buttons.*;
 
-public class MenuButton extends State {
+public class MenuButton{
     private int xPos, yPos, rowIndex, index;
     private int xOffsetCenter = B_WIDTH / 2;
     private Gamestate state;
@@ -23,14 +22,16 @@ public class MenuButton extends State {
     private int buttonState = GLFW.GLFW_RELEASE, prevButtonState = GLFW.GLFW_RELEASE;
     private Rectangle bounds;
     private int controllerButtonId;
+    private boolean mouseOver;
+    private Game game;
 
     public MenuButton(int xPos, int yPos, int rowIndex, Gamestate state, int controllerButtonId, Game game) {
-        super(game);
         this.xPos = xPos;
         this.yPos = yPos;
         this.rowIndex = rowIndex;
         this.state = state;
         this.controllerButtonId = controllerButtonId;
+        this.game = game;
         loadImgs();
         initBounds();
     }
@@ -72,12 +73,13 @@ public class MenuButton extends State {
     }
 
     public void applyGamestate() {
-        setGamestate(state);
+        Gamestate.state = state;
     }
 
     public void resetBools() {
         buttonState = GLFW.GLFW_RELEASE;
         prevButtonState = GLFW.GLFW_RELEASE;
+        mouseOver = false;
     }
 
     public Gamestate getState() {
@@ -106,6 +108,14 @@ public class MenuButton extends State {
 
     public void setPrevButtonState(int prevButtonState) {
         this.prevButtonState = prevButtonState;
+    }
+
+    public void setMouseOver(boolean isOver) {
+        this.mouseOver = isOver;
+    }
+
+    public boolean isMouseOver() {
+        return mouseOver;
     }
 
 }

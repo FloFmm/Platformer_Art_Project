@@ -1,6 +1,10 @@
 package gamestates;
 
-import java.awt.Graphics;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import static utilz.Constants.ControllerConstants.*;
@@ -15,13 +19,14 @@ import ui.MenuButton;
 import ui.VolumeButton;
 import utilz.LoadSave;
 
-public class Menu extends State implements Statemethods {
+public class Menu extends State implements Statemethods, MouseListener, MouseMotionListener {
 
     private MenuButton[] buttons = new MenuButton[4];
     private BufferedImage backgroundImg, backgroundImgPink, controllerOnlineImg, controllerOfflineImg;
     private int menuX, menuY, menuWidth, menuHeight;
     private VolumeButton volumeButton;
     private boolean useVolumeButton = false;
+    private int selectedButtonIndex = 0;
 
     public Menu(Game game) {
         super(game);
@@ -61,9 +66,10 @@ public class Menu extends State implements Statemethods {
                     game.getPlaying().loadLevel(rowId, true);
                     game.getAudioPlayer().playSong(AudioPlayer.WIND);
                 }
-                resetButtons();
+                selectButton(mb.getRowIndex());
             }
         }
+        updateButtonSelection();
         if (useVolumeButton)
             volumeButton.update();
     }
@@ -90,8 +96,16 @@ public class Menu extends State implements Statemethods {
             g.drawImage(controllerOfflineImg, (int) (Game.GAME_WIDTH * 0.9 + xDrawOffset),
                     (int) (Game.GAME_WIDTH * 0.01), (int) (Game.GAME_WIDTH * 0.1), (int) (Game.GAME_HEIGHT * 0.1), null);
 
-        for (MenuButton mb : buttons)
-            mb.draw(g, xDrawOffset);
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].draw(g, xDrawOffset);
+            if (i == selectedButtonIndex) {
+                // Draw a highlight around the selected button
+                g.setColor(Color.YELLOW);
+                Rectangle bounds = buttons[i].getBounds();
+                g.drawRect(bounds.x + xDrawOffset - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
+
+            }
+        }
         if (useVolumeButton)
             volumeButton.draw(g, xDrawOffset);
     }
@@ -99,6 +113,128 @@ public class Menu extends State implements Statemethods {
     private void resetButtons() {
         for (MenuButton mb : buttons)
             mb.resetBools();
+    }
+    public void keyPressed(int key) {
+        switch (key) {
+            case KeyEvent.VK_DOWN -> {
+                selectNextButton();
+            }
+            case KeyEvent.VK_UP -> {
+                selectPreviousButton();
+            }
+            case KeyEvent.VK_ENTER -> {
+                if (getSelectedButton() != -1) activateButton(getSelectedButton());
+            }
+            case KeyEvent.VK_ESCAPE -> {
+                Gamestate.state = Gamestate.PLAYING;
+            }
+        }
+    }
 
+    public void keyReleased(int key) {
+        // You can add specific behavior for key releases if needed
+    }
+
+    private void activateButton(int index) {
+        if (index >= 0 && index < buttons.length) {
+            setGamestate(buttons[index].getState());
+            if (buttons[index].getState() == Gamestate.MENU) {
+                Gamestate.state = Gamestate.QUIT;
+                return;
+            } else if (buttons[index].getState() == Gamestate.QUIT) {
+                return;
+            }
+            game.getPlaying().loadLevel(index, true);
+            game.getPlaying().setLoading(true);
+            game.getPlaying().update();
+            game.getAudioPlayer().playSong(AudioPlayer.WIND);
+            buttons[index].applyGamestate();
+        }
+    }
+
+    private void selectNextButton() {
+        selectedButtonIndex = (selectedButtonIndex + 1) % buttons.length;
+        updateButtonSelection();
+    }
+
+    private void selectPreviousButton() {
+        selectedButtonIndex = (selectedButtonIndex - 1 + buttons.length) % buttons.length;
+        updateButtonSelection();
+    }
+
+    private void updateButtonSelection() {
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].setMouseOver(i == selectedButtonIndex);
+        }
+    }
+
+    private int getSelectedButtonIndex() {
+        return selectedButtonIndex;
+    }
+
+    private int getSelectedButton() {
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i].isMouseOver())
+                return i;
+        }
+        return -1;
+    }
+
+    private void selectButton(int index) {
+        buttons[index].applyGamestate();
+        if (buttons[index].getState() == Gamestate.PLAYING) {
+            game.getPlaying().loadLevel(buttons[index].getRowIndex(), true);
+            game.getAudioPlayer().playSong(AudioPlayer.WIND);
+        }
+        resetButtons();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // This method is called when a mouse button is clicked
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        // This method is called when a mouse button is pressed
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        // This method is called when a mouse button is released
+        for (MenuButton mb : buttons) {
+            if (mb.getBounds().contains(e.getX(), e.getY())) {
+                activateButton(mb.getRowIndex());
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        // This method is called when the mouse enters the component
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        // This method is called when the mouse exits the component
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        // This method is called when the mouse is moved
+        for (MenuButton mb : buttons) {
+            mb.setMouseOver(false);
+            if (mb.getBounds().contains(e.getX(), e.getY())) {
+                mb.setMouseOver(true);
+                selectedButtonIndex = mb.getRowIndex();
+                break;
+            }
+        }
     }
 }

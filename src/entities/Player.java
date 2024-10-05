@@ -1,10 +1,8 @@
 package entities;
 
+import static utilz.Constants.*;
 import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.*;
-import static utilz.Constants.UPS_SET;
-import static utilz.Constants.GRAVITY;
-import static utilz.Constants.ANI_SPEED;
 import static utilz.Constants.Directions.*;
 import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.ControllerConstants.*;
@@ -112,6 +110,13 @@ public class Player extends Entity {
     private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
 
     private final boolean isPlayer1;
+
+    private int jumpsDone = 0;
+    private boolean resetJump = true;
+    private boolean jumpRequest;
+    private boolean fasterFall = false;
+    private boolean keyboardRotatedTile = false;
+
 
     public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
         super(x, y, width, height);
@@ -419,20 +424,9 @@ public class Player extends Entity {
             aniStateOffset = NUM_ANIMATIONS;
         g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX,
                 (int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
-        //drawHitbox(g, xLvlOffset, yLvlOffset);
-        //drawGrabBox(g, xLvlOffset, yLvlOffset);
-        //drawAttackBox(g, xLvlOffset, yLvlOffset);
-        if ((playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_X_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-                playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_RIGHT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-                playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_LEFT_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-                playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_UP_BUTTON_ID] < THROW_ARC_SHOW_TIME ||
-                playing.getGameTimeInSeconds() - buttonLastPressed[CONTROLLER_DOWN_BUTTON_ID] < THROW_ARC_SHOW_TIME)
-                && (isCarrying != null) && throwHeightInSmallTiles > 0) {
+        if ((isCarrying != null) && throwHeightInSmallTiles > 0) {
             drawThrowArc(g, xLvlOffset, yLvlOffset);
-            drawThrowArc = true;
         }
-        drawThrowArc = false;
-
     }
 
     protected void drawGrabBox(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -629,28 +623,44 @@ public class Player extends Entity {
         aniIndex = 0;
     }
 
-    private void updatePos() {
-        moving = false;
-        //System.out.println(jump);
-        if (jump)
-            jump();
-
-        if (!inAir)
-            if (!powerAttackActive)
-                if ((!left && !right) || (right && left))
-                    return;
-
-        float xSpeed = 0;
+    private void turnDirection(float speed) {
         if (left && !right) {
-            xSpeed -= walkSpeed;
+            xSpeed = -speed;
             flipX = width;
             flipW = -1;
-        }
-        if (right && !left) {
-            xSpeed += walkSpeed;
+        } else if (right && !left) {
+            xSpeed = speed;
             flipX = 0;
             flipW = 1;
         }
+    }
+
+
+    private void updatePos() {
+        if (jumpRequest) {
+            // only apply jump once per button press - for keyboard
+            if (resetJump && jumpsDone < MAX_ALLOWED_JUMPS) {
+                // TODO: jump using qLERP
+                jump();
+                jumpsDone++;
+                resetJump = false;
+            } else {
+                jumpRequest = false;
+            }
+        }
+
+        if (!inAir) {
+            jumpsDone = 0;
+            resetJump = true;
+            xSpeed = 0;
+
+            // stop movement if left and right pressed
+            if (!powerAttackActive)
+                if ((!left && !right) || (right && left))
+                    return;
+        }
+
+        turnDirection(walkSpeed);
 
         if (powerAttackActive) {
             if ((!left && !right) || (left && right)) {
@@ -666,12 +676,14 @@ public class Player extends Entity {
             if (!IsEntityOnFloor(hitbox, lvlData))
                 inAir = true;
 
+        // normal airborne
         if (inAir && !powerAttackActive) {
             if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
                 hitbox.y += airSpeed;
-                airSpeed += GRAVITY;
+                airSpeed += GRAVITY * (fasterFall ? 5 : 1);
                 updateXPos(xSpeed, lvlData);
             } else {
+                float fallSpeedAfterCollision = 0.5f * Game.SCALE;
                 if (airSpeed > 0)
                     resetInAir();
                 else
@@ -681,13 +693,13 @@ public class Player extends Entity {
             }
 
         } else {
+            // execute x pos update
             updateXPos(xSpeed, lvlData);
             if (powerAttackActive && !CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)) {
                 powerAttackActive = false;
                 powerAttackTick = 0;
             }
         }
-        moving = true;
     }
 
     private void jump() {
@@ -968,5 +980,59 @@ public class Player extends Entity {
     public boolean getDrawThrowArc() {
         return drawThrowArc;
     }
+
+    public void setJumpRequest(boolean jumpRequest) {
+        //this.jump = jump;
+        if (!jumpRequest && jumpsDone < MAX_ALLOWED_JUMPS) {
+            resetJump = true;
+        } else {
+            this.jumpRequest = true;
+        }
+    }
+
+    public void fastFall(boolean doSpeedup) {
+        this.fasterFall = doSpeedup;
+    }
+
+    public void rotateTile(boolean is_pressed) {
+        if (!keyboardRotatedTile && is_pressed && isCarrying != null) {
+            int old_rotation_player1 = isCarrying.getRotation();
+            isCarrying.setRotation((old_rotation_player1 + 1) % 4);
+        }
+
+        // should be activated on each release -> reset rotating on
+        keyboardRotatedTile = is_pressed;
+    }
+
+    public float getX() {
+        return this.x;
+    }
+
+    public float getY() {
+        return this.y;
+    }
+
+    public void changeThrowDirectionKeyboardLeft() {
+        throwWidthInSmallTiles = Math.max(throwWidthInSmallTiles - 1, -TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES);
+    }
+
+    public void changeThrowDirectionKeyboardRight() {
+        throwWidthInSmallTiles = Math.min(throwWidthInSmallTiles + 1, TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES);
+    }
+
+    public void changeThrowDirectionKeyboardDown() {
+        throwHeightInSmallTiles = Math.max(throwHeightInSmallTiles - 1, 1);
+    }
+
+    public void changeThrowDirectionKeyboardUp() {
+        throwHeightInSmallTiles = Math.min(throwHeightInSmallTiles + 1, TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES);
+    }
+
+    public void stopMovement() {
+        this.left = false;
+        this.right = false;
+        this.jumpRequest = false;
+    }
+
 
 }

@@ -2,6 +2,8 @@ package gamestates;
 
 
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import org.lwjgl.glfw.GLFW;
@@ -21,6 +23,11 @@ public class Credits extends State implements Statemethods {
         backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
         creditsImg = LoadSave.GetSpriteAtlas(LoadSave.CREDITS);
         loadButtons();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
     }
 
     private void loadButtons() {
@@ -53,5 +60,17 @@ public class Credits extends State implements Statemethods {
     private void resetButtons() {
         for (MenuButton mb : buttons)
             mb.resetBools();
+    }
+
+    public void keyPressed(int key) {
+        switch (key) {
+            case KeyEvent.VK_ESCAPE -> {
+                Gamestate.state = Gamestate.MENU;
+            }
+        }
+    }
+
+    public void keyReleased(int key) {
+
     }
 }
