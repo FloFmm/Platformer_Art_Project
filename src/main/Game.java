@@ -1,32 +1,22 @@
 package main;
 
-import java.awt.Graphics;
-import java.awt.geom.Rectangle2D;
-
-import entities.TetrisTile;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWJoystickCallback;
-
 import audio.AudioPlayer;
+import entities.TetrisTile;
 import gamestates.Credits;
 import gamestates.Gamestate;
 import gamestates.Menu;
 import gamestates.Playing;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWJoystickCallback;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 import static utilz.Constants.*;
 
 
 public class Game implements Runnable {
 
-    private final GamePanel gamePanel1;
-    private final GamePanel gamePanel2;
-    private Thread gameThread;
-
-
-    private Playing playing;
-    private Menu menu;
-    private Credits credits;
-    private AudioPlayer audioPlayer;
     public final static int TILES_DEFAULT_SIZE = 32;
     public final static float SCALE = 2f;
     //public final static int TILES_IN_WIDTH = 15;//30;//26;
@@ -34,70 +24,64 @@ public class Game implements Runnable {
     public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
     public final static int GAME_WIDTH = 1920;//TILES_SIZE * TILES_IN_WIDTH;
     public final static int GAME_HEIGHT = 1080;//TILES_SIZE * TILES_IN_HEIGHT;
-
-    private final boolean SHOW_FPS_UPS = false;
     private static GLFWJoystickCallback joystickCallback;
-
-    private boolean keyboardRotatedTile = false;
-
-    // player control
-
-    private boolean attacking = false;
-    /**
-     * requesting to go left
-     */
-    private boolean left;
-
-    /**
-     * requesting to go right
-     */
-    private boolean right;
-
-    /**
-     * requesting to jump
-     */
-    private boolean jumpRequest;
-
-    /**
-     * request to fall down faster
-     */
-    private boolean fasterFall = false;
-    protected Rectangle2D.Float grabBox;
-    private TetrisTile isCarrying;
-
-    /**
-     * counting time in the air for jumping acceleration
-     */
-    private float startTimeInAir;
-    private boolean attackChecked;
-
-    // player control ++
-    private int jumpsDone = 0;
-    /**
-     * handle keyboard press/release cycle for double jump
-     */
-    private boolean resetJump = true;
-
+    private final GamePanel gamePanel1;
+    private final GamePanel gamePanel2;
+    private final boolean SHOW_FPS_UPS = false;
     /**
      * used to reset double dash counter on turning to the other side
      */
     private final Direction lastDirection = Direction.LEFT;
-
+    private final boolean keyboardRotatedTile = false;
+    private final boolean attacking = false;
+    /**
+     * request to fall down faster
+     */
+    private final boolean fasterFall = false;
+    // player control ++
+    private final int jumpsDone = 0;
     /**
      * starting with <b>NOTHING</b> -> ACTIVATE1 (left or right, resets dash counter) <p>
      * <b>RELEASE1</b> (required since holding down a key fires continuous press events) <p>
      * <b>ACTIVATE2</b> (second movement input, reset dash counter if opposite direction) <p>
      * <b>DASHING</b> (is automatically applied if ACTIVATE2 -> start dash timer and give burst of movement)
      */
-    private DashState dashState = DashState.NOTHING;
-
+    private final DashState dashState = DashState.NOTHING;
+    public GameWindow gameWindow;
+    protected Rectangle2D.Float grabBox;
+    private Thread gameThread;
+    private Playing playing;
+    private Menu menu;
+    // player control
+    private Credits credits;
+    private AudioPlayer audioPlayer;
+    /**
+     * requesting to go left
+     */
+    private boolean left;
+    /**
+     * requesting to go right
+     */
+    private boolean right;
+    /**
+     * requesting to jump
+     */
+    private boolean jumpRequest;
+    private TetrisTile isCarrying;
+    /**
+     * counting time in the air for jumping acceleration
+     */
+    private float startTimeInAir;
+    private boolean attackChecked;
+    /**
+     * handle keyboard press/release cycle for double jump
+     */
+    private boolean resetJump = true;
     /**
      * if state is <b>DASHING</b> start timer <p>
      * if timer exceeds maximum reset dashState to <b>NOTHING</b>
      */
     private long dashStartTime;
-
-    public GameWindow gameWindow;
 
     public Game() {
 
@@ -271,4 +255,11 @@ public class Game implements Runnable {
         }
     }
 
+    public GamePanel getGamePanel1() {
+        return gamePanel1;
+    }
+
+    public GamePanel getGamePanel2() {
+        return gamePanel2;
+    }
 }

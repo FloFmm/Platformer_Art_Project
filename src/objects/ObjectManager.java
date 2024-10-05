@@ -1,9 +1,5 @@
 package objects;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
 import entities.Enemy;
 import entities.Entity;
 import entities.Player;
@@ -11,11 +7,16 @@ import gamestates.Playing;
 import levels.Level;
 import utilz.LoadSave;
 
-import static utilz.Constants.ObjectConstants.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
+import static utilz.Constants.ObjectConstants.EXPLOSION;
+import static utilz.Constants.ObjectConstants.GetSpriteAmount;
 
 public class ObjectManager {
 
-    private Playing playing;
+    private final Playing playing;
     private BufferedImage[] explosionImgs;
     private ArrayList<Explosion> explosions;
 
@@ -63,7 +64,7 @@ public class ObjectManager {
     private void drawExplosions(Graphics g, int xLvlOffset, int yLvlOffset) {
         for (Explosion p : explosions)
             if (p.isActive()) {
-                g.drawImage(explosionImgs[p.getAniIndex()], (int) (p.x - p.getWidth() / 2 - xLvlOffset), (int) (p.y - p.getHeight() / 2 - yLvlOffset), p.getWidth(), p.getHeight(),
+                g.drawImage(explosionImgs[p.getAniIndex()], p.x - p.getWidth() / 2 - xLvlOffset, p.y - p.getHeight() / 2 - yLvlOffset, p.getWidth(), p.getHeight(),
                         null);
             }
     }

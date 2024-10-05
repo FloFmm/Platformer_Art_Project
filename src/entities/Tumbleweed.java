@@ -1,30 +1,26 @@
 package entities;
 
-import static utilz.Constants.EnemyConstants.*;
-import static utilz.Constants.Environment.WATER_DMG_PER_SECOND;
-import static utilz.Constants.Directions.*;
-import static utilz.HelpMethods.CanMoveHere;
-import static utilz.HelpMethods.GetEntityXPosNextToWall;
-import static utilz.HelpMethods.IsEntityOnFloor;
-
-import java.util.Random;
-
-import audio.AudioPlayer;
-
-import static utilz.Constants.GRAVITY;
-import static utilz.Constants.UPS_SET;
-
 import gamestates.Playing;
 import main.Game;
 
+import static utilz.Constants.Directions.LEFT;
+import static utilz.Constants.Directions.RIGHT;
+import static utilz.Constants.EnemyConstants.*;
+import static utilz.Constants.Environment.WATER_DMG_PER_SECOND;
+import static utilz.Constants.GRAVITY;
+import static utilz.Constants.UPS_SET;
+import static utilz.HelpMethods.CanMoveHere;
+import static utilz.HelpMethods.IsEntityOnFloor;
+
 public class Tumbleweed extends Enemy {
-    private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
+    private final float fallSpeedAfterCollision = 0.5f * Game.SCALE;
+    private final int[][] lvlData;
+    private final boolean friendly = true;
+    private final float sizeFactor;
+    private final int xDrawOffset;
+    private final int yDrawOffset;
     private boolean moving = false;
-    private int[][] lvlData;
     private float lastTimeRunning;
-    private boolean friendly = true;
-    private float sizeFactor;
-    private int xDrawOffset, yDrawOffset;
 
     public Tumbleweed(float x, float y, float sizeFactor, int[][] lvlData) {
         super(x, y, (int) (sizeFactor * TUMBLE_WEED_WIDTH), (int) (sizeFactor * TUMBLE_WEED_HEIGHT), TUMBLE_WEED);

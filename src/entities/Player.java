@@ -1,116 +1,93 @@
 package entities;
 
-import static utilz.Constants.*;
-import static utilz.Constants.PlayerConstants.*;
-import static utilz.HelpMethods.*;
-import static utilz.Constants.Directions.*;
-import static utilz.Constants.TetrisTileConstants.*;
-import static utilz.Constants.ControllerConstants.*;
-import static utilz.Constants.UI.*;
-import static utilz.Constants.Environment.*;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-
-import audio.AudioPlayer;
 import gamestates.Playing;
 import main.Game;
+import org.lwjgl.glfw.GLFW;
 import utilz.LoadSave;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import org.lwjgl.glfw.GLFW;
+import static utilz.Constants.*;
+import static utilz.Constants.ControllerConstants.*;
+import static utilz.Constants.Directions.*;
+import static utilz.Constants.Environment.*;
+import static utilz.Constants.PlayerConstants.*;
+import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.UI.BACKGROUND_GREY;
+import static utilz.Constants.UI.BASE_GREY;
+import static utilz.HelpMethods.*;
 
 
 public class Player extends Entity {
 
+    private final boolean isPlayer1;
+    private final float xDrawOffset = (width - HITBOX_BASE_WIDTH * Game.SCALE) / 2;//21 * Game.SCALE;
+    private final float yDrawOffset = (height - HITBOX_BASE_HEIGHT * Game.SCALE) / 2;//4 * Game.SCALE;
+    private final float fallSpeedAfterCollision = 0.5f * Game.SCALE;
+    private final Color tempScaleBackgroundColor = BACKGROUND_GREY;
+    private final int tempScaleWidth = (int) (20 * Game.SCALE);
+    private final int tempBarWidth = (int) (10 * Game.SCALE);
+    private final int tempBarMaxHeight = (int) (108 * Game.SCALE);
+    private final int tempBarY = (int) (25 * Game.SCALE);
+    private final int windsockWidth = Game.GAME_WIDTH / 17;
+    private final int windsockHeight = Game.GAME_WIDTH / 17;
+    private final int windsockY = (int) (3 * Game.SCALE);
+    private final int statusBarWidth = (int) (128 * Game.SCALE);
+    private final int statusBarHeight = (int) (64 * Game.SCALE);
+    private final int statusBarX = (int) (10 * Game.SCALE);
+    private final int statusBarY = (int) (0 * Game.SCALE);
+    private final Color healthBarBackgroundColor = BACKGROUND_GREY;
+    private final Color healthBarColor = BASE_GREY;
+    private final int healthBarWidth = statusBarWidth * 800 / 1024;
+    private int healthWidth = healthBarWidth;
+    private final int healthBarHeight = statusBarHeight * 100 / 512;
+    private final int healthBarXStart = statusBarWidth * 180 / 1024;
+    private final int healthBarYStart = statusBarHeight * 80 / 512;
+    private final Color powerBarBackgroundColor = BACKGROUND_GREY;
+    private final Color powerBarColor = BASE_GREY;
+    private final int powerBarWidth = statusBarWidth * 800 / 1024;
+    private int powerWidth = powerBarWidth;
+    private final int powerBarHeight = statusBarHeight * 100 / 512;
+    private final int powerBarXStart = statusBarWidth * 180 / 1024;
+    private final int powerBarYStart = statusBarHeight * 270 / 512;
+    private final int powerMaxValue = 200;
+    private final Playing playing;
+    private final int powerGrowSpeed = 15;
+    private final boolean drawThrowArc = false;
+    //controller
+    private boolean controllerIsPresent = false;
+    private final int[] buttonStates = new int[NUM_BUTTONS];
+    private final int[] prevButtonStates = new int[NUM_BUTTONS];
+    private final float[] pushDownStartTimes = new float[NUM_BUTTONS];
+    private final float[] buttonLastPressed = new float[NUM_BUTTONS];
+    private final int controllerID;
+    protected Rectangle2D.Float grabBox;
     private BufferedImage[][] animations;
     private boolean moving = false, attacking = false;
     private boolean left, right, jump, grabOrThrow = false;
-    protected Rectangle2D.Float grabBox;
     private TetrisTile isCarrying;
     private float startTimeInAir;
     private int[][] lvlData;
-    private float xDrawOffset = (width - HITBOX_BASE_WIDTH * Game.SCALE) / 2;//21 * Game.SCALE;
-    private float yDrawOffset = (height - HITBOX_BASE_HEIGHT * Game.SCALE) / 2;//4 * Game.SCALE;
     private int xLvlOffset, yLvlOffset;
-
     // Jumping / Gravity
     private float jumpSpeed = PLAYER_JUMP_SPEED;
-    private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
-
     // StatusBarUI
     private BufferedImage statusBarImg, windsockImg1, windsockImg2, windsockImg3, tempScaleImg;
-
-    private Color tempScaleBackgroundColor = BACKGROUND_GREY;
-    private int tempScaleWidth = (int) (20 * Game.SCALE);
-    private int tempBarWidth = (int) (10 * Game.SCALE);
-    private int tempBarMaxHeight = (int) (108 * Game.SCALE);
-    private int tempBarY = (int) (25 * Game.SCALE);
-
-    private int windsockWidth = (int) (Game.GAME_WIDTH / 17);
-    private int windsockHeight = (int) (Game.GAME_WIDTH / 17);
-    private int windsockY = (int) (3 * Game.SCALE);
-
-    private int statusBarWidth = (int) (128 * Game.SCALE);
-    private int statusBarHeight = (int) (64 * Game.SCALE);
-    private int statusBarX = (int) (10 * Game.SCALE);
-    private int statusBarY = (int) (0 * Game.SCALE);
-
-    private Color healthBarBackgroundColor = BACKGROUND_GREY;
-    private Color healthBarColor = BASE_GREY;
-    private int healthBarWidth = (int) (statusBarWidth * 800 / 1024);
-    private int healthBarHeight = (int) (statusBarHeight * 100 / 512);
-    private int healthBarXStart = (int) (statusBarWidth * 180 / 1024);
-    private int healthBarYStart = (int) (statusBarHeight * 80 / 512);
-    private int healthWidth = healthBarWidth;
-
-    private Color powerBarBackgroundColor = BACKGROUND_GREY;
-    private Color powerBarColor = BASE_GREY;
-    private int powerBarWidth = (int) (statusBarWidth * 800 / 1024);
-    private int powerBarHeight = (int) (statusBarHeight * 100 / 512);
-    private int powerBarXStart = (int) (statusBarWidth * 180 / 1024);
-    private int powerBarYStart = (int) (statusBarHeight * 270 / 512);
-    private int powerWidth = powerBarWidth;
-    private int powerMaxValue = 200;
     private int powerValue = powerMaxValue;
-
     private int flipX = 0;
     private int flipW = 1;
     private boolean attackChecked;
-    private Playing playing;
     private int tileY = 0;
-
     private boolean powerAttackActive = false, selfHurt = false;
     private int powerAttackTick;
-    private int powerGrowSpeed = 15;
     private int powerGrowTick;
-
     // grab and throw
     private float throwHeightInSmallTiles = TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES / 2, throwWidthInSmallTiles = TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES / 2;
     private boolean throwActive = false;
-    private boolean drawThrowArc = false;
-    //controller
-    private int[] buttonStates = new int[NUM_BUTTONS];
-    private int[] prevButtonStates = new int[NUM_BUTTONS];
-    private float[] pushDownStartTimes = new float[NUM_BUTTONS];
-    private float[] buttonLastPressed = new float[NUM_BUTTONS];
-    private int controllerID;
-    private int prevGrabOrThrowControllerState = GLFW.GLFW_RELEASE, grabOrThrowControllerState = GLFW.GLFW_RELEASE;
-    private int prevRotateControllerState = GLFW.GLFW_RELEASE, rotateControllerState = GLFW.GLFW_RELEASE;
-    private int prevPauseControllerState = GLFW.GLFW_RELEASE, pauseControllerState = GLFW.GLFW_RELEASE;
-    private int prevDashControllerState = GLFW.GLFW_RELEASE, dashControllerState = GLFW.GLFW_RELEASE;
-
-    private final boolean isPlayer1;
-
     private int jumpsDone = 0;
     private boolean resetJump = true;
     private boolean jumpRequest;
@@ -121,10 +98,8 @@ public class Player extends Entity {
     public Player(float x, float y, int width, int height, Playing playing, boolean isPlayer1) {
         super(x, y, width, height);
         this.isPlayer1 = isPlayer1;
-        if (isPlayer1)
-            controllerID = GLFW.GLFW_JOYSTICK_1;
-        else
-            controllerID = GLFW.GLFW_JOYSTICK_2;
+        if (isPlayer1) controllerID = GLFW.GLFW_JOYSTICK_1;
+        else controllerID = GLFW.GLFW_JOYSTICK_2;
         this.playing = playing;
         this.state = IDLE;
         this.maxHealth = 100;
@@ -161,8 +136,7 @@ public class Player extends Entity {
         boolean startInAir = inAir;
 
         updateControllerInputs();
-        if (playing.getLoading())
-            return;
+        if (playing.getLoading()) return;
         updateHealthBar();
         updatePowerBar();
 
@@ -184,12 +158,10 @@ public class Player extends Entity {
                 updateAnimationTick();
 
                 // Fall if in air
-                if (inAir)
-                    if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
-                        hitbox.y += airSpeed;
-                        airSpeed += GRAVITY;
-                    } else
-                        inAir = false;
+                if (inAir) if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
+                    hitbox.y += airSpeed;
+                    airSpeed += GRAVITY;
+                } else inAir = false;
 
             }
 
@@ -200,11 +172,9 @@ public class Player extends Entity {
         updateGrabBox();
 
         if (state == HIT) {
-            if (aniIndex <= GetSpriteAmount(state) - 3)
-                pushBack(pushBackDir, lvlData, 1.25f);
+            if (aniIndex <= GetSpriteAmount(state) - 3) pushBack(pushBackDir, lvlData, 1.25f);
             updatePushBackDrawOffset();
-        } else
-            updatePos();
+        } else updatePos();
 
 
         checkSpikesTouched();
@@ -220,31 +190,27 @@ public class Player extends Entity {
             }
         }
 
-        if (attacking || powerAttackActive)
-            checkAttack();
+        if (attacking || powerAttackActive) checkAttack();
 
         updateAnimationTick();
         setAnimation();
 
-        if (!startInAir && inAir)
-            startTimeInAir = playing.getGameTimeInSeconds();
+        if (!startInAir && inAir) startTimeInAir = playing.getGameTimeInSeconds();
     }
 
     private void updateControllerInputs() {
-        boolean controllerIsPresent = GLFW.glfwJoystickPresent(controllerID);
+        controllerIsPresent = GLFW.glfwJoystickPresent(controllerID);
         if (controllerIsPresent) {
             ByteBuffer buttons = GLFW.glfwGetJoystickButtons(controllerID);
             for (int i = 0; i < NUM_BUTTONS; i += 1) {
                 controllerIsPresent = GLFW.glfwJoystickPresent(controllerID);
                 prevButtonStates[i] = buttonStates[i];
-                if (!controllerIsPresent)
-                    return;
+                if (!controllerIsPresent) return;
                 buttonStates[i] = buttons.get(i);
                 if (buttonStates[i] == GLFW.GLFW_PRESS && prevButtonStates[i] == GLFW.GLFW_RELEASE) {
                     pushDownStartTimes[i] = playing.getGameTimeInSeconds();
                 }
-                if (buttonStates[i] == GLFW.GLFW_PRESS)
-                    buttonLastPressed[i] = playing.getGameTimeInSeconds();
+                if (buttonStates[i] == GLFW.GLFW_PRESS) buttonLastPressed[i] = playing.getGameTimeInSeconds();
             }
             // continue on loading screen
             if (playing.getLoading()) {
@@ -255,24 +221,19 @@ public class Player extends Entity {
 
             // jump
             if (buttonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_PRESS) {
-                jump = true;
+                setJumpRequest(true);
             }
             if (buttonStates[CONTROLLER_A_BUTTON_ID] == GLFW.GLFW_RELEASE) {
-                jump = false;
-
+                setJumpRequest(false);
             }
 
             // dash
-            prevDashControllerState = dashControllerState;
-            dashControllerState = buttons.get(CONTROLLER_L_BUTTON_ID);
-            if (dashControllerState == GLFW.GLFW_RELEASE && prevDashControllerState == GLFW.GLFW_PRESS) {
+            if (buttonStates[CONTROLLER_L_BUTTON_ID] == GLFW.GLFW_RELEASE && prevButtonStates[CONTROLLER_L_BUTTON_ID] == GLFW.GLFW_PRESS) {
                 powerAttack();
             }
 
             // grab or throw
-            prevGrabOrThrowControllerState = grabOrThrowControllerState;
-            grabOrThrowControllerState = buttons.get(CONTROLLER_X_BUTTON_ID);
-            if (grabOrThrowControllerState == GLFW.GLFW_RELEASE && prevGrabOrThrowControllerState == GLFW.GLFW_PRESS) {
+            if (buttonStates[CONTROLLER_X_BUTTON_ID] == GLFW.GLFW_RELEASE && prevButtonStates[CONTROLLER_X_BUTTON_ID] == GLFW.GLFW_PRESS) {
                 grabOrThrow = false;
                 grabOrThrow();
             }
@@ -291,9 +252,7 @@ public class Player extends Entity {
             }
 
             // rotate tetris tile
-            prevRotateControllerState = rotateControllerState;
-            rotateControllerState = buttons.get(CONTROLLER_Y_BUTTON_ID);
-            if (rotateControllerState == GLFW.GLFW_RELEASE && prevRotateControllerState == GLFW.GLFW_PRESS) {
+            if (buttonStates[CONTROLLER_Y_BUTTON_ID] == GLFW.GLFW_RELEASE && prevButtonStates[CONTROLLER_Y_BUTTON_ID] == GLFW.GLFW_PRESS) {
                 if (isCarrying != null) {
                     int old_rotation_player1 = isCarrying.getRotation();
                     isCarrying.setRotation((old_rotation_player1 + 1) % 4);
@@ -316,12 +275,9 @@ public class Player extends Entity {
             }
 
             // pause menu
-            prevPauseControllerState = pauseControllerState;
-            pauseControllerState = buttons.get(CONTROLLER_H_BUTTON_ID);
-            if (pauseControllerState == GLFW.GLFW_RELEASE && prevPauseControllerState == GLFW.GLFW_PRESS) {
+            if (buttonStates[CONTROLLER_H_BUTTON_ID] == GLFW.GLFW_RELEASE && prevButtonStates[CONTROLLER_H_BUTTON_ID] == GLFW.GLFW_PRESS) {
                 playing.setPaused(!playing.getPaused());
-                if (playing.getPaused())
-                    playing.getGame().getAudioPlayer().stopSong();
+                if (playing.getPaused()) playing.getGame().getAudioPlayer().stopSong();
             }
         }
     }
@@ -361,12 +317,9 @@ public class Player extends Entity {
     }
 
     private void checkAttack() {
-        if (attackChecked || aniIndex != 1)
-            return;
-        attackChecked = true;
+        if (attackChecked || aniIndex != 1) return;
 
-        if (powerAttackActive)
-            attackChecked = false;
+        attackChecked = !powerAttackActive;
 
         playing.checkEnemyPlayerHit(isPlayer1);
         playing.checkEnemyHit(attackBox);
@@ -374,7 +327,7 @@ public class Player extends Entity {
 
     public float[] calcThrowSpeed() {
         float tileAirSpeed = (float) Math.sqrt(2.0f * GRAVITY * throwHeightInSmallTiles * Game.TILES_SIZE / 4.0f);
-        float tileXSpeed = (float) ((throwWidthInSmallTiles * Game.TILES_SIZE / 4.0f) / (2.0f * tileAirSpeed / GRAVITY));
+        float tileXSpeed = (throwWidthInSmallTiles * Game.TILES_SIZE / 4.0f) / (2.0f * tileAirSpeed / GRAVITY);
         return new float[]{tileXSpeed, tileAirSpeed};
     }
 
@@ -420,10 +373,8 @@ public class Player extends Entity {
     public void drawPlayer(Graphics g, int xLvlOffset, int yLvlOffset) {
 
         int aniStateOffset = 0;
-        if (isCarrying != null)
-            aniStateOffset = NUM_ANIMATIONS;
-        g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX,
-                (int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
+        if (isCarrying != null) aniStateOffset = NUM_ANIMATIONS;
+        g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, (int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
         if ((isCarrying != null) && throwHeightInSmallTiles > 0) {
             drawThrowArc(g, xLvlOffset, yLvlOffset);
         }
@@ -439,10 +390,8 @@ public class Player extends Entity {
         float[] throwSpeed = calcThrowSpeed();
         float tileXSpeed = throwSpeed[0];
         float tileAirSpeed = throwSpeed[1];
-        if (isPlayer1)
-            g.setColor(THROW_ARC_COLOR_PLAYER1);
-        else
-            g.setColor(THROW_ARC_COLOR_PLAYER2);
+        if (isPlayer1) g.setColor(THROW_ARC_COLOR_PLAYER1);
+        else g.setColor(THROW_ARC_COLOR_PLAYER2);
         int circle_x, circle_y, lastX = 0, lastY = 0;
         int radius, maxRadius = 15, minRadius = 6;
         float maxThrowTime = tileAirSpeed / GRAVITY * 2;
@@ -454,18 +403,16 @@ public class Player extends Entity {
             if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET)
                 xDistanceDueWind = playing.getWindSpeed() / (TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET) * 0.5f * time * time;
             else
-                xDistanceDueWind = playing.getWindSpeed() * (TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET) * 0.5f +
-                        playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET);
+                xDistanceDueWind = playing.getWindSpeed() * (TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET) * 0.5f + playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET);
             xDistanceTraveled = xDistanceDueStartSpeed + xDistanceDueWind;
 
             radius = (int) (minRadius + i / ((float) numArcPoints) * (maxRadius - minRadius));
             circle_x = (int) (hitbox.x + hitbox.width / 2 - xLvlOffset - radius / 2 + xDistanceTraveled);
 
             if (isCarrying != null) {
-                circle_y = (int) (hitbox.y - yLvlOffset - radius / 2 - isCarrying.hitbox.height / 2 -
-                        calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
+                circle_y = (int) (hitbox.y - yLvlOffset - radius / 2 - isCarrying.hitbox.height / 2 - calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
                 if (lastPointExists) {
-                    g2.setStroke(new BasicStroke((int) radius));
+                    g2.setStroke(new BasicStroke(radius));
                     g2.drawLine(lastX, lastY, circle_x, circle_y);
                 }
                 lastX = circle_x;
@@ -495,7 +442,7 @@ public class Player extends Entity {
                 return;
             }
             if (i != 0) {
-                g2.setStroke(new BasicStroke((int) radius));
+                g2.setStroke(new BasicStroke(radius));
                 g2.drawLine(lastX, lastY, circle_x, circle_y);
             }
             lastX = circle_x;
@@ -510,23 +457,17 @@ public class Player extends Entity {
         int xWindsockOffset = (int) (statusBarX + statusBarWidth + 30 * Game.SCALE);
         if (!isPlayer1) {
             xDrawOffset = -Game.GAME_WIDTH / 2;
-            xStatusBarOffset = (int) (-statusBarX + Game.GAME_WIDTH / 2 - statusBarWidth);
+            xStatusBarOffset = -statusBarX + Game.GAME_WIDTH / 2 - statusBarWidth;
             xWindsockOffset = (int) (Game.GAME_WIDTH / 2 - statusBarX - statusBarWidth - 30 * Game.SCALE);
         }
 
         // temperature
         g.setColor(tempScaleBackgroundColor);
-        g.fillRect(Game.GAME_WIDTH / 2 - tempBarWidth / 2 + xDrawOffset,
-                tempBarY,
-                tempBarWidth,
-                tempBarMaxHeight);
+        g.fillRect(Game.GAME_WIDTH / 2 - tempBarWidth / 2 + xDrawOffset, tempBarY, tempBarWidth, tempBarMaxHeight);
         Color tempColor = new Color((int) (playing.getTemperature() * 255 / MAX_TEMP), 0, (int) (255 - playing.getTemperature() * 255 / MAX_TEMP));
         g.setColor(tempColor);
         int tempBarHeight = (int) (tempBarMaxHeight * playing.getTemperature() / MAX_TEMP);
-        g.fillRect(Game.GAME_WIDTH / 2 - tempBarWidth / 2 + xDrawOffset,
-                tempBarY + tempBarMaxHeight - tempBarHeight,
-                tempBarWidth,
-                (int) (tempBarHeight + 20 * Game.SCALE));
+        g.fillRect(Game.GAME_WIDTH / 2 - tempBarWidth / 2 + xDrawOffset, tempBarY + tempBarMaxHeight - tempBarHeight, tempBarWidth, (int) (tempBarHeight + 20 * Game.SCALE));
         g.drawImage(tempScaleImg, Game.GAME_WIDTH / 2 - tempScaleWidth / 2 + xDrawOffset, 0, tempScaleWidth, Game.GAME_HEIGHT, null);
 
         // Health bar
@@ -546,15 +487,11 @@ public class Player extends Entity {
         BufferedImage wsImg;
         int flip = 1;
         float windSpeed = playing.getWindSpeed();
-        if (windSpeed < 0)
-            flip = -1;
+        if (windSpeed < 0) flip = -1;
 
-        if (Math.abs(windSpeed) <= WEAK_WIND_TH)
-            wsImg = windsockImg1;
-        else if (WEAK_WIND_TH <= Math.abs(windSpeed) && Math.abs(windSpeed) <= STRONG_WIND_TH)
-            wsImg = windsockImg2;
-        else
-            wsImg = windsockImg3;
+        if (Math.abs(windSpeed) <= WEAK_WIND_TH) wsImg = windsockImg1;
+        else if (WEAK_WIND_TH <= Math.abs(windSpeed) && Math.abs(windSpeed) <= STRONG_WIND_TH) wsImg = windsockImg2;
+        else wsImg = windsockImg3;
 
         int windsockX = 50;
         g.drawImage(wsImg, xWindsockOffset - flip * windsockWidth / 2, windsockY, flip * windsockWidth, windsockHeight, null);
@@ -568,15 +505,12 @@ public class Player extends Entity {
             aniTick = 0;
             aniIndex++;
             if (aniIndex >= GetSpriteAmount(state)) {
-                if (state == JUMP || state == FALLING || state == ATTACK)
-                    aniIndex--;
-                else
-                    aniIndex = 0;
+                if (state == JUMP || state == FALLING || state == ATTACK) aniIndex--;
+                else aniIndex = 0;
                 if (state == HIT) {
                     newState(IDLE);
                     //airSpeed = 0f;
-                    if (!IsFloor(hitbox, 0, lvlData))
-                        inAir = true;
+                    if (!IsFloor(hitbox, 0, lvlData)) inAir = true;
                 }
                 attacking = false;
                 attackChecked = false;
@@ -588,19 +522,14 @@ public class Player extends Entity {
     private void setAnimation() {
         int startAni = state;
 
-        if (state == HIT)
-            return;
+        if (state == HIT) return;
 
-        if (moving)
-            state = RUNNING;
-        else
-            state = IDLE;
+        if (moving) state = RUNNING;
+        else state = IDLE;
 
         if (inAir) {
-            if (airSpeed < 0)
-                state = JUMP;
-            else if ((playing.getGameTimeInSeconds() - startTimeInAir) > 0.2f)
-                state = FALLING;
+            if (airSpeed < 0) state = JUMP;
+            else if ((playing.getGameTimeInSeconds() - startTimeInAir) > 0.2f) state = FALLING;
         }
 
         if (powerAttackActive) {
@@ -614,8 +543,7 @@ public class Player extends Entity {
             state = THROW;
         }
 
-        if (startAni != state)
-            resetAniTick();
+        if (startAni != state) resetAniTick();
     }
 
     private void resetAniTick() {
@@ -654,26 +582,20 @@ public class Player extends Entity {
             xSpeed = 0;
 
             // stop movement if left and right pressed
-            if (!powerAttackActive)
-                if ((!left && !right) || (right && left))
-                    return;
+            if (!powerAttackActive) if ((!left && !right) || (right && left)) return;
         }
 
         turnDirection(walkSpeed);
 
         if (powerAttackActive) {
             if ((!left && !right) || (left && right)) {
-                if (flipW == -1)
-                    xSpeed = -walkSpeed;
-                else
-                    xSpeed = walkSpeed;
+                if (flipW == -1) xSpeed = -walkSpeed;
+                else xSpeed = walkSpeed;
             }
             xSpeed *= 3;
         }
 
-        if (!inAir)
-            if (!IsEntityOnFloor(hitbox, lvlData))
-                inAir = true;
+        if (!inAir) if (!IsEntityOnFloor(hitbox, lvlData)) inAir = true;
 
         // normal airborne
         if (inAir && !powerAttackActive) {
@@ -683,10 +605,8 @@ public class Player extends Entity {
                 updateXPos(xSpeed, lvlData);
             } else {
                 float fallSpeedAfterCollision = 0.5f * Game.SCALE;
-                if (airSpeed > 0)
-                    resetInAir();
-                else
-                    airSpeed = fallSpeedAfterCollision;
+                if (airSpeed > 0) resetInAir();
+                else airSpeed = fallSpeedAfterCollision;
                 // TODO
                 updateXPos(xSpeed, lvlData);
             }
@@ -715,8 +635,7 @@ public class Player extends Entity {
     }
 
     public void selfHurtFromPowerAttack(int value) {
-        if (selfHurt)
-            return;
+        if (selfHurt) return;
 
         currentHealth += value;
         currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
@@ -725,10 +644,8 @@ public class Player extends Entity {
 
     public void changeHealth(int value) {
         if (value < 0) {
-            if (state == HIT)
-                return;
-            else
-                newState(HIT);
+            if (state == HIT) return;
+            else newState(HIT);
         }
 
         currentHealth += value;
@@ -736,16 +653,13 @@ public class Player extends Entity {
     }
 
     public void changeHealth(int value, Entity e) {
-        if (state == HIT || state == DEAD)
-            return;
+        if (state == HIT || state == DEAD) return;
         changeHealth(value);
         pushBackOffsetDir = UP;
         pushDrawOffset = 0;
 
-        if (e.getHitbox().x < hitbox.x)
-            pushBackDir = RIGHT;
-        else
-            pushBackDir = LEFT;
+        if (e.getHitbox().x < hitbox.x) pushBackDir = RIGHT;
+        else pushBackDir = LEFT;
     }
 
     public void kill() {
@@ -761,10 +675,8 @@ public class Player extends Entity {
         String fileName = "", baseDir = "";
         animations = new BufferedImage[NUM_ANIMATIONS * 2][MAX_ANIMATION_LENGTH];
 
-        if (isPlayer1)
-            baseDir = "animation/player" + 1;
-        else
-            baseDir = "animation/player" + 2;
+        if (isPlayer1) baseDir = "animation/player" + 1;
+        else baseDir = "animation/player" + 2;
 
         for (int j = 0; j < NUM_ANIMATIONS; j++) {
             switch (j) {
@@ -841,8 +753,7 @@ public class Player extends Entity {
 
     public void loadLvlData(int[][] lvlData) {
         this.lvlData = lvlData;
-        if (!IsEntityOnFloor(hitbox, lvlData))
-            inAir = true;
+        if (!IsEntityOnFloor(hitbox, lvlData)) inAir = true;
     }
 
     public void resetDirBooleans() {
@@ -874,16 +785,12 @@ public class Player extends Entity {
         this.jump = jump;
     }
 
-    public void setGrabOrThrow(boolean grabOrThrow) {
-        this.grabOrThrow = grabOrThrow;
+    public TetrisTile getIsCarrying() {
+        return isCarrying;
     }
 
     public void setIsCarrying(TetrisTile isCarrying) {
         this.isCarrying = isCarrying;
-    }
-
-    public TetrisTile getIsCarrying() {
-        return isCarrying;
     }
 
     public void resetAll() {
@@ -924,19 +831,16 @@ public class Player extends Entity {
         throwHeightInSmallTiles = TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES / 2;
         throwWidthInSmallTiles = TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES / 2;
         throwActive = false;
-        if (!IsEntityOnFloor(hitbox, lvlData))
-            inAir = true;
+        if (!IsEntityOnFloor(hitbox, lvlData)) inAir = true;
     }
 
     public int getTileY() {
         return tileY;
     }
 
-
     public void powerAttack() {
         selfHurt = false;
-        if (powerAttackActive)
-            return;
+        if (powerAttackActive) return;
         if (powerValue >= 60) {
             powerAttackActive = true;
             changePower(-60);
@@ -948,20 +852,24 @@ public class Player extends Entity {
         return xLvlOffset;
     }
 
+    public void setXLvlOffset(int xLvlOffset) {
+        this.xLvlOffset = xLvlOffset;
+    }
+
     public int getYLvlOffset() {
         return yLvlOffset;
+    }
+
+    public void setYLvlOffset(int yLvlOffset) {
+        this.yLvlOffset = yLvlOffset;
     }
 
     public boolean getGrabOrThrow() {
         return grabOrThrow;
     }
 
-    public void setXLvlOffset(int xLvlOffset) {
-        this.xLvlOffset = xLvlOffset;
-    }
-
-    public void setYLvlOffset(int yLvlOffset) {
-        this.yLvlOffset = yLvlOffset;
+    public void setGrabOrThrow(boolean grabOrThrow) {
+        this.grabOrThrow = grabOrThrow;
     }
 
     public boolean getPowerAttackActive() {
@@ -1033,5 +941,7 @@ public class Player extends Entity {
         this.jumpRequest = false;
     }
 
-
+    public boolean getControllerIsPresent() {
+        return controllerIsPresent;
+    }
 }

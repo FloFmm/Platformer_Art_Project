@@ -1,13 +1,9 @@
 package main;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import javax.swing.JPanel;
-
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import gamestates.Gamestate;
 import static main.Game.GAME_HEIGHT;
 import static main.Game.GAME_WIDTH;
 
@@ -22,8 +18,8 @@ public class GamePanel extends JPanel implements KeyListener, MouseMotionListene
         setPanelSize();
         setFocusable(true);
         addKeyListener(this);
-        this.addMouseListener(game.getMenu());
-        this.addMouseMotionListener(game.getMenu());
+        this.addMouseListener(game.getMenu().getUI());
+        this.addMouseMotionListener(game.getMenu().getUI());
     }
 
     private void setPanelSize() {
@@ -52,8 +48,6 @@ public class GamePanel extends JPanel implements KeyListener, MouseMotionListene
     @Override
     public void keyPressed(KeyEvent e) {
         game.keyPressed(e.getKeyCode());
-
-
     }
 
     @Override
@@ -70,5 +64,34 @@ public class GamePanel extends JPanel implements KeyListener, MouseMotionListene
     public void mouseMoved(MouseEvent e) {
 
     }
+
+    public void removeMouseListeners() {
+        for (MouseListener listener : getMouseListeners()) {
+            removeMouseListener(listener);
+        }
+        for (MouseMotionListener listener : getMouseMotionListeners()) {
+            removeMouseMotionListener(listener);
+        }
+    }
+
+    public void addMouseListeners(Gamestate state) {
+        switch (state) {
+            case MENU:
+                addMouseListener(game.getMenu().getUI());
+                addMouseMotionListener(game.getMenu().getUI());
+                break;
+            case PLAYING:
+                addMouseListener(game.getPlaying().getUI());
+                addMouseMotionListener(game.getPlaying().getUI());
+                addMouseListener(game.getPlaying().getUIGameOver());
+                addMouseMotionListener(game.getPlaying().getUIGameOver());
+                break;
+            case CREDITS:
+                addMouseListener(game.getCredits().getUI());
+                addMouseMotionListener(game.getCredits().getUI());
+                break;
+        }
+    }
+
 
 }

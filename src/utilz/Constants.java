@@ -2,19 +2,32 @@ package utilz;
 
 import main.Game;
 
-import static utilz.HelpMethods.*;
-
-import java.awt.Color;
+import java.awt.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static utilz.HelpMethods.rotateMatrixBy90Degree;
 
 public class Constants {
     public static final int FPS_SET = 120;
     public static final int UPS_SET = 200;
     public static final float GRAVITY = 0.04f * Game.SCALE;
     public static final int ANI_SPEED = 13;//25;
+    public static final int MAX_ALLOWED_JUMPS = 3;
+
+    public enum Direction {
+        LEFT, RIGHT
+    }
+
+    public enum DashState {
+        NOTHING, ACTIVATE1, RELEASE1, ACTIVATE2, DASHING
+    }
+
+    public enum PlayerState {
+        IDLE, RUNNING, JUMP, FALLING, ATTACK, HIT, DEAD, THROW, FASTFALLING
+    }
 
     public static class Dialogue {
         public static final int QUESTION = 0;
@@ -145,16 +158,15 @@ public class Constants {
         public static final int TUMBLE_WEED_HITBOX_WIDTH_DEFAULT = 24;
         public static final int TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT = 24;
         public static final int TUMBLE_WEED_HITBOX_WIDTH = (int) (TUMBLE_WEED_HITBOX_WIDTH_DEFAULT * Game.SCALE);
+        public static final int TUMBLE_WEED_DRAWOFFSET_X = (TUMBLE_WEED_WIDTH - TUMBLE_WEED_HITBOX_WIDTH) / 2;
         public static final int TUMBLE_WEED_HITBOX_HEIGHT = (int) (TUMBLE_WEED_HITBOX_HEIGHT_DEFAULT * Game.SCALE);
-
-        public static final int TUMBLE_WEED_DRAWOFFSET_X = (int) ((TUMBLE_WEED_WIDTH - TUMBLE_WEED_HITBOX_WIDTH) / 2);
-        public static final int TUMBLE_WEED_DRAWOFFSET_Y = (int) ((TUMBLE_WEED_HEIGHT - TUMBLE_WEED_HITBOX_HEIGHT) / 2);
+        public static final int TUMBLE_WEED_DRAWOFFSET_Y = (TUMBLE_WEED_HEIGHT - TUMBLE_WEED_HITBOX_HEIGHT) / 2;
         public static final int TUMBLE_WEED_NUM_ANIMATIONS = 5;
         public static final int TUMBLE_WEED_MAX_ANIMATION_LENGTH = 10;
-        public static final float TUMBLE_WEED_MAX_SPEED = 1.0f * Game.SCALE;
+        public static final float TUMBLE_WEED_MAX_SPEED = Game.SCALE;
         public static final float TUMBLE_WEED_TIME_TO_REACH_WIND_SPEED = 5.0f;
         public static final int TUMBLE_WEED_MAX_ANI_SPEED = (int) (0.5 * ANI_SPEED);
-        public static final int TUMBLE_WEED_MIN_ANI_SPEED = (int) (3 * ANI_SPEED);
+        public static final int TUMBLE_WEED_MIN_ANI_SPEED = 3 * ANI_SPEED;
 
         public static int GetSpriteAmount(int enemy_type, int enemy_state) {
             switch (enemy_state) {
@@ -278,22 +290,8 @@ public class Constants {
         public static final int DOWN = 3;
     }
 
-    public enum Direction {
-        LEFT, RIGHT
-    }
-
-    public enum DashState {
-        NOTHING, ACTIVATE1, RELEASE1, ACTIVATE2, DASHING
-    }
-
-    public enum PlayerState {
-        IDLE, RUNNING, JUMP, FALLING, ATTACK, HIT, DEAD, THROW, FASTFALLING
-    }
-
-    public static final int MAX_ALLOWED_JUMPS = 3;
-
     public static class PlayerConstants {
-        public static final float PLAYER_WALKSPEED = Game.SCALE * 1.0f;
+        public static final float PLAYER_WALKSPEED = Game.SCALE;
         public static final float PLAYER_JUMP_SPEED = -2.25f * Game.SCALE;
         public static final float TIME_TO_JUMP_WHEN_ALREADY_IN_AIR = 0.25f;
 
@@ -325,6 +323,21 @@ public class Constants {
 
         public static final int NUM_ANIMATIONS = 8;
         public static final int MAX_ANIMATION_LENGTH = 12;
+        public static final Color PLAYER_DEFAULT_COLOR = new Color(21, 19, 26); // BLACK
+        public static final int PLAYER_COLOR_TOLERANCE = 8; // BLACK
+        public static final Map<Color, Color> COLOR_MAP;
+
+        static {
+            Map<Color, Color> map = new HashMap<>();
+            map.put(new Color(233, 38, 28), new Color(252, 191, 43)); // A
+            map.put(new Color(171, 40, 28), new Color(215, 150, 33)); // B
+            map.put(new Color(97, 39, 24), new Color(153, 104, 20)); // C
+            map.put(new Color(225, 85, 39), new Color(248, 214, 126)); // D
+            map.put(new Color(22, 22, 28), new Color(22, 22, 28)); // BLACK
+            map.put(new Color(14, 0, 12), new Color(14, 0, 12)); // BLACK
+
+            COLOR_MAP = Collections.unmodifiableMap(map);
+        }
 
         public static int GetSpriteAmount(int player_action) {
             switch (player_action) {
@@ -347,23 +360,6 @@ public class Constants {
                 default:
                     return 1;
             }
-        }
-
-        public static final Color PLAYER_DEFAULT_COLOR = new Color(21, 19, 26); // BLACK
-        public static final int PLAYER_COLOR_TOLERANCE = 8; // BLACK
-
-        public static final Map<Color, Color> COLOR_MAP;
-
-        static {
-            Map<Color, Color> map = new HashMap<>();
-            map.put(new Color(233, 38, 28), new Color(252, 191, 43)); // A
-            map.put(new Color(171, 40, 28), new Color(215, 150, 33)); // B
-            map.put(new Color(97, 39, 24), new Color(153, 104, 20)); // C
-            map.put(new Color(225, 85, 39), new Color(248, 214, 126)); // D
-            map.put(new Color(22, 22, 28), new Color(22, 22, 28)); // BLACK
-            map.put(new Color(14, 0, 12), new Color(14, 0, 12)); // BLACK
-
-            COLOR_MAP = Collections.unmodifiableMap(map);
         }
     }
 
@@ -406,29 +402,6 @@ public class Constants {
                 0.025f,
                 0.025f,
                 0.10f};
-
-        public static int GetRandomTetrisTileIndex(Random random) {
-            double r = random.nextFloat();
-            double cumulativeProbability = 0.0;
-            float probSum = 0.0f;
-
-            for (int i = 0; i < NUM_TETRIS_TILES; i++) {
-                probSum += TETRIS_TILE_PROBS[i];
-            }
-            if (probSum < 0.999 || probSum > 1.001) {
-                System.out.println("probability of tetris tiles does not add up to 1.0");
-                System.out.println(probSum);
-            }
-
-            for (int i = 0; i < NUM_TETRIS_TILES; i++) {
-                cumulativeProbability += TETRIS_TILE_PROBS[i];
-                if (r <= cumulativeProbability) {
-                    return i;
-                }
-            }
-            return NUM_TETRIS_TILES - 1; // fallback
-        }
-
         public static final int FINAL_PREDICTION_POINT = -1;
         public static final float THROW_ARC_PREDICTION_TIME = 1.5f;
         public static final int NUM_THROW_ARC_PREDICTION_POINTS = 30;
@@ -438,17 +411,14 @@ public class Constants {
         public static final int TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES = 6 * 4;
         public static final int TETRIS_TILE_MAX_THROW_WIDTH_IN_SMALL_TILES = 6 * 4;
         public static final float TETRIS_TILE_MAX_THROW_SPEED = (float) Math.sqrt(TETRIS_TILE_MAX_THROW_HEIGHT_IN_SMALL_TILES * Game.TILES_SIZE * 2 * GRAVITY);
-
         public static final float TETRIS_TILE_MIN_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED * 0.1f;
         public static final float TETRIS_TILE_MAX_EXPLOSION_X_SPEED = TETRIS_TILE_MAX_THROW_SPEED * 0.5f;
         public static final float TETRIS_TILE_MIN_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED * 0.75f;
         public static final float TETRIS_TILE_MAX_EXPLOSION_Y_SPEED = TETRIS_TILE_MAX_THROW_SPEED * 1.5f;
         public static final float TETRIS_TILE_TIME_TO_EXPLODE = 1f;
-
         public static final float TETRIS_TILE_TIME_TO_REACH_WINDSPEED = 1.0f;
         public static final float TETRIS_TILE_TIME_TO_STOP_WHEN_IS_ON_FLOOR = 0.1f;
         public static final int TETRIS_GRID_SIZE = Game.TILES_SIZE / 4;
-
         public static final int[][] ROCKET_GOAL_MATRIX = new int[][]{
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
@@ -480,7 +450,6 @@ public class Constants {
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         };
-
         public static final int[][] ROCKET_TUTORIAL_PRE_MATRIX = new int[][]{
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
@@ -512,7 +481,6 @@ public class Constants {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
-
         public static final int[][] ROCKET_PRE_MATRIX = new int[][]{
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -544,7 +512,6 @@ public class Constants {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
-
         public static final int[][] WINDMILL_GOAL_MATRIX = new int[][]{
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -576,7 +543,6 @@ public class Constants {
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         };
-
         public static final int[][] WINDMILL_TUTORIAL_PRE_MATRIX = new int[][]{
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -608,7 +574,6 @@ public class Constants {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
-
         public static final int[][] WINDMILL_PRE_MATRIX = new int[][]{
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -641,6 +606,27 @@ public class Constants {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
 
+        public static int GetRandomTetrisTileIndex(Random random) {
+            double r = random.nextFloat();
+            double cumulativeProbability = 0.0;
+            float probSum = 0.0f;
+
+            for (int i = 0; i < NUM_TETRIS_TILES; i++) {
+                probSum += TETRIS_TILE_PROBS[i];
+            }
+            if (probSum < 0.999 || probSum > 1.001) {
+                System.out.println("probability of tetris tiles does not add up to 1.0");
+                System.out.println(probSum);
+            }
+
+            for (int i = 0; i < NUM_TETRIS_TILES; i++) {
+                cumulativeProbability += TETRIS_TILE_PROBS[i];
+                if (r <= cumulativeProbability) {
+                    return i;
+                }
+            }
+            return NUM_TETRIS_TILES - 1; // fallback
+        }
 
         public static int[][] GetTetrisTileShape(int tileIndex, int rotation) {
             int[][] matrix;

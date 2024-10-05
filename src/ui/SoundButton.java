@@ -1,11 +1,11 @@
 package ui;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-
 import utilz.LoadSave;
 
-import static utilz.Constants.UI.PauseButtons.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+import static utilz.Constants.UI.PauseButtons.SOUND_SIZE_DEFAULT;
 
 public class SoundButton extends PauseButton {
 

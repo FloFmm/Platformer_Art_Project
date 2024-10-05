@@ -1,43 +1,39 @@
 package levels;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.image.BufferedImage;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Random;
-
-import entities.Tumbleweed;
 import entities.TetrisTile;
+import entities.Tumbleweed;
 import main.Game;
 import objects.Spike;
 import utilz.LoadSave;
 import zones.BuildingZone;
 
-import static utilz.Constants.EnemyConstants.*;
-import static utilz.Constants.ObjectConstants.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Random;
+
+import static utilz.Constants.EnemyConstants.TUMBLE_WEED;
+import static utilz.Constants.ObjectConstants.SPIKE;
+import static utilz.Constants.PlayerConstants.PLAYER_GREEN_VALUE;
 import static utilz.Constants.TetrisTileConstants.*;
-import static utilz.Constants.PlayerConstants.*;
-import static utilz.HelpMethods.*;
+import static utilz.HelpMethods.calculateAreaCoveredByEquivalentTiles;
 
 public class Level {
 
-    private BufferedImage img;
-    private int[][] lvlData;
+    private final BufferedImage img;
+    private final int[][] lvlData;
 
-    private ArrayList<Tumbleweed> crabs = new ArrayList<>();
-    private ArrayList<TetrisTile> tetrisTiles = new ArrayList<>();
-    private ArrayList<BuildingZone> buildingZones = new ArrayList<>();
-    private ArrayList<Spike> spikes = new ArrayList<>();
-
+    private final ArrayList<Tumbleweed> crabs = new ArrayList<>();
+    private final ArrayList<TetrisTile> tetrisTiles = new ArrayList<>();
+    private final ArrayList<BuildingZone> buildingZones = new ArrayList<>();
+    private final ArrayList<Spike> spikes = new ArrayList<>();
+    private final int lvlId;
+    private final LevelManager levelManager;
+    private final boolean isTutorial;
     private int lvlTilesWide;
     private int lvlTilesHigh;
     private int lvlWidth;
     private int lvlHeight;
-
-
     //private int maxTilesOffset;
     private int maxLvlOffsetX;
     private int maxLvlOffsetY;
@@ -45,9 +41,6 @@ public class Level {
     private int buildingZoneIndex = 0;
     private boolean drawForeground = true, drawPolygons = false, drawClouds = true, drawBackground = true, drawSky = true, drawWater = true, drawDarkness = true;
     private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
-    private int lvlId;
-    private LevelManager levelManager;
-    private boolean isTutorial;
 
     public Level(BufferedImage img, boolean tutorial, int lvlId, LevelManager levelManager) {
         this.img = img;
@@ -185,7 +178,7 @@ public class Level {
                     if (lvlId == 2)
                         type += "_tutorial";
 
-                    buildingZones.add(new BuildingZone((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE),
+                    buildingZones.add(new BuildingZone(x * Game.TILES_SIZE, y * Game.TILES_SIZE,
                             (rightBound - leftBound + 1) * Game.TILES_SIZE,
                             (upperBound - lowerBound + 1) * Game.TILES_SIZE,
                             buildingZoneIndex,

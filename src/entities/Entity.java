@@ -1,16 +1,13 @@
 package entities;
 
-import static utilz.Constants.Directions.DOWN;
-import static utilz.Constants.Directions.LEFT;
-import static utilz.Constants.Directions.UP;
-import static utilz.HelpMethods.CanMoveHere;
-import static utilz.HelpMethods.GetEntityXPosNextToWall;
+import main.Game;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-import main.Game;
+import static utilz.Constants.Directions.*;
+import static utilz.HelpMethods.CanMoveHere;
+import static utilz.HelpMethods.GetEntityXPosNextToWall;
 
 public abstract class Entity {
 

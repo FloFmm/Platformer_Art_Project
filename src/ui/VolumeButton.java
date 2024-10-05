@@ -1,26 +1,26 @@
 package ui;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-
-import org.lwjgl.glfw.GLFW;
-
-import utilz.LoadSave;
 import main.Game;
+import org.lwjgl.glfw.GLFW;
+import utilz.LoadSave;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.nio.FloatBuffer;
 
 import static utilz.Constants.ControllerConstants.JOYSTICK_DEAD_ZONE;
 import static utilz.Constants.UI.VolumeButtons.*;
 
 public class VolumeButton extends PauseButton {
 
+    private final int minX;
+    private final int maxX;
+    private final Game game;
     private BufferedImage[] imgs;
     private BufferedImage slider;
     private int index = 0;
-    private int buttonX, minX, maxX;
+    private int buttonX;
     private float floatValue = 0f;
-    private Game game;
 
     public VolumeButton(int x, int y, int width, int height, Game game) {
         super(x + width / 2, y, VOLUME_WIDTH, height);

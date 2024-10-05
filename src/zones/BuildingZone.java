@@ -1,37 +1,35 @@
 package zones;
 
-import static utilz.HelpMethods.*;
-import static utilz.Constants.TetrisTileConstants.*;
-import static utilz.Constants.Environment.*;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.geom.Rectangle2D;
-
-import entities.Entity;
 import entities.TetrisTile;
 import gamestates.Playing;
 import main.Game;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import static utilz.Constants.Environment.TEMP_FROM_FINISHED_WINDMILL;
+import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.HelpMethods.*;
+
 
 public class BuildingZone {
-    private int gridWidth, gridHeight;
-    private int[][] matrix, goalMatrix, preMatrix;
-    private int buildingZoneIndex;
+    private final int gridWidth;
+    private final int gridHeight;
+    private final int buildingZoneIndex;
+    private final String zoneType;
     protected Rectangle2D.Float hitbox;
+    private int[][] matrix, goalMatrix, preMatrix;
     private List<TetrisTile> tetrisTiles = new ArrayList<>();
-    private String zoneType;
     private boolean finished = false;
     private BuildingZoneManager buildingZoneManager;
 
     public BuildingZone(int x, int y, int width, int height, int buildingZoneIndex, String zoneType) {
         this.buildingZoneIndex = buildingZoneIndex;
-        hitbox = new Rectangle2D.Float(x, y, (int) (width), (int) (height));
-        gridWidth = (int) width / Game.TILES_SIZE * 4;
-        gridHeight = (int) height / Game.TILES_SIZE * 4;
+        hitbox = new Rectangle2D.Float(x, y, width, height);
+        gridWidth = width / Game.TILES_SIZE * 4;
+        gridHeight = height / Game.TILES_SIZE * 4;
         this.zoneType = zoneType;
         initMatrixes();
     }
@@ -136,7 +134,6 @@ public class BuildingZone {
         finished = true;
         if (zoneType.contains("windmill")) {
             buildingZoneManager.getPlaying().setTempFromWindmills(buildingZoneManager.getPlaying().getTempFromWindmills() + TEMP_FROM_FINISHED_WINDMILL);
-            ;
         }
     }
 

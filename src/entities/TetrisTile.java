@@ -1,40 +1,36 @@
 package entities;
 
-import static utilz.Constants.TetrisTileConstants.*;
-import static utilz.Constants.ObjectConstants.*;
-import static utilz.Constants.Environment.*;
-import static utilz.Constants.UPS_SET;
-import static utilz.Constants.EnemyConstants.TUMBLE_WEED;
-import static utilz.Constants.EnemyConstants.TUMBLE_WEED_MAX_SPEED;
-import static utilz.Constants.PlayerConstants.IDLE;
-import static utilz.HelpMethods.*;
-import static utilz.Constants.*;
+import gamestates.Playing;
+import main.Game;
+import zones.BuildingZone;
 
 import java.util.List;
 import java.util.Random;
 
-import org.lwjgl.opengl.EXTX11SyncObject;
-
-import gamestates.Playing;
-import levels.Level;
-import main.Game;
-import zones.BuildingZone;
+import static utilz.Constants.EnemyConstants.TUMBLE_WEED_MAX_SPEED;
+import static utilz.Constants.Environment.TEMP_FROM_ROCKET_EXPLOSION;
+import static utilz.Constants.Environment.TEMP_FROM_WINDMILL_EXPLOSION;
+import static utilz.Constants.GRAVITY;
+import static utilz.Constants.ObjectConstants.*;
+import static utilz.Constants.TetrisTileConstants.*;
+import static utilz.Constants.UPS_SET;
+import static utilz.HelpMethods.*;
 
 public class TetrisTile extends Entity {
 
+    private final float fallSpeedAfterCollision = 0.5f * Game.SCALE;
+    private final int tileY = 0;
+    int[][] matrix;
+    boolean movingInGrid = false;
+    boolean moving = false;
     private int[][] lvlData;
-    private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
     private int rotation = 0;
-    private int tileY = 0;
     private int tileIndex;
     private BuildingZone lockedInBuildingZone = null;
     private TetrisTileManager tetrisTileManager;
     private float xDrawOffset = 0;
     private float yDrawOffset = 0;
     private Player isCarriedBy;
-    int[][] matrix;
-    boolean movingInGrid = false;
-    boolean moving = false;
     private float explosionStartTime = -1;
     private String explosionType = "small";
     private BuildingZone currentBZ;
@@ -86,12 +82,8 @@ public class TetrisTile extends Entity {
             return false;
         }
 
-        if (matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexFloor, yGridIndexFloor,
-                matrix, xDrawOffset, yDrawOffset), 2)) {
-            return false;
-        }
-
-        return true;
+        return !matrixContainsValue(buildingZone.addTetrisTileMatrix(xGridIndexFloor, yGridIndexFloor,
+                matrix, xDrawOffset, yDrawOffset), 2);
     }
 
     private int[] closestLockingXY(float x, float y, BuildingZone buildingZone) {
@@ -255,10 +247,7 @@ public class TetrisTile extends Entity {
         }
 
         // check whether moving
-        if (Math.abs(hitbox.x - oldXPos) > 0.1f || Math.abs(hitbox.y - oldYPos) > 0.1f)
-            moving = true;
-        else
-            moving = false;
+        moving = Math.abs(hitbox.x - oldXPos) > 0.1f || Math.abs(hitbox.y - oldYPos) > 0.1f;
     }
 
     public void startExplosionTimer(String explosionType, BuildingZone currentBZ, float offset) {
@@ -385,8 +374,16 @@ public class TetrisTile extends Entity {
         return tileIndex;
     }
 
+    public void setTileIndex(int tileIndex) {
+        this.tileIndex = tileIndex;
+    }
+
     public int getRotation() {
         return rotation;
+    }
+
+    public void setRotation(int rotation) {
+        this.rotation = rotation;
     }
 
     public float getXDrawOffset() {
@@ -397,9 +394,12 @@ public class TetrisTile extends Entity {
         return yDrawOffset;
     }
 
-
     public BuildingZone getLockedInBuildingZone() {
         return lockedInBuildingZone;
+    }
+
+    public void setLockedInBuildingZone(BuildingZone lockedInBuildingZone) {
+        this.lockedInBuildingZone = lockedInBuildingZone;
     }
 
     public float getXSpeed() {
@@ -422,10 +422,6 @@ public class TetrisTile extends Entity {
         this.isCarriedBy = isCarriedBy;
     }
 
-    public void setRotation(int rotation) {
-        this.rotation = rotation;
-    }
-
     public void setTetrisTileManager(TetrisTileManager tetrisTileManager) {
         this.tetrisTileManager = tetrisTileManager;
     }
@@ -434,33 +430,24 @@ public class TetrisTile extends Entity {
         return matrix;
     }
 
-    public void setLockedInBuildingZone(BuildingZone lockedInBuildingZone) {
-        this.lockedInBuildingZone = lockedInBuildingZone;
-    }
-
-    public void setMovingInGrid(boolean movingInGrid) {
-        this.movingInGrid = movingInGrid;
+    public void setMatrix(int[][] matrix) {
+        this.matrix = matrix;
     }
 
     public void setInAir(boolean inAir) {
         this.inAir = inAir;
     }
 
-    public void setTileIndex(int tileIndex) {
-        this.tileIndex = tileIndex;
-    }
-
-    public void setMatrix(int[][] matrix) {
-        this.matrix = matrix;
-    }
-
     public boolean getMoving() {
         return moving;
     }
 
-
     public boolean getMovingInGrid() {
         return movingInGrid;
+    }
+
+    public void setMovingInGrid(boolean movingInGrid) {
+        this.movingInGrid = movingInGrid;
     }
 
     public boolean getIsPredictionTile() {

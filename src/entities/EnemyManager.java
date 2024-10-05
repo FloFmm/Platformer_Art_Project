@@ -1,19 +1,19 @@
 package entities;
 
-import java.awt.Graphics;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-
 import gamestates.Playing;
 import levels.Level;
 import utilz.LoadSave;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import static utilz.Constants.EnemyConstants.*;
 import static utilz.HelpMethods.rotateImage;
 
 public class EnemyManager {
 
-    private Playing playing;
+    private final Playing playing;
     private BufferedImage[][] tumbleWeedArr;
     private Level currentLevel;
 
@@ -45,8 +45,8 @@ public class EnemyManager {
                 g.drawImage(tumbleWeedArr[c.getState()][c.getAniIndex()],
                         (int) (c.getHitbox().x - xLvlOffset - c.getXDrawOffset() + c.flipX()),
                         (int) (c.getHitbox().y - yLvlOffset - c.getYDrawOffset()),
-                        (int) (c.getWidth() * c.flipW()),
-                        (int) (c.getHeight()), null);
+                        c.getWidth() * c.flipW(),
+                        c.getHeight(), null);
 
                 //c.drawHitbox(g, xLvlOffset, yLvlOffset);
                 //c.drawAttackBox(g, xLvlOffset, yLvlOffset);
@@ -73,13 +73,11 @@ public class EnemyManager {
             tumbleWeedArr[RUNNING][i] = rotateImage(tumbleWeedArr[RUNNING][i - 1], 360 / GetSpriteAmount(TUMBLE_WEED, RUNNING));
         }
 
-        for (int i = 0; i < GetSpriteAmount(TUMBLE_WEED, HIT); i++) {
-            tumbleWeedArr[HIT][i] = tumbleWeedArr[RUNNING][i];
-        }
+        if (GetSpriteAmount(TUMBLE_WEED, HIT) >= 0)
+            System.arraycopy(tumbleWeedArr[RUNNING], 0, tumbleWeedArr[HIT], 0, GetSpriteAmount(TUMBLE_WEED, HIT));
 
-        for (int i = 0; i < GetSpriteAmount(TUMBLE_WEED, DEAD); i++) {
-            tumbleWeedArr[DEAD][i] = tumbleWeedArr[RUNNING][i];
-        }
+        if (GetSpriteAmount(TUMBLE_WEED, DEAD) >= 0)
+            System.arraycopy(tumbleWeedArr[RUNNING], 0, tumbleWeedArr[DEAD], 0, GetSpriteAmount(TUMBLE_WEED, DEAD));
     }
 
     public void resetAllEnemies() {
