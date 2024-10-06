@@ -58,17 +58,17 @@ public class Player extends Entity {
     private final Playing playing;
     private final int powerGrowSpeed = 15;
     private final boolean drawThrowArc = false;
-    //controller
-    private boolean controllerIsPresent = false;
     private final int[] buttonStates = new int[NUM_BUTTONS];
     private final int[] prevButtonStates = new int[NUM_BUTTONS];
     private final float[] pushDownStartTimes = new float[NUM_BUTTONS];
     private final float[] buttonLastPressed = new float[NUM_BUTTONS];
     private final int controllerID;
     protected Rectangle2D.Float grabBox;
+    //controller
+    private boolean controllerIsPresent = false;
     private BufferedImage[][] animations;
-    private boolean moving = false, attacking = false;
-    private boolean left, right, jump, grabOrThrow = false;
+    private boolean attacking = false;
+    private boolean left, right, grabOrThrow = false;
     private TetrisTile isCarrying;
     private float startTimeInAir;
     private int[][] lvlData;
@@ -179,7 +179,7 @@ public class Player extends Entity {
 
         checkSpikesTouched();
         checkInsideWater();
-        if (moving) {
+        if (xSpeed != 0) {
             tileY = (int) (hitbox.y / Game.TILES_SIZE);
             if (powerAttackActive) {
                 powerAttackTick++;
@@ -371,7 +371,6 @@ public class Player extends Entity {
     }
 
     public void drawPlayer(Graphics g, int xLvlOffset, int yLvlOffset) {
-
         int aniStateOffset = 0;
         if (isCarrying != null) aniStateOffset = NUM_ANIMATIONS;
         g.drawImage(animations[state + aniStateOffset][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX, (int) (hitbox.y - yDrawOffset - yLvlOffset + (int) (pushDrawOffset)), width * flipW, height, null);
@@ -383,43 +382,6 @@ public class Player extends Entity {
     protected void drawGrabBox(Graphics g, int xLvlOffset, int yLvlOffset) {
         g.setColor(Color.BLACK);
         g.drawRect((int) grabBox.x - xLvlOffset, (int) grabBox.y - yLvlOffset, (int) grabBox.width, (int) grabBox.height);
-    }
-
-    protected void drawThrowArcOld(Graphics g, int xLvlOffset, int yLvlOffset, int numArcPoints) {
-        Graphics2D g2 = (Graphics2D) g;
-        float[] throwSpeed = calcThrowSpeed();
-        float tileXSpeed = throwSpeed[0];
-        float tileAirSpeed = throwSpeed[1];
-        if (isPlayer1) g.setColor(THROW_ARC_COLOR_PLAYER1);
-        else g.setColor(THROW_ARC_COLOR_PLAYER2);
-        int circle_x, circle_y, lastX = 0, lastY = 0;
-        int radius, maxRadius = 15, minRadius = 6;
-        float maxThrowTime = tileAirSpeed / GRAVITY * 2;
-        float xDistanceTraveled, xDistanceDueStartSpeed, xDistanceDueWind, time;
-        boolean lastPointExists = false;
-        for (int i = 0; i < numArcPoints + 1; i++) {
-            time = i / (numArcPoints - 1.0f) * maxThrowTime;
-            xDistanceDueStartSpeed = time * tileXSpeed;
-            if (time <= TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET)
-                xDistanceDueWind = playing.getWindSpeed() / (TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET) * 0.5f * time * time;
-            else
-                xDistanceDueWind = playing.getWindSpeed() * (TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET) * 0.5f + playing.getWindSpeed() * (time - TETRIS_TILE_TIME_TO_REACH_WINDSPEED * UPS_SET);
-            xDistanceTraveled = xDistanceDueStartSpeed + xDistanceDueWind;
-
-            radius = (int) (minRadius + i / ((float) numArcPoints) * (maxRadius - minRadius));
-            circle_x = (int) (hitbox.x + hitbox.width / 2 - xLvlOffset - radius / 2 + xDistanceTraveled);
-
-            if (isCarrying != null) {
-                circle_y = (int) (hitbox.y - yLvlOffset - radius / 2 - isCarrying.hitbox.height / 2 - calculateYOfThrowArc(time, playing.getWindSpeed(), tileAirSpeed, GRAVITY));
-                if (lastPointExists) {
-                    g2.setStroke(new BasicStroke(radius));
-                    g2.drawLine(lastX, lastY, circle_x, circle_y);
-                }
-                lastX = circle_x;
-                lastY = circle_y;
-                lastPointExists = true;
-            }
-        }
     }
 
     protected void drawThrowArc(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -524,8 +486,10 @@ public class Player extends Entity {
 
         if (state == HIT) return;
 
-        if (moving) state = RUNNING;
-        else state = IDLE;
+        if (xSpeed != 0)
+            state = RUNNING;
+        else
+            state = IDLE;
 
         if (inAir) {
             if (airSpeed < 0) state = JUMP;
@@ -781,10 +745,6 @@ public class Player extends Entity {
         this.right = right;
     }
 
-    public void setJump(boolean jump) {
-        this.jump = jump;
-    }
-
     public TetrisTile getIsCarrying() {
         return isCarrying;
     }
@@ -817,7 +777,6 @@ public class Player extends Entity {
         }
         inAir = false;
         attacking = false;
-        moving = false;
         airSpeed = 0f;
         state = IDLE;
         currentHealth = maxHealth;
