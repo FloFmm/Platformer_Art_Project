@@ -17,7 +17,7 @@ The game features two opposing players playing on splitscreen:
 Follow these steps to download and run the project:
 **Requirements:**
 - tested on Java 17 (anything higher than 11 should work) and Maven 3.9.0
-- 2 game controllers with at least 9 buttons and a joystick. 
+- keyboard and mouse or 2 game controllers with at least 9 buttons and a joystick (also combination of keyboard and controller possible). 
 
 You might have to rebind the buttons to the correct action (e.g. JUMP) in the code: 
 	```
