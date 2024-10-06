@@ -57,8 +57,7 @@ public abstract class UserInterface implements MouseListener, MouseMotionListene
                 selectPreviousButton();
             }
             case KeyEvent.VK_ENTER -> {
-                int button_id = getSelectedButton();
-                if (button_id != -1) activateButton(buttons[button_id]);
+                if (selectedButtonIndex != -1) activateButton(buttons[selectedButtonIndex]);
             }
         }
     }
