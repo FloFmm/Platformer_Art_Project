@@ -42,28 +42,49 @@ public class Level {
     private boolean drawForeground = true, drawPolygons = false, drawClouds = true, drawBackground = true, drawSky = true, drawWater = true, drawDarkness = true;
     private BufferedImage backgroundImg1, backgroundImg2, foregroundImg, skyImg, cloudImg1, cloudImg2, waterImg;
 
-    public Level(BufferedImage img, boolean tutorial, int lvlId, LevelManager levelManager) {
+    public Level(BufferedImage img, int lvlId, LevelManager levelManager) {
         this.img = img;
         this.levelManager = levelManager;
         lvlData = new int[img.getHeight()][img.getWidth()];
-        if (tutorial) {
-            this.drawForeground = true;
-            this.drawPolygons = false;
-            this.drawSky = true;
-            this.drawBackground = false;
-            this.drawClouds = false;
-            this.drawWater = false;
-            this.drawDarkness = false;
-        } else {
-            this.drawForeground = true;
-            this.drawPolygons = false;
-            this.drawSky = true;
-            this.drawBackground = true;
-            this.drawClouds = true;
-            this.drawWater = true;
-            this.drawDarkness = true;
+        switch (lvlId) {
+            case(0) -> { //tutorial
+                this.drawForeground = true;
+                this.drawPolygons = false;
+                this.drawSky = true;
+                this.drawBackground = false;
+                this.drawClouds = false;
+                this.drawWater = false;
+                this.drawDarkness = false;
+            }
+            case(1) -> { //lvl 1
+                this.drawForeground = true;
+                this.drawPolygons = false;
+                this.drawSky = true;
+                this.drawBackground = true;
+                this.drawClouds = true;
+                this.drawWater = true;
+                this.drawDarkness = true;
+            }
+            case(2) -> { //lvl 2
+                this.drawForeground = false;
+                this.drawPolygons = true;
+                this.drawSky = false;
+                this.drawBackground = false;
+                this.drawClouds = false;
+                this.drawWater = false;
+                this.drawDarkness = false;
+            }
+            default -> {
+                this.drawForeground = false;
+                this.drawPolygons = true;
+                this.drawSky = false;
+                this.drawBackground = false;
+                this.drawClouds = false;
+                this.drawWater = false;
+                this.drawDarkness = false;
+            }
         }
-        this.isTutorial = tutorial;
+        this.isTutorial = (lvlId == 0);
         this.lvlId = lvlId;
         loadLevel();
         calcLvlOffsets();
@@ -95,49 +116,49 @@ public class Level {
             waterImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_water.png");
         } else {
             System.out.println("file does not exist: " + "layers/" + (lvlId) + "_water.png");
-            waterImg = levelManager.getLevelByIndex(lvlId - 1).getWaterImg();
+            waterImg = null;//levelManager.getLevelByIndex(lvlId - 1).getWaterImg();
         }
 
         if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_sky.png") != null) {
             skyImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_sky.png");
         } else {
             System.out.println("file does not exist: " + "layers/" + (lvlId) + "_sky.png");
-            skyImg = levelManager.getLevelByIndex(lvlId - 1).getSkyImg();
+            skyImg = null;//levelManager.getLevelByIndex(lvlId - 1).getSkyImg();
         }
 
         if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_cloud1.png") != null) {
             cloudImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud1.png");
         } else {
             System.out.println("file does not exist: " + "layers/" + (lvlId) + "_cloud1.png");
-            cloudImg1 = levelManager.getLevelByIndex(lvlId - 1).getCloudImg1();
+            cloudImg1 = null;//levelManager.getLevelByIndex(lvlId - 1).getCloudImg1();
         }
 
         if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_cloud2.png") != null) {
             cloudImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_cloud2.png");
         } else {
             System.out.println("file does not exist: " + "layers/" + (lvlId) + "_cloud2.png");
-            cloudImg2 = levelManager.getLevelByIndex(lvlId - 1).getCloudImg2();
+            cloudImg2 = null;//levelManager.getLevelByIndex(lvlId - 1).getCloudImg2();
         }
 
         if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_background1.png") != null) {
             backgroundImg1 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background1.png");
         } else {
             System.out.println("file does not exist: " + "layers/" + (lvlId) + "_background1.png");
-            backgroundImg1 = levelManager.getLevelByIndex(lvlId - 1).getBackgroundImg1();
+            backgroundImg1 = null;//levelManager.getLevelByIndex(lvlId - 1).getBackgroundImg1();
         }
 
         if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_background2.png") != null) {
             backgroundImg2 = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_background2.png");
         } else {
             System.out.println("file does not exist: " + "layers/" + (lvlId) + "_background2.png");
-            backgroundImg2 = levelManager.getLevelByIndex(lvlId - 1).getBackgroundImg2();
+            backgroundImg2 = null;//levelManager.getLevelByIndex(lvlId - 1).getBackgroundImg2();
         }
 
         if (Thread.currentThread().getContextClassLoader().getResource("layers/" + (lvlId) + "_foreground.png") != null) {
             foregroundImg = LoadSave.GetSpriteAtlas("layers/" + (lvlId) + "_foreground.png");
         } else {
             System.out.println("file does not exist: " + "layers/" + (lvlId) + "_foreground.png");
-            foregroundImg = levelManager.getLevelByIndex(lvlId - 1).getForegroundImg();
+            foregroundImg = null;//levelManager.getLevelByIndex(lvlId - 1).getForegroundImg();
         }
     }
 

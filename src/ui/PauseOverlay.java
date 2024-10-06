@@ -42,8 +42,8 @@ public class PauseOverlay extends UserInterface {
 
     public void loadButtons() {
         buttons = new MenuButton[2];
-        buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID, game);
-        buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, game);
+        buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), "CONTINUE [A]",0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID, game);
+        buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), "MENU [B]", 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, game);
         if (useVolumeButton)
             volumeButton = new VolumeButton((Game.GAME_WIDTH / 6 - SLIDER_WIDTH / 2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
     }

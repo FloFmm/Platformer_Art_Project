@@ -90,6 +90,10 @@ public class GamePanel extends JPanel implements KeyListener, MouseMotionListene
                 addMouseListener(game.getCredits().getUI());
                 addMouseMotionListener(game.getCredits().getUI());
                 break;
+            case LEVEL_SELECTION:
+                addMouseListener(game.getLevelSelection().getUI());
+                addMouseMotionListener(game.getLevelSelection().getUI());
+                break;
         }
     }
 

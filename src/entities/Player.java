@@ -781,7 +781,6 @@ public class Player extends Entity {
         state = IDLE;
         currentHealth = maxHealth;
         powerAttackActive = false;
-        throwActive = false;
         powerAttackTick = 0;
         powerValue = powerMaxValue;
 

@@ -28,7 +28,7 @@ public class GameOverOverlay extends UserInterface{
 
     public void loadButtons() {
         buttons = new MenuButton[1];
-        buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT * 0.85), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, game);
+        buttons[0] = new MenuButton(Game.GAME_WIDTH / 8, (int) (Game.GAME_HEIGHT * 0.85), "MENU [B]", 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, game);
     }
 
     public void update() {

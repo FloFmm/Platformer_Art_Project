@@ -23,15 +23,16 @@ public class MenuButton {
     private final Gamestate state;
     private final int controllerButtonId;
     private final Game game;
-    private int index;
-    private BufferedImage[] imgs;
+    private BufferedImage pressedEmptyButton, emptyButton;
     private int buttonState = GLFW.GLFW_RELEASE, prevButtonState = GLFW.GLFW_RELEASE;
     private Rectangle bounds;
     private boolean mouseOver;
+    private String buttonText;
 
-    public MenuButton(int xPos, int yPos, int rowIndex, Gamestate state, int controllerButtonId, Game game) {
+    public MenuButton(int xPos, int yPos, String buttonText, int rowIndex, Gamestate state, int controllerButtonId, Game game) {
         this.xPos = xPos;
         this.yPos = yPos;
+        this.buttonText = buttonText;
         this.rowIndex = rowIndex;
         this.state = state;
         this.controllerButtonId = controllerButtonId;
@@ -46,14 +47,52 @@ public class MenuButton {
     }
 
     private void loadImgs() {
-        imgs = new BufferedImage[2];
-        BufferedImage temp = LoadSave.GetSpriteAtlas(LoadSave.MENU_BUTTONS);
-        for (int i = 0; i < imgs.length; i++)
-            imgs[i] = temp.getSubimage(i * B_WIDTH_DEFAULT, rowIndex * B_HEIGHT_DEFAULT, B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT);
+        pressedEmptyButton = LoadSave.GetSpriteAtlas(LoadSave.PRESSED_EMPTY_BUTTON);
+        emptyButton = LoadSave.GetSpriteAtlas(LoadSave.EMPTY_BUTTON);
     }
 
     public void draw(Graphics g, int xDrawOffset) {
-        g.drawImage(imgs[index], xPos - xOffsetCenter + xDrawOffset, yPos, B_WIDTH, B_HEIGHT, null);
+        BufferedImage img = emptyButton;
+        if (buttonState == GLFW.GLFW_PRESS)
+            img = pressedEmptyButton;
+
+
+        g.drawImage(img, xPos - xOffsetCenter + xDrawOffset, yPos, B_WIDTH, B_HEIGHT, null);
+
+        // draw text on button
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setFont(new Font("SansSerif", Font.PLAIN, 100));
+        g2d.setColor(Color.WHITE);
+        //g2d.drawString("PLAY [A]", xPos - xOffsetCenter + xDrawOffset, (int)(yPos + B_HEIGHT*0.75 + pressedYPushDown));
+        drawCenteredString(g2d, buttonText, xDrawOffset);
+    }
+
+    public void drawCenteredString(Graphics g2d, String text, int xDrawOffset) {
+        Rectangle b = new Rectangle(bounds.x, bounds.y, bounds.width, (int)(0.8*bounds.height));
+        if (buttonState == GLFW.GLFW_PRESS)
+            b = new Rectangle(bounds.x, bounds.y + (int)(0.2*bounds.height), bounds.width, (int)(0.8*bounds.height));
+
+        int fontSize = 100; // Start with a large font size
+        Font font = g2d.getFont().deriveFont((float) fontSize);
+        FontMetrics metrics = g2d.getFontMetrics(font);
+
+        // Reduce the font size until the text fits the width of the rectangle
+        while (metrics.stringWidth(text) > b.width) {
+            fontSize--;
+            font = g2d.getFont().deriveFont((float) fontSize);
+            metrics = g2d.getFontMetrics(font);
+        }
+        fontSize -= 5;
+        font = g2d.getFont().deriveFont((float) fontSize);
+        metrics = g2d.getFontMetrics(font);
+
+        // Find the X coordinate for the text
+        int x = b.x + (b.width - metrics.stringWidth(text)) / 2;
+        // Find the Y coordinate for the text (centered vertically within the rectangle)
+        int y = b.y + ((b.height - metrics.getHeight()) / 2) + metrics.getAscent();
+
+        g2d.setFont(font);
+        g2d.drawString(text, x + xDrawOffset, y);
     }
 
     public void update() {
@@ -67,9 +106,6 @@ public class MenuButton {
             if (buttons2.get(controllerButtonId) == GLFW.GLFW_PRESS)
                 buttonState = GLFW.GLFW_PRESS;
         }
-        index = 0;
-        if (buttonState == GLFW.GLFW_PRESS)
-            index = 1;
     }
 
     public Rectangle getBounds() {

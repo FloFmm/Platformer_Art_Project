@@ -19,7 +19,6 @@ import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
 public class MenuOverlay extends UserInterface{
     private final boolean useVolumeButton = false;
     private VolumeButton volumeButton;
-    private int selectedButtonIndex = 0;
 
     public MenuOverlay(Game game) {
         super(game);
@@ -30,10 +29,10 @@ public class MenuOverlay extends UserInterface{
 
     public void loadButtons() {
         buttons = new MenuButton[4];
-        buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID, game);
-        buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), 1, Gamestate.PLAYING, CONTROLLER_X_BUTTON_ID, game);
-        buttons[2] = new MenuButton(Game.GAME_WIDTH / 6, (int) (270 * Game.SCALE), 2, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID, game);
-        buttons[3] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID, game);
+        buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), "PLAY [A]",-1, Gamestate.LEVEL_SELECTION, CONTROLLER_A_BUTTON_ID, game);
+        buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), "TUTORIAL [X]", 0, Gamestate.PLAYING, CONTROLLER_X_BUTTON_ID, game);
+        buttons[2] = new MenuButton(Game.GAME_WIDTH / 6, (int) (270 * Game.SCALE), "CREDITS [Y]", -1, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID, game);
+        buttons[3] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), "EXIT [B]", -1, Gamestate.QUIT, CONTROLLER_B_BUTTON_ID, game);
         if (useVolumeButton)
             volumeButton = new VolumeButton((Game.GAME_WIDTH / 6 - SLIDER_WIDTH / 2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
     }
