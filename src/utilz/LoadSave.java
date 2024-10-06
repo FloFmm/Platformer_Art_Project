@@ -13,7 +13,8 @@ import java.util.List;
 public class LoadSave {
     public static final String LOADING = "displays/loading.png";
     public static final String LEVEL_ATLAS = "outside_sprites.png";
-    public static final String MENU_BUTTONS = "displays/button_atlas.png";
+    public static final String PRESSED_EMPTY_BUTTON = "displays/pressed_empty_button.png";
+    public static final String EMPTY_BUTTON = "displays/empty_button.png";
     public static final String MENU_BACKGROUND = "displays/controller_labeled.png";
     public static final String PAUSE_BACKGROUND = "displays/pause_menu.png";
     public static final String SOUND_BUTTONS = "displays/sound_button.png";
@@ -74,7 +75,7 @@ public class LoadSave {
         List<BufferedImage> imageList = new ArrayList<>();
 
         // Get the resources as input streams
-        for (int i = 1; ; i++) {
+        for (int i = 0; ; i++) {
             String resourcePath = "/lvls/" + i + ".png";
             InputStream inputStream = LoadSave.class.getResourceAsStream(resourcePath);
             if (inputStream == null) {

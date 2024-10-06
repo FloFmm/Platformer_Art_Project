@@ -2,10 +2,8 @@ package main;
 
 import audio.AudioPlayer;
 import entities.TetrisTile;
-import gamestates.Credits;
-import gamestates.Gamestate;
+import gamestates.*;
 import gamestates.Menu;
-import gamestates.Playing;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWJoystickCallback;
 
@@ -52,6 +50,7 @@ public class Game implements Runnable {
     private Thread gameThread;
     private Playing playing;
     private Menu menu;
+    private LevelSelection levelSelection;
     // player control
     private Credits credits;
     private AudioPlayer audioPlayer;
@@ -99,6 +98,7 @@ public class Game implements Runnable {
     private void initClasses() {
         audioPlayer = new AudioPlayer();
         menu = new Menu(this);
+        levelSelection = new LevelSelection(this);
         playing = new Playing(this);
         credits = new Credits(this);
 
@@ -128,6 +128,7 @@ public class Game implements Runnable {
     public void keyPressed(int key) {
         switch (Gamestate.state) {
             case MENU -> menu.keyPressed(key);
+            case LEVEL_SELECTION -> levelSelection.keyPressed(key);
             case PLAYING -> playing.keyPressed(key);
             case CREDITS -> credits.keyPressed(key);
         }
@@ -136,6 +137,7 @@ public class Game implements Runnable {
     public void keyReleased(int key) {
         switch (Gamestate.state) {
             case MENU -> menu.keyReleased(key);
+            case LEVEL_SELECTION -> levelSelection.keyReleased(key);
             case PLAYING -> playing.keyReleased(key);
             case CREDITS -> credits.keyReleased(key);
         }
@@ -151,6 +153,7 @@ public class Game implements Runnable {
         GLFW.glfwPollEvents();
         switch (Gamestate.state) {
             case MENU -> menu.update();
+            case LEVEL_SELECTION -> levelSelection.update();
             case PLAYING -> playing.update();
             case CREDITS -> credits.update();
             case QUIT -> System.exit(0);
@@ -162,9 +165,8 @@ public class Game implements Runnable {
     public void render(Graphics g, boolean isPlayer1) {
         switch (Gamestate.state) {
             case MENU -> menu.draw(g, isPlayer1);
-            case PLAYING -> {
-                playing.draw(g, isPlayer1);
-            }
+            case LEVEL_SELECTION -> levelSelection.draw(g, isPlayer1);
+            case PLAYING -> playing.draw(g, isPlayer1);
             case CREDITS -> credits.draw(g, isPlayer1);
         }
     }
@@ -232,14 +234,13 @@ public class Game implements Runnable {
     public Menu getMenu() {
         return menu;
     }
-
+    public LevelSelection getLevelSelection() {
+        return levelSelection;
+    }
     public Playing getPlaying() {
         return playing;
     }
-
-    public Credits getCredits() {
-        return credits;
-    }
+    public Credits getCredits() { return credits; }
 
 
     public AudioPlayer getAudioPlayer() {

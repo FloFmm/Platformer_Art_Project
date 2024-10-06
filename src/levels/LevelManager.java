@@ -42,7 +42,7 @@ public class LevelManager {
         for (int i = 0; i < allLevels.length; i++) {
             BufferedImage img = allLevels[i];
             boolean tutorial = i == 1;
-            levels.add(new Level(img, tutorial, i + 1, this));
+            levels.add(new Level(img, i, this));
         }
     }
 
