@@ -1,36 +1,41 @@
 package ui;
 
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import audio.AudioPlayer;
+import gamestates.Gamestate;
+import main.Game;
+import main.GamePanel;
+import org.lwjgl.glfw.GLFW;
+import utilz.LoadSave;
+
+import java.awt.*;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
-import org.lwjgl.glfw.GLFW;
-
-import audio.AudioPlayer;
-import gamestates.Gamestate;
-import gamestates.State;
-import main.Game;
-import utilz.LoadSave;
-
 import static utilz.Constants.UI.Buttons.*;
 
-public class MenuButton extends State {
-    private int xPos, yPos, rowIndex, index;
-    private int xOffsetCenter = B_WIDTH / 2;
-    private Gamestate state;
+public class MenuButton {
+    private final int xPos;
+    private final int yPos;
+    private final int rowIndex;
+    private final int xOffsetCenter = B_WIDTH / 2;
+    private final Gamestate state;
+    private final int controllerButtonId;
+    private final Game game;
+    private int index;
     private BufferedImage[] imgs;
     private int buttonState = GLFW.GLFW_RELEASE, prevButtonState = GLFW.GLFW_RELEASE;
     private Rectangle bounds;
-    private int controllerButtonId;
+    private boolean mouseOver;
 
     public MenuButton(int xPos, int yPos, int rowIndex, Gamestate state, int controllerButtonId, Game game) {
-        super(game);
         this.xPos = xPos;
         this.yPos = yPos;
         this.rowIndex = rowIndex;
         this.state = state;
         this.controllerButtonId = controllerButtonId;
+        this.game = game;
         loadImgs();
         initBounds();
     }
@@ -72,12 +77,19 @@ public class MenuButton extends State {
     }
 
     public void applyGamestate() {
-        setGamestate(state);
+        GamePanel gamePanel1 = game.getGamePanel1();
+        GamePanel gamePanel2 = game.getGamePanel2();
+        gamePanel1.removeMouseListeners();
+        gamePanel2.removeMouseListeners();
+        gamePanel1.addMouseListeners(state);
+        gamePanel2.addMouseListeners(state);
+        Gamestate.state = state;
     }
 
     public void resetBools() {
         buttonState = GLFW.GLFW_RELEASE;
         prevButtonState = GLFW.GLFW_RELEASE;
+        mouseOver = false;
     }
 
     public Gamestate getState() {
@@ -92,12 +104,12 @@ public class MenuButton extends State {
         return buttonState;
     }
 
-    public int getRowIndex() {
-        return rowIndex;
-    }
-
     public void setButtonState(int buttonState) {
         this.buttonState = buttonState;
+    }
+
+    public int getRowIndex() {
+        return rowIndex;
     }
 
     public int getPrevButtonState() {
@@ -106,6 +118,14 @@ public class MenuButton extends State {
 
     public void setPrevButtonState(int prevButtonState) {
         this.prevButtonState = prevButtonState;
+    }
+
+    public boolean isMouseOver() {
+        return mouseOver;
+    }
+
+    public void setMouseOver(boolean isOver) {
+        this.mouseOver = isOver;
     }
 
 }

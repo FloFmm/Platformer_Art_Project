@@ -1,13 +1,13 @@
 package objects;
 
-import static utilz.Constants.ANI_SPEED;
-import static utilz.Constants.ObjectConstants.*;
+import main.Game;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-import main.Game;
+import static utilz.Constants.ANI_SPEED;
+import static utilz.Constants.ObjectConstants.EXPLOSION;
+import static utilz.Constants.ObjectConstants.GetSpriteAmount;
 
 public class GameObject {
 

@@ -1,19 +1,16 @@
 package entities;
 
-import static utilz.Constants.EnemyConstants.*;
-import static utilz.Constants.PlayerConstants.IDLE;
-import static utilz.HelpMethods.*;
+import main.Game;
 
 import java.awt.geom.Rectangle2D;
 
-import gamestates.Playing;
-
+import static utilz.Constants.ANI_SPEED;
 import static utilz.Constants.Directions.*;
-import static utilz.Constants.*;
-
-import main.Game;
+import static utilz.Constants.EnemyConstants.*;
+import static utilz.Constants.PlayerConstants.IDLE;
 
 public abstract class Enemy extends Entity {
+    public int aniSpeed;
     protected int enemyType;
     protected boolean firstUpdate = true;
     protected int walkDir = LEFT;
@@ -22,7 +19,6 @@ public abstract class Enemy extends Entity {
     protected boolean active = true;
     protected boolean attackChecked;
     protected int attackBoxOffsetX;
-    public int aniSpeed;
 
     public Enemy(float x, float y, int width, int height, int enemyType) {
         super(x, y, width, height);

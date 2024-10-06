@@ -1,9 +1,5 @@
 package objects;
 
-import static utilz.Constants.ObjectConstants.*;
-
-import main.Game;
-
 public class Explosion extends GameObject {
     private int width, height;
 
@@ -23,6 +19,10 @@ public class Explosion extends GameObject {
         return width;
     }
 
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     public int getHeight() {
         return height;
     }
@@ -30,10 +30,6 @@ public class Explosion extends GameObject {
     public void setHeight(int height) {
         this.height = height;
 
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
     }
 
     public void setY(int y) {

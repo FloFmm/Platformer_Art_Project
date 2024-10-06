@@ -1,24 +1,18 @@
 package zones;
 
-import java.awt.Graphics;
+import gamestates.Playing;
+import levels.Level;
+import main.Game;
+import utilz.LoadSave;
+
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import entities.Player;
-import entities.Tumbleweed;
-import gamestates.Playing;
-import levels.Level;
-import main.Game;
-import objects.Spike;
-import utilz.LoadSave;
-
-import static utilz.HelpMethods.*;
-import static utilz.Constants.TetrisTileConstants.*;
-
 public class BuildingZoneManager {
 
-    private Playing playing;
+    private final Playing playing;
     private Level currentLevel;
     private BufferedImage rocketImg, windmillImg, rocketTutorialImg, windmillTutorialImg;
     private boolean player1Finished = false, player2Finished = false;

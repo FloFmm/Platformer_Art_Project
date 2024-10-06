@@ -1,36 +1,46 @@
 package entities;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Map;
-
 import gamestates.Playing;
 import levels.Level;
 import main.Game;
 import utilz.LoadSave;
 
-import static utilz.HelpMethods.*;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+
 import static utilz.Constants.TetrisTileConstants.*;
 import static utilz.Constants.UPS_SET;
-import static utilz.Constants.PlayerConstants.COLOR_MAP;
-import static utilz.Constants.PlayerConstants.NUM_ANIMATIONS;
-import static utilz.Constants.PlayerConstants.PLAYER_COLOR_TOLERANCE;
-import static utilz.Constants.PlayerConstants.PLAYER_DEFAULT_COLOR;
+import static utilz.HelpMethods.linear;
+import static utilz.HelpMethods.rotateImage;
 
 public class TetrisTileManager {
 
-    private Playing playing;
-    private BufferedImage[][][] tetrisTileArr = new BufferedImage[NUM_TETRIS_TILES][4][3];
+    private final Playing playing;
+    private final BufferedImage[][][] tetrisTileArr = new BufferedImage[NUM_TETRIS_TILES][4][3];
+    private final TetrisTile[] throwArcPredictionTiles = new TetrisTile[2];
     private Level currentLevel;
     private int[][][] throwArcPredictionPoints;
-    private TetrisTile[] throwArcPredictionTiles = new TetrisTile[2];
 
     public TetrisTileManager(Playing playing) {
         this.playing = playing;
         initThrowArcPrediction();
         loadTetrisTileImgs();
+    }
+
+    public static BufferedImage uniformReplaceColors(BufferedImage image, Color goalColor) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Color oldColor = new Color(image.getRGB(x, y), true); // true to consider alpha
+                int newA = (int) (linear((oldColor.getRed() + oldColor.getGreen() + oldColor.getBlue()), 0, 3 * 200, 255, 0) * (oldColor.getAlpha() / 255.0f));
+                int newRgba = (newA << 24) | (goalColor.getRed() << 16) | (goalColor.getGreen() << 8) | goalColor.getBlue();
+                newImage.setRGB(x, y, newRgba);
+            }
+        }
+        return newImage;
     }
 
     private void predictThrowArc(int[][] lvlData, Player player) {
@@ -127,7 +137,6 @@ public class TetrisTileManager {
         drawTetrisTiles(g, xLvlOffset, yLvlOffset);
     }
 
-
     private void drawTetrisTiles(Graphics g, int xLvlOffset, int yLvlOffset) {
         for (TetrisTile c : currentLevel.getTetrisTiles()) {
             g.drawImage(tetrisTileArr[c.getTileIndex()][c.getRotation()][0],
@@ -186,21 +195,6 @@ public class TetrisTileManager {
             tetrisTileArr[tile][2][2] = rotateImage(tetrisTileArr[tile][0][2], 180);
             tetrisTileArr[tile][3][2] = rotateImage(tetrisTileArr[tile][0][2], 270);
         }
-    }
-
-    public static BufferedImage uniformReplaceColors(BufferedImage image, Color goalColor) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Color oldColor = new Color(image.getRGB(x, y), true); // true to consider alpha
-                int newA = (int) (linear((oldColor.getRed() + oldColor.getGreen() + oldColor.getBlue()), 0, 3 * 200, 255, 0) * (oldColor.getAlpha() / 255.0f));
-                int newRgba = (newA << 24) | (goalColor.getRed() << 16) | (goalColor.getGreen() << 8) | goalColor.getBlue();
-                newImage.setRGB(x, y, newRgba);
-            }
-        }
-        return newImage;
     }
 
     public void resetAllTetrisTiles() {

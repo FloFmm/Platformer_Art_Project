@@ -1,22 +1,21 @@
 package levels;
 
-import static utilz.HelpMethods.*;
-import static utilz.Constants.Environment.*;
-import static utilz.Constants.PlayerConstants.*;
+import main.Game;
+import utilz.LoadSave;
 
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import main.Game;
-import utilz.LoadSave;
+import static utilz.Constants.Environment.FLOOR_TILE_COLOR;
+import static utilz.HelpMethods.TriangleCoordinatesBaseLongShort;
 
 
 public class LevelManager {
 
-    private Game game;
+    private final Game game;
+    private final ArrayList<Level> levels;
     private BufferedImage[] levelSprite;
-    private ArrayList<Level> levels;
     private int lvlIndex = 0, aniTick, aniIndex;
 
     public LevelManager(Game game) {
@@ -112,14 +111,13 @@ public class LevelManager {
         return lvlIndex;
     }
 
-    public Level getLevelByIndex(int lvlId) {
-        return levels.get(lvlId - 1);
-    }
-
     public void setLevelIndex(int lvlIndex) {
         this.lvlIndex = lvlIndex;
     }
 
+    public Level getLevelByIndex(int lvlId) {
+        return levels.get(lvlId - 1);
+    }
 
     public Game getGame() {
         return game;

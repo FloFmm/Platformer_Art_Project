@@ -1,15 +1,12 @@
 package main;
 
-import java.awt.Color;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 public class GameWindow {
-    private JFrame jframe;
+    private final JFrame jframe;
 
     public GameWindow(GamePanel gamePanel1, GamePanel gamePanel2) {
 

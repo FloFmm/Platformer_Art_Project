@@ -1,35 +1,24 @@
 package gamestates;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-
-import static utilz.Constants.ControllerConstants.*;
-import static utilz.Constants.UI.VolumeButtons.SLIDER_WIDTH;
-import static utilz.Constants.UI.VolumeButtons.VOLUME_HEIGHT;
-
-import org.lwjgl.glfw.GLFW;
-
-import audio.AudioPlayer;
 import main.Game;
-import ui.MenuButton;
-import ui.VolumeButton;
+import org.lwjgl.glfw.GLFW;
+import ui.MenuOverlay;
 import utilz.LoadSave;
 
-public class Menu extends State implements Statemethods {
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
-    private MenuButton[] buttons = new MenuButton[4];
+public class Menu extends State {
     private BufferedImage backgroundImg, backgroundImgPink, controllerOnlineImg, controllerOfflineImg;
     private int menuX, menuY, menuWidth, menuHeight;
-    private VolumeButton volumeButton;
-    private boolean useVolumeButton = false;
 
     public Menu(Game game) {
         super(game);
-        loadButtons();
+        ui = new MenuOverlay(game);
         loadImages();
     }
 
-    private void loadImages() {
+    public void loadImages() {
         backgroundImgPink = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND_IMG);
         backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.MENU_BACKGROUND);
         controllerOnlineImg = LoadSave.GetSpriteAtlas(LoadSave.CONTROLLER_ONLINE);
@@ -41,34 +30,10 @@ public class Menu extends State implements Statemethods {
         menuY = 0; //Game.GAME_HEIGHT / 2 - menuHeight / 2 - (int) ((1-heightFactor)/3*Game.GAME_HEIGHT);
     }
 
-    private void loadButtons() {
-        buttons[0] = new MenuButton(Game.GAME_WIDTH / 6, (int) (130 * Game.SCALE), 0, Gamestate.PLAYING, CONTROLLER_A_BUTTON_ID, game);
-        buttons[1] = new MenuButton(Game.GAME_WIDTH / 6, (int) (200 * Game.SCALE), 1, Gamestate.PLAYING, CONTROLLER_X_BUTTON_ID, game);
-        buttons[2] = new MenuButton(Game.GAME_WIDTH / 6, (int) (270 * Game.SCALE), 2, Gamestate.CREDITS, CONTROLLER_Y_BUTTON_ID, game);
-        buttons[3] = new MenuButton(Game.GAME_WIDTH / 6, (int) (340 * Game.SCALE), 3, Gamestate.MENU, CONTROLLER_B_BUTTON_ID, game);
-        if (useVolumeButton)
-            volumeButton = new VolumeButton((Game.GAME_WIDTH / 6 - SLIDER_WIDTH / 2), (int) (410 * Game.SCALE), SLIDER_WIDTH, VOLUME_HEIGHT, game);
-    }
-
-    @Override
     public void update() {
-        for (MenuButton mb : buttons) {
-            mb.update();
-            if (mb.getButtonState() == GLFW.GLFW_RELEASE && mb.getPrevButtonState() == GLFW.GLFW_PRESS) {
-                mb.applyGamestate();
-                if (mb.getState() == Gamestate.PLAYING) {
-                    int rowId = mb.getRowIndex();
-                    game.getPlaying().loadLevel(rowId, true);
-                    game.getAudioPlayer().playSong(AudioPlayer.WIND);
-                }
-                resetButtons();
-            }
-        }
-        if (useVolumeButton)
-            volumeButton.update();
+        ui.update();
     }
 
-    @Override
     public void draw(Graphics g, boolean isPlayer1) {
         int xDrawOffset = 0;
         if (!isPlayer1)
@@ -90,15 +55,6 @@ public class Menu extends State implements Statemethods {
             g.drawImage(controllerOfflineImg, (int) (Game.GAME_WIDTH * 0.9 + xDrawOffset),
                     (int) (Game.GAME_WIDTH * 0.01), (int) (Game.GAME_WIDTH * 0.1), (int) (Game.GAME_HEIGHT * 0.1), null);
 
-        for (MenuButton mb : buttons)
-            mb.draw(g, xDrawOffset);
-        if (useVolumeButton)
-            volumeButton.draw(g, xDrawOffset);
-    }
-
-    private void resetButtons() {
-        for (MenuButton mb : buttons)
-            mb.resetBools();
-
+        ui.draw(g, isPlayer1);
     }
 }

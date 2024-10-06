@@ -1,20 +1,13 @@
 package utilz;
 
-import java.awt.geom.Rectangle2D;
-//import java.util.Arrays;
-import java.awt.image.BufferedImage;
-import java.awt.Color;
-import java.awt.Graphics2D;
+import main.Game;
+
+import java.awt.*;
 import java.awt.geom.AffineTransform;
-import javax.imageio.ImageIO;
-
-import java.io.File;
-import java.io.IOException;
-
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.Set;
-
-import main.Game;
 
 public class HelpMethods {
 
@@ -93,9 +86,7 @@ public class HelpMethods {
 
         int triangleBaseX = triangleCoordinatesBaseLongShort[0][0];
         int triangleBaseY = triangleCoordinatesBaseLongShort[0][1];
-        if ((y <= triangleBaseY && y + height >= triangleBaseY) || (x <= triangleBaseX && x + width >= triangleBaseX))
-            return true;
-        return false;
+        return (y <= triangleBaseY && y + height >= triangleBaseY) || (x <= triangleBaseX && x + width >= triangleBaseX);
     }
 
     public static int[][] TriangleCoordinatesBaseLongShort(int xTile, int yTile, int[][] lvlData) {
@@ -441,8 +432,7 @@ public class HelpMethods {
 
     public static boolean IsEntityOnFloor(Rectangle2D.Float hitbox, int[][] lvlData) {
         if (!IsSolid(hitbox.x, hitbox.y + hitbox.height + 1, lvlData))
-            if (!IsSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, lvlData))
-                return false;
+            return IsSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, lvlData);
         return true;
     }
 
@@ -455,8 +445,7 @@ public class HelpMethods {
 
     public static boolean IsFloor(Rectangle2D.Float hitbox, int[][] lvlData) {
         if (!IsSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, lvlData))
-            if (!IsSolid(hitbox.x, hitbox.y + hitbox.height + 1, lvlData))
-                return false;
+            return IsSolid(hitbox.x, hitbox.y + hitbox.height + 1, lvlData);
         return true;
     }
 
@@ -660,9 +649,7 @@ public class HelpMethods {
         int[][] result = new int[rowsA][colsA];
 
         for (int i = 0; i < rowsA; i++) {
-            for (int j = 0; j < colsA; j++) {
-                result[i][j] = matrixA[i][j];
-            }
+            System.arraycopy(matrixA[i], 0, result[i], 0, colsA);
         }
         return result;
     }
