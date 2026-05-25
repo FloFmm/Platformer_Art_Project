@@ -26,7 +26,7 @@ You might have to rebind the buttons to the correct action (e.g. JUMP) in the co
 
 1. **Clone the repository (or download the zip file):**
 	```sh
-	git clone https://github.com/FloFmm/Platformer_Art_Project.git
+	git clone -b stable https://github.com/FloFmm/Platformer_Art_Project.git
 	```
 2. **Navigate to the project directory:**
 	```sh
